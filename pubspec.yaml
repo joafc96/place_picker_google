@@ -11,6 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  http: ^0.13.6
+  google_maps_flutter: ^2.5.3
+  geolocator: ^9.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
