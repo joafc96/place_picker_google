@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
@@ -26,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Google Place Picker Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        useMaterial3: false,
       ),
       home: const GooglePlacePickerExample(),
     );
@@ -46,8 +45,8 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: TextButton(
-          child: Text("Pick Delivery location"),
+        child: ElevatedButton(
+          child: const Text("Pick Delivery location"),
           onPressed: () {
             showPlacePicker();
           },
@@ -60,9 +59,10 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
     LocationResult? result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PlacePicker(
-          Platform.isAndroid
+        apiKey:   Platform.isAndroid
               ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
               : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+          showNearbyPlaces: true,
           displayLocation: const LatLng(
             29.378586,
             47.990341,
