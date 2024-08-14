@@ -82,6 +82,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     searchInputBorderRadius: const BorderRadius.all(
                       Radius.circular(12.0),
                     ),
+                    selectActionStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
                 // Container(height: 100, )

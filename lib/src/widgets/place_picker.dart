@@ -37,6 +37,10 @@ class PlacePicker extends StatefulWidget {
   final Widget? searchInputSuffixIcon;
   final TextStyle? searchInputHintStyle;
   final BorderRadiusGeometry? searchInputBorderRadius;
+  final TextStyle? nearbyPlaceItemStyle;
+  final TextStyle? selectLocationNameStyle;
+  final TextStyle? selectFormattedAddressStyle;
+  final TextStyle? selectActionStyle;
 
   const PlacePicker({
     super.key,
@@ -53,6 +57,10 @@ class PlacePicker extends StatefulWidget {
     this.searchInputSuffixIcon,
     this.searchInputHintStyle,
     this.searchInputBorderRadius,
+    this.nearbyPlaceItemStyle,
+    this.selectLocationNameStyle,
+    this.selectFormattedAddressStyle,
+    this.selectActionStyle,
   });
 
   @override
@@ -194,8 +202,10 @@ class PlacePickerState extends State<PlacePicker> {
                           widget?.onPlacePicked?.call(locationResult!);
                         }
                       : null,
-                  selectActionText:
-                      widget.localizationConfig.selectActionLocation,
+                  actionText: widget.localizationConfig.selectActionLocation,
+                  locationNameStyle: widget.selectLocationNameStyle,
+                  formattedAddressStyle: widget.selectFormattedAddressStyle,
+                  actionStyle: widget.selectActionStyle,
                 ),
               ),
 
@@ -205,6 +215,7 @@ class PlacePickerState extends State<PlacePicker> {
                 moveToLocation: moveToLocation,
                 nearbyPlaces: nearbyPlaces,
                 nearbyText: widget.localizationConfig.nearBy,
+                nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
               ),
           ],
         ),

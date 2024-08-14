@@ -4,11 +4,13 @@ import 'package:google_place_picker/src/entities/index.dart';
 class NearbyPlaceItem extends StatelessWidget {
   final NearbyPlace nearbyPlace;
   final VoidCallback onTap;
+  final TextStyle? nearbyPlaceStyle;
 
   const NearbyPlaceItem({
     super.key,
     required this.nearbyPlace,
     required this.onTap,
+    this.nearbyPlaceStyle,
   });
 
   @override
@@ -24,7 +26,7 @@ class NearbyPlaceItem extends StatelessWidget {
             Expanded(
               child: Text(
                 "${nearbyPlace.name}",
-                style: TextStyle(fontSize: 16),
+                style: nearbyPlaceStyle ?? const TextStyle(fontSize: 16),
               ),
             )
           ],

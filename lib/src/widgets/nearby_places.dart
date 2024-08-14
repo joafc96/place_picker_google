@@ -8,18 +8,20 @@ class NearbyPlaces extends StatelessWidget {
   final List<NearbyPlace> nearbyPlaces;
   final Function(LatLng)? moveToLocation;
   final String? nearbyText;
+  final TextStyle? nearbyPlaceItemStyle;
 
   const NearbyPlaces({
     super.key,
     required this.nearbyPlaces,
     required this.nearbyText,
     this.moveToLocation,
+    this.nearbyPlaceItemStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
+      color: Theme.of(context).canvasColor,
       height: MediaQuery.sizeOf(context).height / 3.5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,6 +50,7 @@ class NearbyPlaces extends StatelessWidget {
                           moveToLocation?.call(it.latLng!);
                         }
                       },
+                      nearbyPlaceStyle: nearbyPlaceItemStyle,
                     ),
                   )
                   .toList(),
