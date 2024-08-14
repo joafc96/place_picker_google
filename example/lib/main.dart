@@ -73,7 +73,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                       Navigator.of(context).pop();
                     },
                     showNearbyPlaces: false,
-                    showSearchInput: false,
+                    showSearchInput: true,
                     initialLocation: const LatLng(
                       29.378586,
                       47.990341,
