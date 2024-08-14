@@ -4,7 +4,7 @@ class LocalizationConfig {
   final String findingPlace;
   final String noResultsFound;
   final String unnamedLocation;
-  final String? tapToSelectLocation;
+  final String? selectActionLocation;
 
   const LocalizationConfig({
     required this.languageCode,
@@ -12,7 +12,7 @@ class LocalizationConfig {
     required this.findingPlace,
     required this.noResultsFound,
     required this.unnamedLocation,
-    this.tapToSelectLocation,
+    this.selectActionLocation,
   });
 
   const LocalizationConfig.init({
@@ -21,6 +21,6 @@ class LocalizationConfig {
     this.findingPlace = 'Finding place...',
     this.noResultsFound = 'No results found',
     this.unnamedLocation = 'Unnamed location',
-    this.tapToSelectLocation = 'Tap to select this location',
+    this.selectActionLocation = 'Confirm Location',
   });
 }
