@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +12,12 @@ import 'package:uuid/uuid.dart';
 
 import 'dart:io' show Platform;
 
-/// Place picker widget made with map widget from
+/// Google place picker widget made with map widget from
 /// [google_maps_flutter](https://github.com/flutter/plugins/tree/master/packages/google_maps_flutter)
 /// and other API calls to [Google Places API](https://developers.google.com/places/web-service/intro)
 ///
-/// API key provided should have `Maps SDK for Android`, `Maps SDK for iOS`
-/// and `Places API`  enabled for it
+/// API key provided should have `Maps SDK for Android`,
+/// `Maps SDK for iOS` and `Places API`  enabled for it
 class PlacePicker extends StatefulWidget {
   /// API key generated from Google Cloud Console. You can get an API key
   /// [here](https://cloud.google.com/maps-platform/)
@@ -33,17 +32,27 @@ class PlacePicker extends StatefulWidget {
   final Color appBarBackgroundColor;
   final bool showSearchInput;
   final EdgeInsetsGeometry? searchInputPadding;
+  final ValueChanged<LocationResult>? onPlacePicked;
+  final Widget? searchInputPrefixIcon;
+  final Widget? searchInputSuffixIcon;
+  final TextStyle? searchInputHintStyle;
+  final BorderRadiusGeometry? searchInputBorderRadius;
 
   const PlacePicker({
     super.key,
     required this.apiKey,
     this.initialLocation,
+    this.onPlacePicked,
     this.localizationConfig = const LocalizationConfig.init(),
     this.showNearbyPlaces = true,
     this.defaultLocation = const LatLng(10.5381264, 73.8827201),
     this.appBarBackgroundColor = Colors.transparent,
     this.showSearchInput = true,
     this.searchInputPadding,
+    this.searchInputPrefixIcon,
+    this.searchInputSuffixIcon,
+    this.searchInputHintStyle,
+    this.searchInputBorderRadius,
   });
 
   @override
@@ -102,7 +111,6 @@ class PlacePickerState extends State<PlacePicker> {
             _currentLocation = value;
           });
         } else {
-          //Navigator.of(context).pop(null);
           print("getting current location null");
         }
         setState(() {
@@ -110,7 +118,7 @@ class PlacePickerState extends State<PlacePicker> {
         });
       }).catchError((e) {
         if (e is LocationServiceDisabledException) {
-          Navigator.of(context).pop(null);
+          Navigator.of(context).pop();
         } else {
           setState(() {
             _loadMap = true;
@@ -173,7 +181,7 @@ class PlacePickerState extends State<PlacePicker> {
                     ),
             ),
 
-            /// Search Input
+            /// Select Place Action
             if (!hasSearchTerm)
               SafeArea(
                 top: false,
@@ -183,7 +191,7 @@ class PlacePickerState extends State<PlacePicker> {
                   formattedAddress: getFormattedLocationName(),
                   onTap: locationResult != null
                       ? () {
-                          Navigator.of(context).pop(locationResult);
+                          widget?.onPlacePicked?.call(locationResult!);
                         }
                       : null,
                   selectActionText:
@@ -211,6 +219,11 @@ class PlacePickerState extends State<PlacePicker> {
                 child: SearchInput(
                   key: searchInputKey,
                   onSearchInput: searchPlace,
+                  prefixIcon: widget.searchInputPrefixIcon,
+                  suffixIcon: widget.searchInputSuffixIcon,
+                  hintText: widget.localizationConfig.searchHint,
+                  hintStyle: widget.searchInputHintStyle,
+                  borderRadius: widget.searchInputBorderRadius,
                 ),
               ),
             ),
@@ -451,14 +464,6 @@ class PlacePickerState extends State<PlacePicker> {
     if (locationResult == null) {
       return widget.localizationConfig.unnamedLocation;
     }
-
-    // for (NearbyPlace np in nearbyPlaces) {
-    //   if (np.latLng == locationResult?.latLng &&
-    //       np.name != locationResult?.locality) {
-    //     locationResult?.name = np.name;
-    //     return "${np.name}, ${locationResult?.locality}";
-    //   }
-    // }
 
     return "${locationResult?.formattedAddress}";
   }

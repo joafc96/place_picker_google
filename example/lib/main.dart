@@ -54,8 +54,8 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
     );
   }
 
-  void showPlacePicker() async {
-    LocationResult? result = await Navigator.of(context).push(
+  void showPlacePicker() {
+    Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (context) {
@@ -68,13 +68,20 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     apiKey: Platform.isAndroid
                         ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
                         : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
-                    showNearbyPlaces: true,
+                    onPlacePicked: (LocationResult result) {
+                      debugPrint("Place picked: ${result.formattedAddress}");
+                      Navigator.of(context).pop();
+                    },
+                    showNearbyPlaces: false,
                     initialLocation: const LatLng(
                       29.378586,
                       47.990341,
                     ),
                     searchInputPadding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    searchInputBorderRadius: const BorderRadius.all(
+                      Radius.circular(12.0),
+                    ),
                   ),
                 ),
                 // Container(height: 100, )
@@ -84,8 +91,5 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         },
       ),
     );
-
-    // Handle the result in your way
-    print(result);
   }
 }

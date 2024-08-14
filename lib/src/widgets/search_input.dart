@@ -4,21 +4,30 @@ import 'package:flutter/material.dart';
 
 /// Custom Search input field, showing the search and clear icons.
 class SearchInput extends StatefulWidget {
+  /// Value changed callback for search input field
   final ValueChanged<String> onSearchInput;
-  final BorderRadiusGeometry searchInputBorderRadius;
+
+  /// Border radius geometry for search input field
+  final BorderRadiusGeometry? borderRadius;
+
+  /// Optional prefix and suffix icons for input field
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final String hintText;
+
+  /// Hint text string for input field
+  final String? hintText;
+
+  /// Text style for hint text for input field
+  final TextStyle? hintStyle;
 
   const SearchInput({
     super.key,
     required this.onSearchInput,
-    this.searchInputBorderRadius = const BorderRadius.all(
-      Radius.circular(6.0),
-    ),
+    this.borderRadius,
     this.prefixIcon,
     this.suffixIcon,
-    this.hintText = "Search place...",
+    this.hintText,
+    this.hintStyle,
   });
 
   @override
@@ -66,7 +75,7 @@ class SearchInputState extends State<SearchInput> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: widget.searchInputBorderRadius,
+        borderRadius: widget.borderRadius,
         color: Theme.of(context).canvasColor,
       ),
       child: TextFormField(
@@ -88,6 +97,7 @@ class SearchInputState extends State<SearchInput> {
                 )
               : null,
           hintText: widget.hintText,
+          hintStyle: widget.hintStyle,
           border: InputBorder.none,
         ),
         controller: editController,
