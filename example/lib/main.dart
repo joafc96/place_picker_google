@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: 'Google Place Picker Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: false,
+        useMaterial3: true,
       ),
       home: const GooglePlacePickerExample(),
     );
@@ -68,7 +68,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     apiKey: Platform.isAndroid
                         ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
                         : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
-                    showNearbyPlaces: false,
+                    showNearbyPlaces: true,
                     initialLocation: const LatLng(
                       29.378586,
                       47.990341,

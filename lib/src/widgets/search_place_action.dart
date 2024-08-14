@@ -1,10 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SelectPlaceAction extends StatelessWidget {
+  /// Name of the selected place
   final String locationName;
+
+  /// Formatted address of the selected place
   final String? formattedAddress;
+
+  /// Text that has to be shown on the select action button
   final String? selectActionText;
+
+  /// Optional void call back of the button
   final VoidCallback? onTap;
+
   final TextStyle? locationNameTextStyle;
   final TextStyle? tapToSelectActionTextStyle;
   final TextStyle? formattedAddressTextStyle;
@@ -23,6 +32,7 @@ class SelectPlaceAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Theme.of(context).cardColor,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -30,9 +40,6 @@ class SelectPlaceAction extends StatelessWidget {
           Text(
             locationName,
             style: locationNameTextStyle ?? const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(
-            height: 4.0,
           ),
           if (formattedAddress != null)
             Text(
@@ -43,11 +50,13 @@ class SelectPlaceAction extends StatelessWidget {
                     fontSize: 14,
                   ),
             ),
-          const SizedBox(
-            height: 4.0,
-          ),
           if (selectActionText != null)
-            ElevatedButton(
+            const SizedBox(
+              height: 12.0,
+            ),
+          if (selectActionText != null)
+            CupertinoButton(
+              color: Theme.of(context).primaryColor,
               onPressed: onTap,
               child: Text(
                 selectActionText!,
