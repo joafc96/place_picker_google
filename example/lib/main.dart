@@ -1,4 +1,4 @@
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:google_place_picker/google_place_picker.dart';
@@ -58,17 +58,30 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   void showPlacePicker() async {
     LocationResult? result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PlacePicker(
-        apiKey:   Platform.isAndroid
-              ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-              : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
-          showNearbyPlaces: true,
-          displayLocation: const LatLng(
-            29.378586,
-            47.990341,
-          ),
-        ),
-      ),
+          fullscreenDialog: true,
+          builder: (context) {
+            return Scaffold(
+              // appBar: AppBar(),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: PlacePicker(
+                      apiKey: Platform.isAndroid
+                          ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
+                          : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+                      showNearbyPlaces: false,
+                      extendBodyBehindAppBar: false,
+                      displayLocation: const LatLng(
+                        29.378586,
+                        47.990341,
+                      ),
+                    ),
+                  ),
+                  // Container(height: 100, )
+                ],
+              ),
+            );
+          }),
     );
 
     // Handle the result in your way

@@ -31,14 +31,18 @@ class PlacePicker extends StatefulWidget {
   final bool showNearbyPlaces;
   final LocalizationConfig localizationItem;
   final LatLng defaultLocation;
+  final bool extendBodyBehindAppBar;
+  final Color appBarBackgroundColor;
 
-  PlacePicker({
+  const PlacePicker({
     super.key,
     required this.apiKey,
     this.displayLocation,
     this.localizationItem = const LocalizationConfig.init(),
     this.showNearbyPlaces = true,
     this.defaultLocation = const LatLng(10.5381264, 73.8827201),
+    this.extendBodyBehindAppBar = false,
+    this.appBarBackgroundColor = Colors.transparent,
   });
 
   @override
@@ -130,100 +134,107 @@ class PlacePickerState extends State<PlacePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        if (Platform.isAndroid) {
-          locationResult = null;
-          // _delayedPop();
-          return Future.value(false);
-        } else {
-          return Future.value(true);
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          key: appBarKey,
-          title: SearchInput(searchPlace),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-        ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: !_loadMap
-                  ? Center(
-                      child: Platform.isAndroid
-                          ? const CircularProgressIndicator()
-                          : const CupertinoActivityIndicator(),
-                    )
-                  : GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: widget.displayLocation ??
-                            _currentLocation ??
-                            widget.defaultLocation,
-                        zoom: _currentLocation == null &&
-                                widget.displayLocation == null
-                            ? 5
-                            : 15,
+    return Scaffold(
+      extendBodyBehindAppBar: widget.extendBodyBehindAppBar,
+      // appBar: AppBar(
+      //   key: appBarKey,
+      //   title: SearchInput(onSearchInput: searchPlace),
+      //   centerTitle: true,
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: widget.appBarBackgroundColor,
+      // ),
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              Expanded(
+                child: !_loadMap
+                    ? Center(
+                        child: Platform.isAndroid
+                            ? const CircularProgressIndicator()
+                            : const CupertinoActivityIndicator(),
+                      )
+                    : GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: widget.displayLocation ??
+                              _currentLocation ??
+                              widget.defaultLocation,
+                          zoom: _currentLocation == null &&
+                                  widget.displayLocation == null
+                              ? 5
+                              : 15,
+                        ),
+                        minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
+                        myLocationButtonEnabled: false,
+                        myLocationEnabled: false,
+                        mapToolbarEnabled: false,
+                        onMapCreated: onMapCreated,
+                        onTap: (latLng) {
+                          clearOverlay();
+                          moveToLocation(latLng);
+                        },
+                        markers: markers,
                       ),
-                      minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
-                      myLocationButtonEnabled: false,
-                      myLocationEnabled: false,
-                      mapToolbarEnabled: false,
-                      onMapCreated: onMapCreated,
-                      onTap: (latLng) {
-                        clearOverlay();
-                        moveToLocation(latLng);
-                      },
-                      markers: markers,
-                    ),
-            ),
-            if (!hasSearchTerm)
-              SelectPlaceAction(
-                locationName: getLocationName(),
-                onTap: () {
-                  Navigator.of(context).pop(locationResult);
-                },
-                tapToSelectActionText:
-                    widget.localizationItem.tapToSelectLocation,
               ),
-            if (!hasSearchTerm && widget.showNearbyPlaces)
-              SizedBox(
-                height: MediaQuery.sizeOf(context).height / 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Divider(),
-                    if (widget.localizationItem.nearBy != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 8),
-                        child: Text(
-                          widget.localizationItem.nearBy!,
-                          style: TextStyle(fontSize: 16),
+              if (!hasSearchTerm)
+                SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  bottom: !widget.showNearbyPlaces,
+                  child: SelectPlaceAction(
+                    locationName: getLocationName(),
+                    onTap: () {
+                      Navigator.of(context).pop(locationResult);
+                    },
+                    tapToSelectActionText:
+                        widget.localizationItem.tapToSelectLocation,
+                  ),
+                ),
+              if (!hasSearchTerm && widget.showNearbyPlaces)
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height / 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Divider(),
+                      if (widget.localizationItem.nearBy != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 8),
+                          child: Text(
+                            widget.localizationItem.nearBy!,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      Expanded(
+                        child: ListView(
+                          children: nearbyPlaces
+                              .map(
+                                (it) => NearbyPlaceItem(
+                                  nearbyPlace: it,
+                                  onTap: () {
+                                    if (it.latLng != null) {
+                                      moveToLocation(it.latLng!);
+                                    }
+                                  },
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
-                    Expanded(
-                      child: ListView(
-                        children: nearbyPlaces
-                            .map(
-                              (it) => NearbyPlaceItem(
-                                nearbyPlace: it,
-                                onTap: () {
-                                  if (it.latLng != null) {
-                                    moveToLocation(it.latLng!);
-                                  }
-                                },
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
+          SafeArea(
+            child: SearchInput(
+              key: appBarKey,
+              onSearchInput: searchPlace,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,27 +284,29 @@ class PlacePickerState extends State<PlacePicker> {
       builder: (context) => Positioned(
         top: appBarBox?.size.height,
         width: size?.width,
-        child: Material(
-          elevation: 1,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            child: Row(
-              children: <Widget>[
-                SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: Platform.isAndroid
-                      ? const CircularProgressIndicator()
-                      : const CupertinoActivityIndicator(),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: Text(
-                    widget.localizationItem!.findingPlace,
-                    style: const TextStyle(fontSize: 16),
+        child: SafeArea(
+          child: Material(
+            elevation: 1,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: Platform.isAndroid
+                        ? const CircularProgressIndicator()
+                        : const CupertinoActivityIndicator(),
                   ),
-                )
-              ],
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Text(
+                      widget.localizationItem!.findingPlace,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -408,16 +421,17 @@ class PlacePickerState extends State<PlacePicker> {
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        width: size?.width,
-        top: appBarBox?.size.height,
-        child: Material(
-          elevation: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: suggestions,
-          ),
-        ),
-      ),
+          width: size?.width,
+          top: appBarBox?.size.height,
+          child: SafeArea(
+            child: Material(
+              elevation: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: suggestions,
+              ),
+            ),
+          )),
     );
 
     Overlay.of(context).insert(overlayEntry!);
