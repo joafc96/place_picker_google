@@ -19,6 +19,8 @@ import 'dart:io' show Platform;
 /// API key provided should have `Maps SDK for Android`,
 /// `Maps SDK for iOS` and `Places API`  enabled for it
 class PlacePicker extends StatefulWidget {
+  static const LatLng defaultLocation = LatLng(37.4221, -122.0853);
+
   /// API key generated from Google Cloud Console. You can get an API key
   /// [here](https://cloud.google.com/maps-platform/)
   final String apiKey;
@@ -26,9 +28,12 @@ class PlacePicker extends StatefulWidget {
   /// Location to be displayed when screen is showed. If this is set or not null, the
   /// map does not pan to the user's current location.
   final LatLng? initialLocation;
+
+  /// Map minimum zoom level & maximum zoom level
+  final MinMaxZoomPreference minMaxZoomPreference;
+
   final bool showNearbyPlaces;
   final LocalizationConfig localizationConfig;
-  final LatLng defaultLocation;
   final Color appBarBackgroundColor;
   final bool showSearchInput;
   final EdgeInsetsGeometry? searchInputPadding;
@@ -38,6 +43,7 @@ class PlacePicker extends StatefulWidget {
   final TextStyle? searchInputHintStyle;
   final BorderRadiusGeometry? searchInputBorderRadius;
   final TextStyle? nearbyPlaceItemStyle;
+  final TextStyle? nearbyPlaceStyle;
   final TextStyle? selectLocationNameStyle;
   final TextStyle? selectFormattedAddressStyle;
   final TextStyle? selectActionStyle;
@@ -46,10 +52,10 @@ class PlacePicker extends StatefulWidget {
     super.key,
     required this.apiKey,
     this.initialLocation,
+    this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16),
     this.onPlacePicked,
     this.localizationConfig = const LocalizationConfig.init(),
     this.showNearbyPlaces = true,
-    this.defaultLocation = const LatLng(10.5381264, 73.8827201),
     this.appBarBackgroundColor = Colors.transparent,
     this.showSearchInput = true,
     this.searchInputPadding,
@@ -58,6 +64,7 @@ class PlacePicker extends StatefulWidget {
     this.searchInputHintStyle,
     this.searchInputBorderRadius,
     this.nearbyPlaceItemStyle,
+    this.nearbyPlaceStyle,
     this.selectLocationNameStyle,
     this.selectFormattedAddressStyle,
     this.selectActionStyle,
@@ -70,8 +77,12 @@ class PlacePicker extends StatefulWidget {
 /// Place picker state
 class PlacePickerState extends State<PlacePicker> {
   final Completer<GoogleMapController> mapController = Completer();
+
+  /// Current location of the marker
   LatLng? _currentLocation;
-  bool _loadMap = false;
+
+  /// Flag to toggle whether map can be shown or not
+  bool _canLoadMap = false;
 
   /// Indicator for the selected location
   final Set<Marker> markers = {};
@@ -82,6 +93,7 @@ class PlacePickerState extends State<PlacePicker> {
   /// Overlay to display autocomplete suggestions
   OverlayEntry? overlayEntry;
 
+  /// List to populate nearby places from places api
   List<NearbyPlace> nearbyPlaces = [];
 
   /// Session token required for autocomplete API call
@@ -112,28 +124,29 @@ class PlacePickerState extends State<PlacePicker> {
   @override
   void initState() {
     super.initState();
+    _initializeMarkers();
+  }
+
+  void _initializeMarkers() async {
     if (widget.initialLocation == null) {
-      _getCurrentLocation().then((value) {
-        if (value != null) {
-          setState(() {
-            _currentLocation = value;
-          });
-        } else {
-          print("getting current location null");
-        }
+      try {
+        final LatLng position = await _getCurrentLocation();
         setState(() {
-          _loadMap = true;
+          _currentLocation = position;
         });
-      }).catchError((e) {
+        setState(() {
+          _canLoadMap = true;
+        });
+      } catch (e) {
         if (e is LocationServiceDisabledException) {
-          Navigator.of(context).pop();
+          if (mounted) Navigator.of(context).pop();
         } else {
           setState(() {
-            _loadMap = true;
+            _canLoadMap = true;
           });
         }
-        print(e);
-      });
+        debugPrint(e.toString());
+      }
     } else {
       setState(() {
         markers.add(
@@ -142,7 +155,7 @@ class PlacePickerState extends State<PlacePicker> {
             markerId: const MarkerId("selected-location"),
           ),
         );
-        _loadMap = true;
+        _canLoadMap = true;
       });
     }
   }
@@ -160,7 +173,7 @@ class PlacePickerState extends State<PlacePicker> {
         Column(
           children: <Widget>[
             Expanded(
-              child: !_loadMap
+              child: !_canLoadMap
                   ? Center(
                       child: Platform.isAndroid
                           ? const CircularProgressIndicator()
@@ -170,13 +183,13 @@ class PlacePickerState extends State<PlacePicker> {
                       initialCameraPosition: CameraPosition(
                         target: widget.initialLocation ??
                             _currentLocation ??
-                            widget.defaultLocation,
+                            PlacePicker.defaultLocation,
                         zoom: _currentLocation == null &&
                                 widget.initialLocation == null
                             ? 5
                             : 15,
                       ),
-                      minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
+                      minMaxZoomPreference: widget.minMaxZoomPreference,
                       myLocationButtonEnabled: false,
                       myLocationEnabled: false,
                       mapToolbarEnabled: false,
@@ -214,7 +227,8 @@ class PlacePickerState extends State<PlacePicker> {
               NearbyPlaces(
                 moveToLocation: moveToLocation,
                 nearbyPlaces: nearbyPlaces,
-                nearbyText: widget.localizationConfig.nearBy,
+                nearbyPlaceText: widget.localizationConfig.nearBy,
+                nearbyPlaceStyle: widget.nearbyPlaceStyle,
                 nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
               ),
           ],
@@ -414,7 +428,7 @@ class PlacePickerState extends State<PlacePicker> {
 
       displayAutoCompleteSuggestions(suggestions);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -445,7 +459,7 @@ class PlacePickerState extends State<PlacePicker> {
         await moveToLocation(LatLng(location['lat'], location['lng']));
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -481,7 +495,6 @@ class PlacePickerState extends State<PlacePicker> {
 
   /// Moves the marker to the indicated lat,lng
   void setMarker(LatLng latLng) {
-    // markers.clear();
     setState(() {
       markers.clear();
       markers.add(
@@ -525,9 +538,9 @@ class PlacePickerState extends State<PlacePicker> {
         nearbyPlaces.add(nearbyPlace);
       }
 
-      // to update the nearby places
+      /// to update the nearby places
       setState(() {
-        // this is to require the result to show
+        /// this is to require the result to show
         hasSearchTerm = false;
       });
     } catch (e) {
@@ -580,13 +593,14 @@ class PlacePickerState extends State<PlacePicker> {
               continue;
             }
             if (i == 0) {
-              // [street_number]
+              /// [street_number]
               name = shortName;
               isOnStreet = types.contains('street_number');
-              // other index 0 types
-              // [establishment, point_of_interest, subway_station, transit_station]
-              // [premise]
-              // [route]
+
+              /// other index 0 types
+              /// [establishment, point_of_interest, subway_station, transit_station]
+              /// [premise]
+              /// [route]
             } else if (i == 1 && isOnStreet) {
               if (types.contains('route')) {
                 name += ", $shortName";
@@ -633,7 +647,7 @@ class PlacePickerState extends State<PlacePicker> {
               longName: subLocalityLevel2, shortName: subLocalityLevel2);
       });
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -661,27 +675,26 @@ class PlacePickerState extends State<PlacePicker> {
   void moveToCurrentUserLocation() async {
     if (widget.initialLocation != null) {
       moveToLocation(widget.initialLocation!);
-      return;
-    }
-    if (_currentLocation != null) {
+    } else if (_currentLocation != null) {
       moveToLocation(_currentLocation!);
     } else {
-      moveToLocation(widget.defaultLocation);
+      moveToLocation(PlacePicker.defaultLocation);
     }
   }
 
   Future<LatLng> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
-    // Test if location services are enabled.
+
+    /// Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      bool? isOk = await _showLocationDisabledAlertDialog(context);
+      /// Location services are not enabled don't continue
+      /// accessing the position and request users of the
+      /// App to enable the location services.
+      final bool? isOk = await _showLocationDisabledAlertDialog(context);
       if (isOk ?? false) {
-        return Future.error(LocationServiceDisabledException());
+        return Future.error(const LocationServiceDisabledException());
       } else {
         return Future.error('Location Services is not enabled');
       }
@@ -690,33 +703,33 @@ class PlacePickerState extends State<PlacePicker> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
+        /// Permissions are denied, next time you could try
+        /// requesting permissions again (this is also where
+        /// Android's shouldShowRequestPermissionRationale
+        /// returned true. According to Android guidelines
+        /// your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      //return widget.defaultLocation;
+      /// Permissions are denied forever, handle appropriately.
+      /// return widget.defaultLocation;
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     try {
       final locationData = await Geolocator.getCurrentPosition(
-          timeLimit: const Duration(seconds: 30));
+        timeLimit: const Duration(seconds: 30),
+      );
       LatLng target = LatLng(locationData.latitude, locationData.longitude);
-      //moveToLocation(target);
-      print('target:$target');
+      debugPrint('target:$target');
       return target;
     } on TimeoutException catch (_) {
       final locationData = await Geolocator.getLastKnownPosition();
       if (locationData != null) {
         return LatLng(locationData.latitude, locationData.longitude);
       } else {
-        return widget.defaultLocation;
+        return PlacePicker.defaultLocation;
       }
     }
   }
@@ -765,6 +778,7 @@ class PlacePickerState extends State<PlacePicker> {
                   child: Text("OK"),
                   onPressed: () async {
                     await Geolocator.openLocationSettings();
+
                     Navigator.of(context).pop(true);
                   },
                 ),

@@ -7,14 +7,19 @@ import 'package:google_place_picker/src/entities/index.dart';
 class NearbyPlaces extends StatelessWidget {
   final List<NearbyPlace> nearbyPlaces;
   final Function(LatLng)? moveToLocation;
-  final String? nearbyText;
+
+  /// Text to display nearby place
+  final String? nearbyPlaceText;
+
   final TextStyle? nearbyPlaceItemStyle;
+  final TextStyle? nearbyPlaceStyle;
 
   const NearbyPlaces({
     super.key,
     required this.nearbyPlaces,
-    required this.nearbyText,
+    required this.nearbyPlaceText,
     this.moveToLocation,
+    this.nearbyPlaceStyle,
     this.nearbyPlaceItemStyle,
   });
 
@@ -27,15 +32,15 @@ class NearbyPlaces extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Divider(),
-          if (nearbyText != null)
+          if (nearbyPlaceText != null)
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24,
                 vertical: 8,
               ),
               child: Text(
-                nearbyText!,
-                style: TextStyle(fontSize: 16),
+                nearbyPlaceText!,
+                style: nearbyPlaceStyle ?? const TextStyle(fontSize: 16),
               ),
             ),
           Expanded(

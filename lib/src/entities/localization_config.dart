@@ -23,7 +23,7 @@ class LocalizationConfig {
     this.findingPlace = 'Finding place...',
     this.noResultsFound = 'No results found',
     this.unnamedLocation = 'Unnamed location',
-    this.searchHint = "Search Place...",
+    this.searchHint = "Search for a building, street or ...",
     this.selectActionLocation = 'Confirm Location',
   });
 }

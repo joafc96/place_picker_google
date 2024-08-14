@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: 'Google Place Picker Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        useMaterial3: false,
       ),
       home: const GooglePlacePickerExample(),
     );
@@ -73,6 +73,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                       Navigator.of(context).pop();
                     },
                     showNearbyPlaces: false,
+                    showSearchInput: false,
                     initialLocation: const LatLng(
                       29.378586,
                       47.990341,
@@ -82,7 +83,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     searchInputBorderRadius: const BorderRadius.all(
                       Radius.circular(12.0),
                     ),
-                    selectActionStyle: TextStyle(fontWeight: FontWeight.bold),
+                    selectActionStyle: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
                 // Container(height: 100, )

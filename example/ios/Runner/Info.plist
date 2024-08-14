@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Need current location access for food delivery</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need current location access for food delivery</string>
 </dict>
 </plist>
