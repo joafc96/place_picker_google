@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: false,
+        useMaterial3: true,
       ),
       home: const GooglePlacePickerExample(),
     );
@@ -58,10 +58,13 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   void showPlacePicker() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        fullscreenDialog: true,
+        // fullscreenDialog: true,
         builder: (context) {
           return Scaffold(
-            // appBar: AppBar(),
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+            ),
             body: Column(
               children: [
                 Expanded(
@@ -79,11 +82,14 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                       29.378586,
                       47.990341,
                     ),
-                    searchInputPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    searchInputBorderRadius: const BorderRadius.all(
-                      Radius.circular(12.0),
+                    searchInputPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
+                    // searchInputBorderRadius: const BorderRadius.all(
+                    //   Radius.circular(12.0),
+                    // ),
+
                   ),
                 ),
                 // Container(height: 100, )

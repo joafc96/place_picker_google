@@ -507,7 +507,7 @@ class PlacePickerState extends State<PlacePicker>
 
     for (NearbyPlace np in nearbyPlaces) {
       if (np.latLng == locationResult?.latLng &&
-          np.name != locationResult?.locality) {
+          np.name != locationResult?.locality?.shortName) {
         locationResult?.name = np.name;
         return "${np.name}, ${locationResult?.locality}";
       }
@@ -603,79 +603,123 @@ class PlacePickerState extends State<PlacePicker>
 
       final result = responseJson['results'][0];
 
-      setState(() {
-        String name = "";
-        String? locality,
-            postalCode,
-            country,
-            administrativeAreaLevel1,
-            administrativeAreaLevel2,
-            city,
-            subLocalityLevel1,
-            subLocalityLevel2;
-        bool isOnStreet = false;
-        if (result['address_components'] is List<dynamic> &&
-            result['address_components'].length != null &&
-            result['address_components'].length > 0) {
-          for (var i = 0; i < result['address_components'].length; i++) {
-            var tmp = result['address_components'][i];
-            var types = tmp["types"] as List<dynamic>;
-            var shortName = tmp['short_name'];
-            if (i == 0) {
-              /// [street_number]
-              name = shortName;
-              isOnStreet = types.contains('street_number');
+      setState(
+        () {
+          String name = "";
+          String? localityShortName,
+              postalCodeShortName,
+              plusCodeShortName,
+              countryShortName,
+              administrativeAreaLevel1ShortName,
+              administrativeAreaLevel2ShortName,
+              subLocalityLevel1ShortName,
+              subLocalityLevel2ShortName;
 
-              /// other index 0 types
-              /// [establishment, point_of_interest, subway_station, transit_station]
-              /// [premise]
-              /// [route]
-            } else if (i == 1 && isOnStreet) {
-              if (types.contains('route')) {
-                name += ", $shortName";
-              }
-            } else {
-              if (types.contains("sublocality_level_1")) {
-                subLocalityLevel1 = shortName;
-              } else if (types.contains("sublocality_level_2")) {
-                subLocalityLevel2 = shortName;
-              } else if (types.contains("locality")) {
-                locality = shortName;
-              } else if (types.contains("administrative_area_level_2")) {
-                administrativeAreaLevel2 = shortName;
-              } else if (types.contains("administrative_area_level_1")) {
-                administrativeAreaLevel1 = shortName;
-              } else if (types.contains("country")) {
-                country = shortName;
-              } else if (types.contains('postal_code')) {
-                postalCode = shortName;
+          String? localityLongName,
+              postalCodeLongName,
+              plusCodeLongName,
+              countryLongName,
+              administrativeAreaLevel1LongName,
+              administrativeAreaLevel2LongName,
+              subLocalityLevel1LongName,
+              subLocalityLevel2LongName;
+          bool isOnStreet = false;
+          if (result['address_components'] is List<dynamic> &&
+              result['address_components'].length != null &&
+              result['address_components'].length > 0) {
+            for (var i = 0; i < result['address_components'].length; i++) {
+              var tmp = result['address_components'][i];
+              var types = tmp["types"] as List<dynamic>;
+
+              /// `short` and `long` names from google api
+              var shortName = tmp['short_name'];
+              var longName = tmp['long_name'];
+
+              if (i == 0) {
+                /// [street_number]
+                name = shortName;
+                isOnStreet = types.contains('street_number');
+
+                /// other index 0 types
+                /// [establishment, point_of_interest, subway_station, transit_station]
+                /// [premise]
+                /// [route]
+              } else if (i == 1 && isOnStreet) {
+                if (types.contains('route')) {
+                  name += ", $shortName";
+                }
+              } else {
+                if (types.contains("country")) {
+                  countryLongName = longName;
+                  countryShortName = shortName;
+                } else if (types.contains("locality")) {
+                  localityLongName = longName;
+                  localityShortName = shortName;
+                } else if (types.contains("sublocality_level_1")) {
+                  subLocalityLevel1LongName = longName;
+                  subLocalityLevel1ShortName = shortName;
+                } else if (types.contains("sublocality_level_2")) {
+                  subLocalityLevel2LongName = longName;
+                  subLocalityLevel2ShortName = shortName;
+                } else if (types.contains("administrative_area_level_1")) {
+                  administrativeAreaLevel1LongName = longName;
+                  administrativeAreaLevel1ShortName = shortName;
+                } else if (types.contains("administrative_area_level_2")) {
+                  administrativeAreaLevel2LongName = longName;
+                  administrativeAreaLevel2ShortName = shortName;
+                } else if (types.contains('postal_code')) {
+                  postalCodeLongName = longName;
+                  postalCodeShortName = shortName;
+                } else if (types.contains('plus_code')) {
+                  plusCodeLongName = longName;
+                  plusCodeShortName = shortName;
+                }
               }
             }
           }
-        }
-        locality = locality ?? administrativeAreaLevel1;
-        city = locality;
-        locationResult = LocationResult()
-          ..name = name
-          ..locality = locality
-          ..latLng = latLng
-          ..formattedAddress = result['formatted_address']
-          ..placeId = result['place_id']
-          ..postalCode = postalCode
-          ..country = AddressComponent(longName: country, shortName: country)
-          ..administrativeAreaLevel1 = AddressComponent(
-              longName: administrativeAreaLevel1,
-              shortName: administrativeAreaLevel1)
-          ..administrativeAreaLevel2 = AddressComponent(
-              longName: administrativeAreaLevel2,
-              shortName: administrativeAreaLevel2)
-          ..city = AddressComponent(longName: city, shortName: city)
-          ..subLocalityLevel1 = AddressComponent(
-              longName: subLocalityLevel1, shortName: subLocalityLevel1)
-          ..subLocalityLevel2 = AddressComponent(
-              longName: subLocalityLevel2, shortName: subLocalityLevel2);
-      });
 
+          locationResult = LocationResult()
+            ..name = name
+            ..latLng = latLng
+            ..formattedAddress = result['formatted_address']
+            ..placeId = result['place_id']
+            ..country = AddressComponent(
+              longName: countryLongName,
+              shortName: countryShortName,
+            )
+            ..locality = AddressComponent(
+              longName: localityLongName ?? administrativeAreaLevel1LongName,
+              shortName: localityShortName ?? administrativeAreaLevel1ShortName,
+            )
+            ..administrativeAreaLevel1 = AddressComponent(
+              longName: administrativeAreaLevel1LongName,
+              shortName: administrativeAreaLevel1ShortName,
+            )
+            ..administrativeAreaLevel2 = AddressComponent(
+              longName: administrativeAreaLevel2LongName,
+              shortName: administrativeAreaLevel2ShortName,
+            )
+            ..subLocalityLevel1 = AddressComponent(
+              longName: subLocalityLevel1LongName,
+              shortName: subLocalityLevel1ShortName,
+            )
+            ..subLocalityLevel2 = AddressComponent(
+              longName: subLocalityLevel2LongName,
+              shortName: subLocalityLevel2ShortName,
+            )
+            ..postalCode = AddressComponent(
+              longName: postalCodeLongName,
+              shortName: postalCodeShortName,
+            )
+            ..plusCode = AddressComponent(
+              longName: plusCodeLongName,
+              shortName: plusCodeShortName,
+            );
+        },
+      );
+
+      /// if show nearby places flag is false, re-build the app here,
+      /// as nearby api wont be called
       if (!widget.showNearbyPlaces) {
         setState(() {
           hasSearchTerm = false;
@@ -719,6 +763,7 @@ class PlacePickerState extends State<PlacePicker>
     }
   }
 
+  /// Get current location API
   Future<LatLng> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -827,4 +872,16 @@ class PlacePickerState extends State<PlacePicker>
       );
     }
   }
+}
+
+enum AddressComponentTypes {
+  plusCode,
+  locality,
+  subLocality,
+  subLocality1,
+  subLocality2,
+  postalCode,
+  country,
+  administrativeAreaLevel1,
+  administrativeAreaLevel2,
 }
