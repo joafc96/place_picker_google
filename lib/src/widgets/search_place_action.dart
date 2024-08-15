@@ -55,8 +55,7 @@ class SelectPlaceAction extends StatelessWidget {
               height: 12.0,
             ),
           if (actionText != null)
-            CupertinoButton(
-              color: Theme.of(context).primaryColor,
+            ElevatedButton(
               onPressed: onTap,
               child: actionChild ?? Text(actionText!),
             ),

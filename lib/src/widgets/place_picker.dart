@@ -24,7 +24,7 @@ typedef SelectPlaceWidgetBuilder = Widget Function(
 /// API key provided should have `Maps SDK for Android`,
 /// `Maps SDK for iOS` and `Places API`  enabled for it
 class PlacePicker extends StatefulWidget {
-  static const LatLng defaultLocation = LatLng(37.4219983, 122.084);
+  static const LatLng defaultLocation = LatLng(37.4219983, -122.084);
 
   /// API key generated from Google Cloud Console. You can get an API key
   /// [here](https://cloud.google.com/maps-platform/)

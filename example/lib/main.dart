@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Google Place Picker Demo',
+      debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
       // theme: ThemeData(
@@ -98,10 +99,10 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     },
                     showNearbyPlaces: false,
                     showSearchInput: true,
-                    initialLocation: const LatLng(
-                      29.378586,
-                      47.990341,
-                    ),
+                    // initialLocation: const LatLng(
+                    //   29.378586,
+                    //   47.990341,
+                    // ),
                     searchInputPadding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     searchInputBorderRadius: const BorderRadius.all(
