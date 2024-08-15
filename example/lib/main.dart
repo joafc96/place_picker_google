@@ -6,28 +6,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'dart:io' show Platform;
 
-// Light Theme
-final ThemeData lightTheme = ThemeData.light().copyWith(
-  // Background color of the FloatingCard
-  cardColor: Colors.white,
-  buttonTheme: ButtonThemeData(
-    // Select here's button color
-    buttonColor: Colors.black,
-    textTheme: ButtonTextTheme.primary,
-  ),
-);
-
-// Dark Theme
-final ThemeData darkTheme = ThemeData.dark().copyWith(
-  // Background color of the FloatingCard
-  cardColor: Colors.black,
-  buttonTheme: ButtonThemeData(
-    // Select here's button color
-    buttonColor: Colors.yellow,
-    textTheme: ButtonTextTheme.primary,
-  ),
-);
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterConfig.loadEnvVariables();
@@ -38,19 +16,17 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Google Place Picker Demo',
       debugShowCheckedModeBanner: false,
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      //   useMaterial3: false,
-      // ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: false,
+      ),
       home: const GooglePlacePickerExample(),
     );
   }
@@ -99,10 +75,10 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     },
                     showNearbyPlaces: false,
                     showSearchInput: true,
-                    // initialLocation: const LatLng(
-                    //   29.378586,
-                    //   47.990341,
-                    // ),
+                    initialLocation: const LatLng(
+                      29.378586,
+                      47.990341,
+                    ),
                     searchInputPadding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     searchInputBorderRadius: const BorderRadius.all(

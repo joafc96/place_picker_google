@@ -312,10 +312,6 @@ class PlacePickerState extends State<PlacePicker>
 
     previousSearchTerm = place;
 
-    if (context == null) {
-      return;
-    }
-
     clearOverlay();
 
     setState(() {
@@ -369,7 +365,6 @@ class PlacePickerState extends State<PlacePicker>
 
     autoCompleteSearch(place);
   }
-
 
   /// Fetches the place autocomplete list with the query [place].
   void autoCompleteSearch(String place) async {
@@ -468,7 +463,6 @@ class PlacePickerState extends State<PlacePicker>
     /// Insert the suggestions overlay
     Overlay.of(context).insert(_suggestionsOverlayEntry!);
   }
-
 
   /// To navigate to the selected place from the autocomplete list to the map,
   /// the lat,lng is required. This method fetches the lat,lng of the place and
@@ -627,9 +621,6 @@ class PlacePickerState extends State<PlacePicker>
             var tmp = result['address_components'][i];
             var types = tmp["types"] as List<dynamic>;
             var shortName = tmp['short_name'];
-            if (types == null) {
-              continue;
-            }
             if (i == 0) {
               /// [street_number]
               name = shortName;
@@ -738,11 +729,13 @@ class PlacePickerState extends State<PlacePicker>
       /// Location services are not enabled don't continue
       /// accessing the position and request users of the
       /// App to enable the location services.
-      final bool? isOk = await _showLocationDisabledAlertDialog(context);
-      if (isOk ?? false) {
-        return Future.error(const LocationServiceDisabledException());
-      } else {
-        return Future.error('Location Services is not enabled');
+      if (mounted) {
+        final bool? isOk = await _showLocationDisabledAlertDialog(context);
+        if (isOk ?? false) {
+          return Future.error(const LocationServiceDisabledException());
+        } else {
+          return Future.error('Location Services is not enabled');
+        }
       }
     }
     permission = await Geolocator.checkPermission();
@@ -786,18 +779,18 @@ class PlacePickerState extends State<PlacePicker>
           context: context,
           builder: (BuildContext ctx) {
             return CupertinoAlertDialog(
-              title: Text("Location is disabled"),
-              content: Text(
+              title: const Text("Location is disabled"),
+              content: const Text(
                   "To use location, go to your Settings App > Privacy > Location Services."),
               actions: [
                 CupertinoDialogAction(
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
                 ),
                 CupertinoDialogAction(
-                  child: Text("Ok"),
+                  child: const Text("Ok"),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
@@ -807,30 +800,31 @@ class PlacePickerState extends State<PlacePicker>
           });
     } else {
       return showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: Text("Location is disabled"),
-              content: Text(
-                  "The app needs to access your location. Please enable location service."),
-              actions: [
-                TextButton(
-                  child: Text("Cancel"),
-                  onPressed: () async {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () async {
-                    await Geolocator.openLocationSettings();
-
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-              ],
-            );
-          });
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Location is disabled"),
+            content: const Text(
+                "The app needs to access your location. Please enable location service."),
+            actions: [
+              TextButton(
+                child: const Text("Cancel"),
+                onPressed: () async {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () async {
+                  await Geolocator.openLocationSettings().then((value) {
+                    if (mounted) Navigator.of(context).pop(true);
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 }
