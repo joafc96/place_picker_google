@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SelectPlaceAction extends StatelessWidget {
@@ -17,6 +16,7 @@ class SelectPlaceAction extends StatelessWidget {
   final TextStyle? locationNameStyle;
   final TextStyle? formattedAddressStyle;
   final TextStyle? actionStyle;
+  final Widget? actionChild;
 
   const SelectPlaceAction({
     super.key,
@@ -27,6 +27,7 @@ class SelectPlaceAction extends StatelessWidget {
     this.locationNameStyle,
     this.actionStyle,
     this.formattedAddressStyle,
+    this.actionChild,
   });
 
   @override
@@ -55,10 +56,9 @@ class SelectPlaceAction extends StatelessWidget {
               height: 12.0,
             ),
           if (actionText != null)
-            CupertinoButton(
-              color: Theme.of(context).primaryColor,
+            ElevatedButton(
               onPressed: onTap,
-              child: Text(
+              child: actionChild ?? Text(
                 actionText!,
                 style: actionStyle,
               ),

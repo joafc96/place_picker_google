@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+
 /// Custom Search input field, showing the search and clear icons.
 class SearchInput extends StatefulWidget {
   /// Value changed callback for search input field

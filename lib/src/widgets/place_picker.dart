@@ -12,6 +12,11 @@ import 'package:uuid/uuid.dart';
 
 import 'dart:io' show Platform;
 
+typedef SelectPlaceWidgetBuilder = Widget Function(
+  BuildContext context,
+  LocationResult? selectedPlace,
+);
+
 /// Google place picker widget made with map widget from
 /// [google_maps_flutter](https://github.com/flutter/plugins/tree/master/packages/google_maps_flutter)
 /// and other API calls to [Google Places API](https://developers.google.com/places/web-service/intro)
@@ -32,42 +37,54 @@ class PlacePicker extends StatefulWidget {
   /// Map minimum zoom level & maximum zoom level
   final MinMaxZoomPreference minMaxZoomPreference;
 
-  final bool showNearbyPlaces;
+  /// Builder method for s
+  final SelectPlaceWidgetBuilder? selectPlaceWidgetBuilder;
+
+  /// Localization Config for passing localized values
   final LocalizationConfig localizationConfig;
-  final Color appBarBackgroundColor;
+
+  final ValueChanged<LocationResult>? onPlacePicked;
+
+  /// Search Input
   final bool showSearchInput;
   final EdgeInsetsGeometry? searchInputPadding;
-  final ValueChanged<LocationResult>? onPlacePicked;
   final Widget? searchInputPrefixIcon;
   final Widget? searchInputSuffixIcon;
   final TextStyle? searchInputHintStyle;
   final BorderRadiusGeometry? searchInputBorderRadius;
+
+  /// Nearby Places
   final TextStyle? nearbyPlaceItemStyle;
   final TextStyle? nearbyPlaceStyle;
+  final bool showNearbyPlaces;
+
+  /// Select Place
   final TextStyle? selectLocationNameStyle;
   final TextStyle? selectFormattedAddressStyle;
   final TextStyle? selectActionStyle;
+  final Widget? selectActionChild;
 
   const PlacePicker({
     super.key,
     required this.apiKey,
     this.initialLocation,
-    this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16),
     this.onPlacePicked,
+    this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16),
     this.localizationConfig = const LocalizationConfig.init(),
-    this.showNearbyPlaces = true,
-    this.appBarBackgroundColor = Colors.transparent,
     this.showSearchInput = true,
     this.searchInputPadding,
     this.searchInputPrefixIcon,
     this.searchInputSuffixIcon,
     this.searchInputHintStyle,
     this.searchInputBorderRadius,
+    this.showNearbyPlaces = true,
     this.nearbyPlaceItemStyle,
     this.nearbyPlaceStyle,
     this.selectLocationNameStyle,
     this.selectFormattedAddressStyle,
     this.selectActionStyle,
+    this.selectPlaceWidgetBuilder,
+    this.selectActionChild,
   });
 
   @override
@@ -123,8 +140,9 @@ class PlacePickerState extends State<PlacePicker> {
 
   @override
   void initState() {
-    super.initState();
     _initializeMarkers();
+
+    super.initState();
   }
 
   void _initializeMarkers() async {
@@ -202,8 +220,15 @@ class PlacePickerState extends State<PlacePicker> {
                     ),
             ),
 
-            /// Select Place Action
-            if (!hasSearchTerm)
+            /// Select Place Action Builder
+            if (!hasSearchTerm && widget.selectPlaceWidgetBuilder != null)
+              Builder(
+                builder: (ctx) =>
+                    widget.selectPlaceWidgetBuilder!(ctx, locationResult),
+              ),
+
+            /// Select Place Action Widget
+            if (!hasSearchTerm && widget.selectPlaceWidgetBuilder == null)
               SafeArea(
                 top: false,
                 bottom: !widget.showNearbyPlaces,
@@ -212,13 +237,14 @@ class PlacePickerState extends State<PlacePicker> {
                   formattedAddress: getFormattedLocationName(),
                   onTap: locationResult != null
                       ? () {
-                          widget?.onPlacePicked?.call(locationResult!);
+                          widget.onPlacePicked?.call(locationResult!);
                         }
                       : null,
                   actionText: widget.localizationConfig.selectActionLocation,
                   locationNameStyle: widget.selectLocationNameStyle,
                   formattedAddressStyle: widget.selectFormattedAddressStyle,
                   actionStyle: widget.selectActionStyle,
+                  actionChild: widget.selectActionChild,
                 ),
               ),
 

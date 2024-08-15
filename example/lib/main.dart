@@ -6,6 +6,28 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'dart:io' show Platform;
 
+// Light Theme
+final ThemeData lightTheme = ThemeData.light().copyWith(
+  // Background color of the FloatingCard
+  cardColor: Colors.white,
+  buttonTheme: ButtonThemeData(
+    // Select here's button color
+    buttonColor: Colors.black,
+    textTheme: ButtonTextTheme.primary,
+  ),
+);
+
+// Dark Theme
+final ThemeData darkTheme = ThemeData.dark().copyWith(
+  // Background color of the FloatingCard
+  cardColor: Colors.black,
+  buttonTheme: ButtonThemeData(
+    // Select here's button color
+    buttonColor: Colors.yellow,
+    textTheme: ButtonTextTheme.primary,
+  ),
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterConfig.loadEnvVariables();
@@ -22,10 +44,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Google Place Picker Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: false,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      //   useMaterial3: false,
+      // ),
       home: const GooglePlacePickerExample(),
     );
   }
@@ -83,7 +107,6 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     searchInputBorderRadius: const BorderRadius.all(
                       Radius.circular(12.0),
                     ),
-                    selectActionStyle: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
                 // Container(height: 100, )
