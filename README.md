@@ -1,4 +1,29 @@
-# Place Picker Google [![Pub](https://img.shields.io/pub/v/place_picker_google.svg)](https://pub.dev/packages/place_picker_google)
+[![Pub Version](https://img.shields.io/pub/v/badges?color=blueviolet)](https://pub.dev/packages/place_picker_google)
+[![popularity](https://img.shields.io/pub/popularity/badges?logo=dart)](https://pub.dev/packages/place_picker_google/score)
+[![likes](https://img.shields.io/pub/likes/badges?logo=dart)](https://pub.dev/packages/place_picker_google/score)
+
+# Place Picker Google
+
+A comprehensive, cross-platform google maps place picker library for Flutter.
+
+The package provides common operations for Place picking, 
+Places autocomplete, and Nearby places from google maps given you have enabled 
+`Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
+
+
+## Setup
+
+Add this to your package's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  place_picker_google:  ^0.0.1
+```
+
+Now in your `Dart` code, you can use:
+```dart
+import 'package:place_picker_google/place_picker_google.dart';
+```
 
 ## Getting Started
 
@@ -111,3 +136,7 @@ Simply open your Info.plist file and add the following:
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 <string>This app needs access to location when open and in the background.</string>
 ```
+
+## Contributing
+
+Issues and PRs welcome. Unless otherwise specified, all contributions to this lib will be under MIT license.
