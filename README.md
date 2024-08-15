@@ -12,10 +12,10 @@ Places autocomplete, and Nearby places from google maps given you have enabled
 
 ## Screenshots
 
-### Place picker home
+### Home
 
-| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_light_mode.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_dark_mode.png" width="350"> | 
-|:---:|:---:|
+| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_dark_mode.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/blob/main/assets/Android_place_picker_google_basic.png" width="350"> | 
+|:----------------------------------------------------------------------------------------------------------------------------:|:---:|
 
 ## Setup
 
