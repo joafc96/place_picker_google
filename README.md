@@ -10,10 +10,12 @@ The package provides common operations for Place picking,
 Places autocomplete, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
-<div style="display: flex;">
-<img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_light_mode.png" width="300" height="800">
-<img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_dark_mode.png" width="300" height="800">
-</div>
+## Screenshots
+
+### Place picker home
+
+| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_light_mode.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google_dark_mode.png" width="350"> | 
+|:---:|:---:|
 
 ## Setup
 
