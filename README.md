@@ -10,8 +10,6 @@ The package provides common operations for Place picking,
 Places autocomplete, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
-Supports light and dark theme.
-
 ## Screenshots
 
 ### Home
