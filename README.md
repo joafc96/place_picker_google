@@ -1,6 +1,6 @@
 [![Pub Version](https://img.shields.io/pub/v/place_picker_google?color=8A2BE2)](https://pub.dev/packages/place_picker_google)
 [![popularity](https://img.shields.io/pub/popularity/place_picker_google?color=1fd400)](https://pub.dev/packages/place_picker_google/score)
-[![likes](https://img.shields.io/pub/likes/place_picker_google?color=15f4ee)](https://pub.dev/packages/place_picker_google/score)
+[![likes](https://img.shields.io/pub/likes/place_picker_google?color=d35d43)](https://pub.dev/packages/place_picker_google/score)
 
 # Place Picker Google
 
@@ -15,7 +15,7 @@ Places autocomplete, and Nearby places from google maps given you have enabled
 ### Home
 
 | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_basic.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/Android_place_picker_google_basic.png" width="350"> | 
-|:---:|:----------------------------------------------------------------------------------------------------------------------------:|
+|:---:|:---:|
 
 ### Places Autocomplete & Nearby Places
 
