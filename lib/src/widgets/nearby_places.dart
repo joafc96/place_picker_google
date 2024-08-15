@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:google_place_picker/src/widgets/index.dart';
-import 'package:google_place_picker/src/entities/index.dart';
+import 'package:place_picker_google/src/widgets/index.dart';
+import 'package:place_picker_google/src/entities/index.dart';
 
 class NearbyPlaces extends StatelessWidget {
   final List<NearbyPlace> nearbyPlaces;

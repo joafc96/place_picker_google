@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:google_place_picker/google_place_picker.dart';
+import 'package:place_picker_google/place_picker_google.dart';
 
 // void main() {
 //   test('adds one to input values', () {

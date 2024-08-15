@@ -1,4 +1,4 @@
-name: google_place_picker
+name: place_picker_google
 description: "A Place picker package fully written in dart for Flutter."
 version: 0.0.1
 homepage: https://github.com/joafc96/google_place_picker

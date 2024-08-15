@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:google_place_picker/google_place_picker.dart';
+import 'package:place_picker_google/place_picker_google.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

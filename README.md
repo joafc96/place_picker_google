@@ -1,4 +1,4 @@
-# Google Place Picker [![Pub](https://img.shields.io/pub/v/place_picker.svg)](https://pub.dev/packages/google_place_picker)
+# Place Picker Google [![Pub](https://img.shields.io/pub/v/place_picker.svg)](https://pub.dev/packages/google_place_picker)
 
 ## Getting Started
 

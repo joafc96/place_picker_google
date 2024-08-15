@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_place_picker/src/entities/index.dart';
+import 'package:place_picker_google/src/entities/index.dart';
 
 class RichSuggestion extends StatelessWidget {
   final VoidCallback? onTap;

@@ -1,5 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_place_picker/src/entities/address_component.dart';
+import 'package:place_picker_google/src/entities/address_component.dart';
 
 /// The result returned after completing location selection.
 class LocationResult {
