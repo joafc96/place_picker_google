@@ -1,7 +1,11 @@
-## 0.0.2
+## [0.0.3] - 15 Aug 2024
+
+* Updated Dart version constraints
+
+## [0.0.2] - 15 Aug 2024
 
 * Updated README
 
-## 0.0.1
+## [0.0.1] - 15 Aug 2024
 
 * Initial release with logic, widget and example.

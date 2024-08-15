@@ -10,6 +10,8 @@ The package provides common operations for Place picking,
 Places autocomplete, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
+Supports light and dark theme.
+
 ## Screenshots
 
 ### Home
@@ -32,7 +34,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  place_picker_google:  ^0.0.1
+  place_picker_google:  ^0.0.3
 ```
 
 Now in your `Dart` code, you can use:
