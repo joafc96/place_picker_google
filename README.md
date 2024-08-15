@@ -10,6 +10,10 @@ The package provides common operations for Place picking,
 Places autocomplete, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
+<div style="display: flex;">
+<img src="https://github.com/joafc96/balloon_tip/raw/main/assets/bottom_center_balloon_tip.png" width="300">
+<img src="https://github.com/joafc96/balloon_tip/raw/main/assets/balloon_tip_scroll_view_example.gif" width="300">
+</div>
 
 ## Setup
 
