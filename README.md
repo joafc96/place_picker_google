@@ -110,8 +110,9 @@ Specify your API key in the application delegate `ios/Runner/AppDelegate.m`:
 @implementation AppDelegate
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  [GMSServices provideAPIKey:@"YOUR KEY HERE"];
   [GeneratedPluginRegistrant registerWithRegistry:self];
+  // TODO: Add your Google Maps API key
+  [GMSServices provideAPIKey:@"YOUR KEY HERE"];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 @end
