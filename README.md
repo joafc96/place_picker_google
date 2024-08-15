@@ -12,7 +12,7 @@ Places autocomplete, and Nearby places from google maps given you have enabled
 
 ## Screenshots
 
-### Home
+### Home (iOS & Android)
 
 | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_basic.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/Android_place_picker_google_basic.png" width="350"> | 
 |:---:|:---:|
