@@ -43,6 +43,7 @@ class PlacePicker extends StatefulWidget {
   /// Localization Config for passing localized values
   final LocalizationConfig localizationConfig;
 
+  /// Callback with `LocationResult` for when user clicks the confirm button
   final ValueChanged<LocationResult>? onPlacePicked;
 
   /// Search Input
@@ -61,8 +62,7 @@ class PlacePicker extends StatefulWidget {
   /// Select Place
   final TextStyle? selectLocationNameStyle;
   final TextStyle? selectFormattedAddressStyle;
-  final TextStyle? selectActionStyle;
-  final Widget? selectActionChild;
+  final Widget? selectActionButtonChild;
 
   const PlacePicker({
     super.key,
@@ -82,9 +82,8 @@ class PlacePicker extends StatefulWidget {
     this.nearbyPlaceStyle,
     this.selectLocationNameStyle,
     this.selectFormattedAddressStyle,
-    this.selectActionStyle,
     this.selectPlaceWidgetBuilder,
-    this.selectActionChild,
+    this.selectActionButtonChild,
   });
 
   @override
@@ -92,7 +91,8 @@ class PlacePicker extends StatefulWidget {
 }
 
 /// Place picker state
-class PlacePickerState extends State<PlacePicker> {
+class PlacePickerState extends State<PlacePicker>
+    with TickerProviderStateMixin {
   final Completer<GoogleMapController> mapController = Completer();
 
   /// Current location of the marker
@@ -108,7 +108,7 @@ class PlacePickerState extends State<PlacePicker> {
   LocationResult? locationResult;
 
   /// Overlay to display autocomplete suggestions
-  OverlayEntry? overlayEntry;
+  OverlayEntry? _suggestionsOverlayEntry;
 
   /// List to populate nearby places from places api
   List<NearbyPlace> nearbyPlaces = [];
@@ -117,7 +117,7 @@ class PlacePickerState extends State<PlacePicker> {
   String sessionToken = const Uuid().v4();
 
   /// To find the render box of search input
-  GlobalKey searchInputKey = GlobalKey();
+  GlobalKey searchInputKey = GlobalKey(debugLabel: "__search_input_box__");
 
   bool hasSearchTerm = false;
 
@@ -126,6 +126,7 @@ class PlacePickerState extends State<PlacePicker> {
   /// Unique link used for composited target and follower
   final _layerLink = LayerLink();
 
+  /// On map created
   void onMapCreated(GoogleMapController controller) {
     mapController.complete(controller);
     moveToCurrentUserLocation();
@@ -180,8 +181,15 @@ class PlacePickerState extends State<PlacePicker> {
 
   @override
   void dispose() {
-    overlayEntry?.remove();
+    _hideOverlay();
+
     super.dispose();
+  }
+
+  /// Method to hide the suggestions overlay
+  void _hideOverlay() {
+    _suggestionsOverlayEntry?.remove();
+    _suggestionsOverlayEntry = null;
   }
 
   @override
@@ -243,8 +251,7 @@ class PlacePickerState extends State<PlacePicker> {
                   actionText: widget.localizationConfig.selectActionLocation,
                   locationNameStyle: widget.selectLocationNameStyle,
                   formattedAddressStyle: widget.selectFormattedAddressStyle,
-                  actionStyle: widget.selectActionStyle,
-                  actionChild: widget.selectActionChild,
+                  actionChild: widget.selectActionButtonChild,
                 ),
               ),
 
@@ -284,10 +291,11 @@ class PlacePickerState extends State<PlacePicker> {
   }
 
   /// Hides the autocomplete overlay
-  void clearOverlay() {
-    if (overlayEntry != null) {
-      overlayEntry?.remove();
-      overlayEntry = null;
+  void clearOverlay() async {
+    if (_suggestionsOverlayEntry != null) {
+      // await _animationController.reverse();
+      _suggestionsOverlayEntry?.remove();
+      _suggestionsOverlayEntry = null;
     }
   }
 
@@ -321,7 +329,7 @@ class PlacePickerState extends State<PlacePicker> {
     final RenderBox? searchInputBox =
         searchInputKey.currentContext?.findRenderObject() as RenderBox?;
 
-    overlayEntry = OverlayEntry(
+    _suggestionsOverlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         width: searchInputBox?.size.width,
         child: CompositedTransformFollower(
@@ -356,38 +364,12 @@ class PlacePickerState extends State<PlacePicker> {
       ),
     );
 
-    Overlay.of(context).insert(overlayEntry!);
+    /// Insert the finding places in suggestions overlay entry
+    Overlay.of(context).insert(_suggestionsOverlayEntry!);
 
     autoCompleteSearch(place);
   }
 
-  /// Display autocomplete suggestions with the overlay.
-  void displayAutoCompleteSuggestions(List<RichSuggestion> suggestions) {
-    final RenderBox? searchInputBox =
-        searchInputKey.currentContext?.findRenderObject() as RenderBox?;
-
-    clearOverlay();
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        width: searchInputBox?.size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          offset: Offset(0, searchInputBox?.size.height ?? 0),
-          child: Material(
-            elevation: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: suggestions,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    Overlay.of(context).insert(overlayEntry!);
-  }
 
   /// Fetches the place autocomplete list with the query [place].
   void autoCompleteSearch(String place) async {
@@ -457,6 +439,36 @@ class PlacePickerState extends State<PlacePicker> {
       debugPrint(e.toString());
     }
   }
+
+  /// Display autocomplete suggestions with the overlay.
+  void displayAutoCompleteSuggestions(List<RichSuggestion> suggestions) {
+    final RenderBox? searchInputBox =
+        searchInputKey.currentContext?.findRenderObject() as RenderBox?;
+
+    clearOverlay();
+
+    _suggestionsOverlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: searchInputBox?.size.width,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0, searchInputBox?.size.height ?? 0),
+          child: Material(
+            elevation: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: suggestions,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    /// Insert the suggestions overlay
+    Overlay.of(context).insert(_suggestionsOverlayEntry!);
+  }
+
 
   /// To navigate to the selected place from the autocomplete list to the map,
   /// the lat,lng is required. This method fetches the lat,lng of the place and
@@ -533,7 +545,7 @@ class PlacePickerState extends State<PlacePicker> {
   }
 
   /// Fetches and updates the nearby places to the provided lat,lng
-  void getNearbyPlaces(LatLng latLng) async {
+  Future<void> getNearbyPlaces(LatLng latLng) async {
     try {
       final url = Uri.parse(
           "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
@@ -570,13 +582,13 @@ class PlacePickerState extends State<PlacePicker> {
         hasSearchTerm = false;
       });
     } catch (e) {
-      //
+      ///
     }
   }
 
   /// This method gets the human readable name of the location. Mostly appears
   /// to be the road name and the locality.
-  void reverseGeocodeLatLng(LatLng latLng) async {
+  Future<void> reverseGeocodeLatLng(LatLng latLng) async {
     try {
       final url = Uri.parse("https://maps.googleapis.com/maps/api/geocode/json?"
           "latlng=${latLng.latitude},${latLng.longitude}&"
@@ -672,6 +684,12 @@ class PlacePickerState extends State<PlacePicker> {
           ..subLocalityLevel2 = AddressComponent(
               longName: subLocalityLevel2, shortName: subLocalityLevel2);
       });
+
+      if (!widget.showNearbyPlaces) {
+        setState(() {
+          hasSearchTerm = false;
+        });
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -691,11 +709,13 @@ class PlacePickerState extends State<PlacePicker> {
       ),
     );
 
+    /// Set Marker
     setMarker(latLng);
 
+    /// Reverse Geocode Lat Lng
     reverseGeocodeLatLng(latLng);
 
-    getNearbyPlaces(latLng);
+    if (widget.showNearbyPlaces) getNearbyPlaces(latLng);
   }
 
   void moveToCurrentUserLocation() async {
