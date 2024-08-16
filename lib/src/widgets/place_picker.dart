@@ -295,7 +295,7 @@ class PlacePickerState extends State<PlacePicker>
                           ),
                         ),
 
-                      if (widget.myLocationButtonEnabled)
+                      if (widget.myLocationButtonEnabled && !hasSearchTerm)
                         _buildMyLocationButton(),
                     ],
                   ),
