@@ -61,37 +61,35 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
-          return Scaffold(
-            body: PlacePicker(
-              apiKey: Platform.isAndroid
-                  ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-                  : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
-              onPlacePicked: (LocationResult result) {
-                debugPrint("Place picked: ${result.formattedAddress}");
-                // Navigator.of(context).pop();
-              },
-              showNearbyPlaces: false,
-              showSearchInput: true,
-              initialLocation: const LatLng(
-                29.378586,
-                47.990341,
+          return PlacePicker(
+            apiKey: Platform.isAndroid
+                ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
+                : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+            onPlacePicked: (LocationResult result) {
+              debugPrint("Place picked: ${result.formattedAddress}");
+              Navigator.of(context).pop();
+            },
+            showNearbyPlaces: true,
+            showSearchInput: true,
+            initialLocation: const LatLng(
+              29.378586,
+              47.990341,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            searchInputConfig: const SearchInputConfig(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
               ),
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              onMapCreated: (controller) {
-                mapController = controller;
-              },
-              searchInputConfig: const SearchInputConfig(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                autofocus: false,
-                textDirection: TextDirection.ltr,
-              ),
-              searchInputDecorationConfig: const SearchInputDecorationConfig(
-                hintText: "Search for a building, street or ...",
-              ),
+              autofocus: false,
+              textDirection: TextDirection.ltr,
+            ),
+            searchInputDecorationConfig: const SearchInputDecorationConfig(
+              hintText: "Search for a building, street or ...",
             ),
           );
         },

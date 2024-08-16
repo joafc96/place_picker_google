@@ -192,7 +192,7 @@ we display the information at the bottom of the map.
 
 However, if you don't like this UI/UX, simply override the builder using `selectedPlaceWidgetBuilder`. 
 
-**Note that using this customization WILL NOT INVOKE [onPlacePicked] callback**
+**Note that using this customization WILL NOT INVOKE `onPlacePicked` callback**
 
 ## Packages Used
 
