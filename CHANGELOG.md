@@ -1,7 +1,8 @@
-## [0.0.5] - 16 Aug 2024
+## [0.0.5] - 17 Aug 2024
 
 * Added `SearchInputConfig` & `SearchInputDecorationConfig` to help update the UI of `Search Input` if required.
-* Added `My Locaation Button`, so users can navigate to their current location. 
+* Added `My Location Button`, so users can easily navigate to their current location. 
+* Added `MyLocationFABConfig` to help update the UI of `myLocationButton`.
 
 ## [0.0.4] - 16 Aug 2024
 

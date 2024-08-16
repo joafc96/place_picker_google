@@ -58,11 +58,10 @@ class PlacePicker extends StatefulWidget {
   final TextStyle? nearbyPlaceStyle;
   final bool showNearbyPlaces;
 
-  /// Select Place
+  /// Selected Place
   final TextStyle? selectedLocationNameStyle;
   final TextStyle? selectedFormattedAddressStyle;
   final Widget? selectedActionButtonChild;
-
   /// Builder method for selected place widget
   final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
 
@@ -104,6 +103,8 @@ class PlacePicker extends StatefulWidget {
   ///   * [myLocationEnabled] parameter.
   final bool myLocationButtonEnabled;
 
+  final MyLocationFABConfig myLocationFABConfig;
+
   /// The elevation provided for the autocomplete overlay.
   final double autoCompleteOverlayElevation;
 
@@ -127,6 +128,7 @@ class PlacePicker extends StatefulWidget {
     this.selectedActionButtonChild,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = false,
+    this.myLocationFABConfig = const MyLocationFABConfig(),
     this.autoCompleteOverlayElevation = 0,
   });
 
@@ -319,15 +321,22 @@ class PlacePickerState extends State<PlacePicker>
   /// My Location Widget
   Widget _buildMyLocationButton() {
     return Positioned(
-      bottom: Platform.isAndroid ? 96.0 : 8.0,
-      right: 8.0,
+      top: widget.myLocationFABConfig.top,
+      bottom: widget.myLocationFABConfig.bottom ??
+          (Platform.isAndroid ? 96.0 : 8.0),
+      right: widget.myLocationFABConfig.right ?? 8.0,
+      left: widget.myLocationFABConfig.left,
       child: FloatingActionButton(
-        mini: true,
-        tooltip: "Locate Me",
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        shape: widget.myLocationFABConfig.shape,
+        elevation: widget.myLocationFABConfig.elevation,
+        mini: widget.myLocationFABConfig.mini,
+        tooltip: widget.myLocationFABConfig.tooltip,
+        backgroundColor: widget.myLocationFABConfig.backgroundColor ??
+            Theme.of(context).primaryColor,
+        foregroundColor: widget.myLocationFABConfig.foregroundColor ??
+            Theme.of(context).colorScheme.onPrimary,
         onPressed: _locateMe,
-        child: const Icon(Icons.gps_fixed),
+        child: widget.myLocationFABConfig.child ?? const Icon(Icons.gps_fixed),
       ),
     );
   }
