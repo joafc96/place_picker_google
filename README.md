@@ -110,9 +110,9 @@ Specify your API key in the application delegate `ios/Runner/AppDelegate.m`:
 @implementation AppDelegate
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  [GeneratedPluginRegistrant registerWithRegistry:self];
   // TODO: Add your Google Maps API key
   [GMSServices provideAPIKey:@"YOUR KEY HERE"];
+  [GeneratedPluginRegistrant registerWithRegistry:self];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 @end
@@ -130,9 +130,9 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
     // TODO: Add your Google Maps API key
     GMSServices.provideAPIKey("YOUR KEY HERE")
+    GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
@@ -155,7 +155,7 @@ Simply open your Info.plist file and add the following:
 
 ### Packages Used
 
-Below are the information about these packages.
+Below are the information about the packages used.
 
 PACKAGE | INFO
 ---|---

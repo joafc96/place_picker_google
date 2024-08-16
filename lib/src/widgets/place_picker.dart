@@ -12,7 +12,7 @@ import 'package:uuid/uuid.dart';
 
 import 'dart:io' show Platform;
 
-typedef SelectPlaceWidgetBuilder = Widget Function(
+typedef SelectedPlaceWidgetBuilder = Widget Function(
   BuildContext context,
   LocationResult? selectedPlace,
 );
@@ -59,11 +59,12 @@ class PlacePicker extends StatefulWidget {
   final bool showNearbyPlaces;
 
   /// Select Place
-  final TextStyle? selectLocationNameStyle;
-  final TextStyle? selectFormattedAddressStyle;
-  final Widget? selectActionButtonChild;
+  final TextStyle? selectedLocationNameStyle;
+  final TextStyle? selectedFormattedAddressStyle;
+  final Widget? selectedActionButtonChild;
+
   /// Builder method for selected place widget
-  final SelectPlaceWidgetBuilder? selectPlaceWidgetBuilder;
+  final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
 
   /// True if a "My Location" layer should be shown on the map.
   ///
@@ -117,10 +118,10 @@ class PlacePicker extends StatefulWidget {
     this.showNearbyPlaces = true,
     this.nearbyPlaceItemStyle,
     this.nearbyPlaceStyle,
-    this.selectLocationNameStyle,
-    this.selectFormattedAddressStyle,
-    this.selectPlaceWidgetBuilder,
-    this.selectActionButtonChild,
+    this.selectedLocationNameStyle,
+    this.selectedFormattedAddressStyle,
+    this.selectedPlaceWidgetBuilder,
+    this.selectedActionButtonChild,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = false,
   });
@@ -293,8 +294,8 @@ class PlacePickerState extends State<PlacePicker>
                 ),
         ),
 
-        /// Select Place
-        if (!hasSearchTerm) _buildSelectPlace(),
+        /// Selected Place
+        if (!hasSearchTerm) _buildSelectedPlace(),
 
         /// Nearby Places
         if (!hasSearchTerm && widget.showNearbyPlaces)
@@ -312,7 +313,7 @@ class PlacePickerState extends State<PlacePicker>
   /// My Location Widget
   Widget _buildMyLocationButton() {
     return Positioned(
-      bottom: 8.0,
+      bottom: Platform.isAndroid ? 96.0 : 8.0,
       right: 8.0,
       child: FloatingActionButton(
         mini: true,
@@ -323,12 +324,12 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   /// Selected Place Widget
-  Widget _buildSelectPlace() {
-    if (widget.selectPlaceWidgetBuilder == null) {
+  Widget _buildSelectedPlace() {
+    if (widget.selectedPlaceWidgetBuilder == null) {
       return SafeArea(
         top: false,
         bottom: !widget.showNearbyPlaces,
-        child: SelectPlaceAction(
+        child: SelectPlaceWidget(
           locationName: getLocationName(),
           formattedAddress: getFormattedLocationName(),
           onTap: locationResult != null
@@ -337,14 +338,15 @@ class PlacePickerState extends State<PlacePicker>
                 }
               : null,
           actionText: widget.localizationConfig.selectActionLocation,
-          locationNameStyle: widget.selectLocationNameStyle,
-          formattedAddressStyle: widget.selectFormattedAddressStyle,
-          actionChild: widget.selectActionButtonChild,
+          locationNameStyle: widget.selectedLocationNameStyle,
+          formattedAddressStyle: widget.selectedFormattedAddressStyle,
+          actionChild: widget.selectedActionButtonChild,
         ),
       );
     } else {
       return Builder(
-        builder: (ctx) => widget.selectPlaceWidgetBuilder!(ctx, locationResult),
+        builder: (ctx) =>
+            widget.selectedPlaceWidgetBuilder!(ctx, locationResult),
       );
     }
   }

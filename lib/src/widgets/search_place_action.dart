@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SelectPlaceAction extends StatelessWidget {
+class SelectPlaceWidget extends StatelessWidget {
   /// Name of the selected place
   final String locationName;
 
@@ -17,7 +17,7 @@ class SelectPlaceAction extends StatelessWidget {
   final TextStyle? formattedAddressStyle;
   final Widget? actionChild;
 
-  const SelectPlaceAction({
+  const SelectPlaceWidget({
     super.key,
     required this.locationName,
     required this.onTap,
