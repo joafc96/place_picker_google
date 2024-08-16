@@ -41,6 +41,8 @@ class GooglePlacePickerExample extends StatefulWidget {
 }
 
 class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
+  GoogleMapController? mapController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,9 +64,9 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         builder: (context) {
           return Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-            ),
+            // appBar: AppBar(
+            //   backgroundColor: Colors.transparent,
+            // ),
             body: Column(
               children: [
                 Expanded(
@@ -74,7 +76,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                         : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
                     onPlacePicked: (LocationResult result) {
                       debugPrint("Place picked: ${result.formattedAddress}");
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                     },
                     showNearbyPlaces: false,
                     showSearchInput: true,
@@ -89,7 +91,12 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                     // searchInputBorderRadius: const BorderRadius.all(
                     //   Radius.circular(12.0),
                     // ),
+                    myLocationEnabled: false,
+                    myLocationButtonEnabled: true,
 
+                    onMapCreated: (controller) {
+                      mapController = controller;
+                    },
                   ),
                 ),
                 // Container(height: 100, )

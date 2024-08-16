@@ -30,6 +30,11 @@ class PlacePicker extends StatefulWidget {
   /// [here](https://cloud.google.com/maps-platform/)
   final String apiKey;
 
+  /// Callback method for when the map is ready to be used.
+  ///
+  /// Used to receive a [GoogleMapController] for this [GoogleMap].
+  final MapCreatedCallback? onMapCreated;
+
   /// Location to be displayed when screen is showed. If this is set or not null, the
   /// map does not pan to the user's current location.
   final LatLng? initialLocation;
@@ -64,9 +69,48 @@ class PlacePicker extends StatefulWidget {
   final TextStyle? selectFormattedAddressStyle;
   final Widget? selectActionButtonChild;
 
+  /// True if a "My Location" layer should be shown on the map.
+  ///
+  /// This layer includes a location indicator at the current device location,
+  /// as well as a My Location button.
+  /// * The indicator is a small blue dot if the device is stationary, or a
+  /// chevron if the device is moving.
+  /// * The My Location button animates to focus on the user's current location
+  /// if the user's location is currently known.
+  ///
+  /// Enabling this feature requires adding location permissions to both native
+  /// platforms of your app.
+  /// * On Android add either
+  /// `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />`
+  /// or `<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />`
+  /// to your `AndroidManifest.xml` file. `ACCESS_COARSE_LOCATION` returns a
+  /// location with an accuracy approximately equivalent to a city block, while
+  /// `ACCESS_FINE_LOCATION` returns as precise a location as possible, although
+  /// it consumes more battery power. You will also need to request these
+  /// permissions during run-time. If they are not granted, the My Location
+  /// feature will fail silently.
+  /// * On iOS add a `NSLocationWhenInUseUsageDescription` key to your
+  /// `Info.plist` file. This will automatically prompt the user for permissions
+  /// when the map tries to turn on the My Location layer.
+  final bool myLocationEnabled;
+
+  /// Enables or disables the my-location button.
+  ///
+  /// The my-location button causes the camera to move such that the user's
+  /// location is in the center of the map. If the button is enabled, it is
+  /// only shown when the my-location layer is enabled.
+  ///
+  /// By default, the my-location button is enabled (and hence shown when the
+  /// my-location layer is enabled).
+  ///
+  /// See also:
+  ///   * [myLocationEnabled] parameter.
+  final bool myLocationButtonEnabled;
+
   const PlacePicker({
     super.key,
     required this.apiKey,
+    this.onMapCreated,
     this.initialLocation,
     this.onPlacePicked,
     this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16),
@@ -84,6 +128,8 @@ class PlacePicker extends StatefulWidget {
     this.selectFormattedAddressStyle,
     this.selectPlaceWidgetBuilder,
     this.selectActionButtonChild,
+    this.myLocationEnabled = false,
+    this.myLocationButtonEnabled = false,
   });
 
   @override
@@ -129,7 +175,11 @@ class PlacePickerState extends State<PlacePicker>
   /// On map created
   void onMapCreated(GoogleMapController controller) {
     mapController.complete(controller);
+
     moveToCurrentUserLocation();
+
+    /// invoke the `onMapCreated` callback
+    widget.onMapCreated?.call(controller);
   }
 
   @override
@@ -142,8 +192,13 @@ class PlacePickerState extends State<PlacePicker>
   @override
   void initState() {
     _initializeMarkers();
-
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _hideOverlay();
+    super.dispose();
   }
 
   void _initializeMarkers() async {
@@ -179,13 +234,6 @@ class PlacePickerState extends State<PlacePicker>
     }
   }
 
-  @override
-  void dispose() {
-    _hideOverlay();
-
-    super.dispose();
-  }
-
   /// Method to hide the suggestions overlay
   void _hideOverlay() {
     _suggestionsOverlayEntry?.remove();
@@ -194,108 +242,141 @@ class PlacePickerState extends State<PlacePicker>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: <Widget>[
-            Expanded(
-              child: !_canLoadMap
-                  ? Center(
-                      child: Platform.isAndroid
-                          ? const CircularProgressIndicator()
-                          : const CupertinoActivityIndicator(),
-                    )
-                  : GoogleMap(
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: !_canLoadMap
+              ? Center(
+                  child: Platform.isAndroid
+                      ? const CircularProgressIndicator()
+                      : const CupertinoActivityIndicator(),
+                )
+              : Stack(
+                  children: [
+                    GoogleMap(
                       initialCameraPosition: CameraPosition(
                         target: widget.initialLocation ??
                             _currentLocation ??
                             PlacePicker.defaultLocation,
                         zoom: _currentLocation == null &&
                                 widget.initialLocation == null
-                            ? 5
-                            : 15,
+                            ? 4
+                            : 16,
                       ),
                       minMaxZoomPreference: widget.minMaxZoomPreference,
-                      myLocationButtonEnabled: false,
-                      myLocationEnabled: false,
-                      mapToolbarEnabled: false,
+                      myLocationEnabled: widget.myLocationEnabled,
                       onMapCreated: onMapCreated,
                       onTap: (latLng) {
-                        clearOverlay();
+                        _clearOverlay();
                         moveToLocation(latLng);
                       },
                       markers: markers,
+                      myLocationButtonEnabled: false,
+                      mapToolbarEnabled: true,
                     ),
-            ),
 
-            /// Select Place Action Builder
-            if (!hasSearchTerm && widget.selectPlaceWidgetBuilder != null)
-              Builder(
-                builder: (ctx) =>
-                    widget.selectPlaceWidgetBuilder!(ctx, locationResult),
-              ),
+                    /// Search Input
+                    if (widget.showSearchInput)
+                      SafeArea(
+                        child: Padding(
+                          padding: widget.searchInputPadding ?? EdgeInsets.zero,
+                          child: CompositedTransformTarget(
+                            link: _layerLink,
+                            child: SearchInput(
+                              key: searchInputKey,
+                              onSearchInput: searchPlace,
+                              prefixIcon: widget.searchInputPrefixIcon,
+                              suffixIcon: widget.searchInputSuffixIcon,
+                              hintText: widget.localizationConfig.searchHint,
+                              hintStyle: widget.searchInputHintStyle,
+                              borderRadius: widget.searchInputBorderRadius,
+                            ),
+                          ),
+                        ),
+                      ),
 
-            /// Select Place Action Widget
-            if (!hasSearchTerm && widget.selectPlaceWidgetBuilder == null)
-              SafeArea(
-                top: false,
-                bottom: !widget.showNearbyPlaces,
-                child: SelectPlaceAction(
-                  locationName: getLocationName(),
-                  formattedAddress: getFormattedLocationName(),
-                  onTap: locationResult != null
-                      ? () {
-                          widget.onPlacePicked?.call(locationResult!);
-                        }
-                      : null,
-                  actionText: widget.localizationConfig.selectActionLocation,
-                  locationNameStyle: widget.selectLocationNameStyle,
-                  formattedAddressStyle: widget.selectFormattedAddressStyle,
-                  actionChild: widget.selectActionButtonChild,
+                    if (widget.myLocationButtonEnabled)
+                      _buildMyLocationButton(),
+                  ],
                 ),
-              ),
-
-            /// Nearby Places
-            if (!hasSearchTerm && widget.showNearbyPlaces)
-              NearbyPlaces(
-                moveToLocation: moveToLocation,
-                nearbyPlaces: nearbyPlaces,
-                nearbyPlaceText: widget.localizationConfig.nearBy,
-                nearbyPlaceStyle: widget.nearbyPlaceStyle,
-                nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
-              ),
-          ],
         ),
 
-        /// Search Input
-        if (widget.showSearchInput)
-          SafeArea(
-            child: Padding(
-              padding: widget.searchInputPadding ?? EdgeInsets.zero,
-              child: CompositedTransformTarget(
-                link: _layerLink,
-                child: SearchInput(
-                  key: searchInputKey,
-                  onSearchInput: searchPlace,
-                  prefixIcon: widget.searchInputPrefixIcon,
-                  suffixIcon: widget.searchInputSuffixIcon,
-                  hintText: widget.localizationConfig.searchHint,
-                  hintStyle: widget.searchInputHintStyle,
-                  borderRadius: widget.searchInputBorderRadius,
-                ),
-              ),
-            ),
+        /// Select Place
+        if (!hasSearchTerm) _buildSelectPlace(),
+
+        /// Nearby Places
+        if (!hasSearchTerm && widget.showNearbyPlaces)
+          NearbyPlaces(
+            moveToLocation: moveToLocation,
+            nearbyPlaces: nearbyPlaces,
+            nearbyPlaceText: widget.localizationConfig.nearBy,
+            nearbyPlaceStyle: widget.nearbyPlaceStyle,
+            nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
           ),
       ],
     );
   }
 
+  /// My Location Widget
+  Widget _buildMyLocationButton() {
+    return Positioned(
+      bottom: 8.0,
+      right: 8.0,
+      child: FloatingActionButton(
+        mini: true,
+        onPressed: _locateMe,
+        child: const Icon(Icons.gps_fixed),
+      ),
+    );
+  }
+
+  /// Selected Place Widget
+  Widget _buildSelectPlace() {
+    if (widget.selectPlaceWidgetBuilder == null) {
+      return SafeArea(
+        top: false,
+        bottom: !widget.showNearbyPlaces,
+        child: SelectPlaceAction(
+          locationName: getLocationName(),
+          formattedAddress: getFormattedLocationName(),
+          onTap: locationResult != null
+              ? () {
+                  widget.onPlacePicked?.call(locationResult!);
+                }
+              : null,
+          actionText: widget.localizationConfig.selectActionLocation,
+          locationNameStyle: widget.selectLocationNameStyle,
+          formattedAddressStyle: widget.selectFormattedAddressStyle,
+          actionChild: widget.selectActionButtonChild,
+        ),
+      );
+    } else {
+      return Builder(
+        builder: (ctx) => widget.selectPlaceWidgetBuilder!(ctx, locationResult),
+      );
+    }
+  }
+
   /// Hides the autocomplete overlay
-  void clearOverlay() async {
+  void _clearOverlay() async {
     if (_suggestionsOverlayEntry != null) {
-      // await _animationController.reverse();
       _suggestionsOverlayEntry?.remove();
       _suggestionsOverlayEntry = null;
+    }
+  }
+
+  /// Callback if user has enabled [myLocationButtonEnabled].
+  /// Function will animate the camera to current location, given user has provided
+  /// permission for location access.
+  Future<void> _locateMe() async {
+    try {
+      final LatLng position = await _getCurrentLocation();
+      moveToLocation(position);
+    } catch (e) {
+      if (e is LocationServiceDisabledException) {
+        if (mounted) Navigator.of(context).pop();
+      }
+      debugPrint(e.toString());
     }
   }
 
@@ -312,7 +393,7 @@ class PlacePickerState extends State<PlacePicker>
 
     previousSearchTerm = place;
 
-    clearOverlay();
+    _clearOverlay();
 
     setState(() {
       hasSearchTerm = place.isNotEmpty;
@@ -440,7 +521,7 @@ class PlacePickerState extends State<PlacePicker>
     final RenderBox? searchInputBox =
         searchInputKey.currentContext?.findRenderObject() as RenderBox?;
 
-    clearOverlay();
+    _clearOverlay();
 
     _suggestionsOverlayEntry = OverlayEntry(
       builder: (context) => Positioned(
@@ -468,7 +549,7 @@ class PlacePickerState extends State<PlacePicker>
   /// the lat,lng is required. This method fetches the lat,lng of the place and
   /// proceeds to moving the map to that location.
   void decodeAndSelectPlace(String placeId) async {
-    clearOverlay();
+    _clearOverlay();
 
     try {
       final url = Uri.parse(
