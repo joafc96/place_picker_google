@@ -60,48 +60,38 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   void showPlacePicker() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        // fullscreenDialog: true,
         builder: (context) {
           return Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-            ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: PlacePicker(
-                    apiKey: Platform.isAndroid
-                        ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-                        : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
-                    onPlacePicked: (LocationResult result) {
-                      debugPrint("Place picked: ${result.formattedAddress}");
-                      // Navigator.of(context).pop();
-                    },
-                    showNearbyPlaces: false,
-                    showSearchInput: true,
-                    initialLocation: const LatLng(
-                      29.378586,
-                      47.990341,
-                    ),
-                    searchInputPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-
-                    myLocationEnabled: false,
-                    myLocationButtonEnabled: true,
-
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                    },
-                    searchInputDecorationConfig: const SearchInputDecorationConfig(
-                      hintText: "Search for a building, street or ...",
-                    ),
-                  ),
+            body: PlacePicker(
+              apiKey: Platform.isAndroid
+                  ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
+                  : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+              onPlacePicked: (LocationResult result) {
+                debugPrint("Place picked: ${result.formattedAddress}");
+                // Navigator.of(context).pop();
+              },
+              showNearbyPlaces: false,
+              showSearchInput: true,
+              initialLocation: const LatLng(
+                29.378586,
+                47.990341,
+              ),
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              onMapCreated: (controller) {
+                mapController = controller;
+              },
+              searchInputConfig: const SearchInputConfig(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
-                // Container(height: 100, )
-              ],
+                autofocus: false,
+                textDirection: TextDirection.ltr,
+              ),
+              searchInputDecorationConfig: const SearchInputDecorationConfig(
+                hintText: "Search for a building, street or ...",
+              ),
             ),
           );
         },

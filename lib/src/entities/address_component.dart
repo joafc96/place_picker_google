@@ -1,6 +1,5 @@
 /// Legacy address component object provided by google
 class AddressComponent {
-
   /// The full text description or name of the address component
   /// as returned by the Geocoder.
   final String? longName;

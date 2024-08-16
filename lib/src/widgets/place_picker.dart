@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:place_picker_google/src/entities/index.dart';
+import 'package:place_picker_google/src/entities/search_input_config.dart';
 import 'package:place_picker_google/src/widgets/index.dart';
 import 'package:uuid/uuid.dart';
 
@@ -53,9 +54,7 @@ class PlacePicker extends StatefulWidget {
 
   /// Search Input
   final bool showSearchInput;
-  final EdgeInsetsGeometry? searchInputPadding;
-  final bool searchInputAutoFocus;
-  final TextStyle? searchInputStyle;
+  final SearchInputConfig searchInputConfig;
   final SearchInputDecorationConfig searchInputDecorationConfig;
 
   /// Nearby Places
@@ -115,9 +114,7 @@ class PlacePicker extends StatefulWidget {
     this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16),
     this.localizationConfig = const LocalizationConfig.init(),
     this.showSearchInput = true,
-    this.searchInputPadding,
-    this.searchInputAutoFocus = false,
-    this.searchInputStyle,
+    this.searchInputConfig = const SearchInputConfig(),
     this.searchInputDecorationConfig = const SearchInputDecorationConfig(),
     this.showNearbyPlaces = true,
     this.nearbyPlaceItemStyle,
@@ -277,15 +274,16 @@ class PlacePickerState extends State<PlacePicker>
                     if (widget.showSearchInput)
                       SafeArea(
                         child: Padding(
-                          padding: widget.searchInputPadding ?? EdgeInsets.zero,
+                          padding: widget.searchInputConfig.padding ??
+                              EdgeInsets.zero,
                           child: CompositedTransformTarget(
                             link: _layerLink,
                             child: SearchInput(
                               key: searchInputKey,
+                              inputConfig: widget.searchInputConfig,
                               onSearchInput: searchPlace,
-                              style: widget.searchInputStyle,
-                              autoFocus: widget.searchInputAutoFocus,
-                              config: widget.searchInputDecorationConfig,
+                              decorationConfig:
+                                  widget.searchInputDecorationConfig,
                             ),
                           ),
                         ),
