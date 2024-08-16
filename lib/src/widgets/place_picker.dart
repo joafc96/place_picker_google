@@ -62,6 +62,7 @@ class PlacePicker extends StatefulWidget {
   final TextStyle? selectedLocationNameStyle;
   final TextStyle? selectedFormattedAddressStyle;
   final Widget? selectedActionButtonChild;
+
   /// Builder method for selected place widget
   final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
 
