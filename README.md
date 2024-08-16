@@ -26,20 +26,6 @@ Places autocomplete, My Location, and Nearby places from google maps given you h
 | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_my_location.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google.gif" width="350"> |
 |:---:|:---:|
 
-## Setup
-
-Add this to your package's `pubspec.yaml` file:
-
-```yaml
-dependencies:
-  place_picker_google:  ^0.0.4
-```
-
-Now in your `Dart` code, you can use:
-```dart
-import 'package:place_picker_google/place_picker_google.dart';
-```
-
 ## Getting Started
 
 * Get an API key at <https://cloud.google.com/maps-platform/>.
@@ -69,7 +55,7 @@ android {
 }
 ```
 
-This means that app will only be available for users that run Android SDK 21 or higher.
+This means that app will only be available for users that run `Android SDK - 21` or higher.
 
 2. Specify your API key in the application manifest `android/app/src/main/AndroidManifest.xml`:
 
@@ -153,7 +139,36 @@ Simply open your Info.plist file and add the following:
 <string>This app needs access to location when open and in the background.</string>
 ```
 
-### Packages Used
+## Setup
+
+Add this to your package's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  place_picker_google:  ^0.0.5
+```
+
+Now in your `Dart` code, you can use:
+```dart
+import 'package:place_picker_google/place_picker_google.dart';
+```
+
+### Basic usage
+
+You can use PlacePicker by pushing to a new page using Navigator, OR put as a child of any widget.  
+When the user picks a place on the map, it will return result to `onPlacePicked` with `LocationResult` type.
+Alternatively, you can build your own way with `selectedPlaceWidgetBuilder` and fetch result from it (See the instruction below).
+
+### Customizing selected place UI
+
+By default, when a user selects a place by using auto complete search or dragging/tapping the map, 
+we display the information at the bottom of the map.
+
+However, if you don't like this UI/UX, simply override the builder using `selectedPlaceWidgetBuilder`. 
+
+**Note that using this customization WILL NOT INVOKE [onPlacePicked] callback**
+
+## Packages Used
 
 Below are the information about the packages used.
 
@@ -163,6 +178,12 @@ PACKAGE | INFO
 [uuid](https://pub.dev/packages/uuid) | Generate unique id's
 [geolocator](https://pub.dev/packages/geolocator) | Access to location services
 [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) | Access to Google Maps widget
+
+## Feature Requests and Issues
+
+Please file feature requests and bugs at the [issue tracker][tracker].
+
+[tracker]: https://github.com/joafc96/place_picker_google/issues/new
 
 ## Contributing
 
