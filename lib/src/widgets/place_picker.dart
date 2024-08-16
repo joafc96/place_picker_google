@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:place_picker_google/src/entities/index.dart';
-import 'package:place_picker_google/src/entities/search_input_config.dart';
 import 'package:place_picker_google/src/widgets/index.dart';
 import 'package:uuid/uuid.dart';
 
@@ -43,9 +42,6 @@ class PlacePicker extends StatefulWidget {
   /// Map minimum zoom level & maximum zoom level
   final MinMaxZoomPreference minMaxZoomPreference;
 
-  /// Builder method for s
-  final SelectPlaceWidgetBuilder? selectPlaceWidgetBuilder;
-
   /// Localization Config for passing localized values
   final LocalizationConfig localizationConfig;
 
@@ -66,6 +62,8 @@ class PlacePicker extends StatefulWidget {
   final TextStyle? selectLocationNameStyle;
   final TextStyle? selectFormattedAddressStyle;
   final Widget? selectActionButtonChild;
+  /// Builder method for selected place widget
+  final SelectPlaceWidgetBuilder? selectPlaceWidgetBuilder;
 
   /// True if a "My Location" layer should be shown on the map.
   ///

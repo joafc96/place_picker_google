@@ -7,7 +7,7 @@
 A comprehensive, cross-platform google maps place picker library for Flutter.
 
 The package provides common operations for Place picking, 
-Places autocomplete, and Nearby places from google maps given you have enabled 
+Places autocomplete, My Location, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
 ## Screenshots
@@ -152,6 +152,17 @@ Simply open your Info.plist file and add the following:
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 <string>This app needs access to location when open and in the background.</string>
 ```
+
+### Packages Used
+
+Below are the information about these packages.
+
+PACKAGE | INFO
+---|---
+[http](https://pub.dev/packages/http) | To consume HTTP resources
+[uuid](https://pub.dev/packages/uuid) | Generate unique id's
+[geolocator](https://pub.dev/packages/geolocator) | Access to location services
+[google_maps_flutter](https://pub.dev/packages/google_maps_flutter) | Access to Google Maps widget
 
 ## Contributing
 

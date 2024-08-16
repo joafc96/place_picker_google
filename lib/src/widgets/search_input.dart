@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:place_picker_google/place_picker_google.dart';
-import 'package:place_picker_google/src/entities/search_input_config.dart';
 
 /// Custom Search input field, showing the search and clear icons.
 class SearchInput extends StatefulWidget {
@@ -12,6 +11,7 @@ class SearchInput extends StatefulWidget {
   ///  Search input decoration config
   final SearchInputDecorationConfig decorationConfig;
 
+  ///  Search input config
   final SearchInputConfig inputConfig;
 
   const SearchInput({
