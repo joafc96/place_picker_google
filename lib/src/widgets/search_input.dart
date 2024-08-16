@@ -1,34 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
+import 'package:place_picker_google/place_picker_google.dart';
 
 /// Custom Search input field, showing the search and clear icons.
 class SearchInput extends StatefulWidget {
   /// Value changed callback for search input field
   final ValueChanged<String> onSearchInput;
 
-  /// Border radius geometry for search input field
-  final BorderRadiusGeometry? borderRadius;
+  ///  Search input decoration config
+  final SearchInputDecorationConfig config;
 
-  /// Optional prefix and suffix icons for input field
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
+  /// Whether the search input be auto focused or not
+  final bool autoFocus;
 
-  /// Hint text string for input field
-  final String? hintText;
+  final TextStyle? style;
 
-  /// Text style for hint text for input field
-  final TextStyle? hintStyle;
+
 
   const SearchInput({
     super.key,
     required this.onSearchInput,
-    this.borderRadius,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.hintText,
-    this.hintStyle,
+    required this.config,
+    this.autoFocus = false,
+    this.style,
   });
 
   @override
@@ -74,40 +69,64 @@ class SearchInputState extends State<SearchInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: widget.borderRadius,
-        color: Theme.of(context).canvasColor,
+    return TextFormField(
+      textAlignVertical: TextAlignVertical.center,
+      autofocus: widget.autoFocus,
+      style: widget.style,
+      decoration: InputDecoration(
+        label: widget.config.label,
+        labelText: widget.config.labelText,
+        labelStyle: widget.config.labelStyle,
+        helperText: widget.config.helperText,
+        helperStyle: widget.config.helperStyle,
+        helperMaxLines: widget.config.helperMaxLines,
+        hintText: widget.config.hintText,
+        hintStyle: widget.config.hintStyle,
+        hintTextDirection: widget.config.hintTextDirection,
+        hintFadeDuration: widget.config.hintFadeDuration,
+        hintMaxLines: widget.config.hintMaxLines,
+        prefixIcon: widget.config.prefixIcon ??
+            const Icon(
+              Icons.search,
+            ),
+        prefixIconConstraints: widget.config.prefixIconConstraints,
+        prefixIconColor: widget.config.prefixIconColor,
+        prefixText: widget.config.prefixText,
+        prefixStyle: widget.config.prefixStyle,
+        suffixIcon: hasSearchEntry
+            ? GestureDetector(
+                child: widget.config.suffixIcon ?? const Icon(Icons.clear),
+                onTap: () {
+                  editController.clear();
+                  setState(() {
+                    hasSearchEntry = false;
+                  });
+                },
+              )
+            : null,
+        suffixIconConstraints: widget.config.suffixIconConstraints,
+        suffixIconColor: widget.config.suffixIconColor,
+        suffixText: widget.config.suffixText,
+        suffixStyle: widget.config.suffixStyle,
+        errorBorder: widget.config.errorBorder,
+        focusedBorder: widget.config.focusedBorder,
+        focusedErrorBorder: widget.config.focusedErrorBorder,
+        disabledBorder: widget.config.disabledBorder,
+        enabledBorder: widget.config.enabledBorder,
+        border: widget.config.border ?? InputBorder.none,
+        isDense: widget.config.isDense,
+        filled: widget.config.filled,
+        fillColor: widget.config.fillColor ?? Theme.of(context).canvasColor,
+        contentPadding: widget.config.contentPadding,
+        enabled: widget.config.enabled,
+        constraints: widget.config.constraints,
       ),
-      child: TextFormField(
-        textAlignVertical: TextAlignVertical.center,
-        decoration: InputDecoration(
-          prefixIcon: widget.prefixIcon ??
-              const Icon(
-                Icons.search,
-              ),
-          suffixIcon: hasSearchEntry
-              ? GestureDetector(
-                  child: widget.suffixIcon ?? const Icon(Icons.clear),
-                  onTap: () {
-                    editController.clear();
-                    setState(() {
-                      hasSearchEntry = false;
-                    });
-                  },
-                )
-              : null,
-          hintText: widget.hintText,
-          hintStyle: widget.hintStyle,
-          border: InputBorder.none,
-        ),
-        controller: editController,
-        onChanged: (value) {
-          setState(() {
-            hasSearchEntry = value.isNotEmpty;
-          });
-        },
-      ),
+      controller: editController,
+      onChanged: (value) {
+        setState(() {
+          hasSearchEntry = value.isNotEmpty;
+        });
+      },
     );
   }
 }

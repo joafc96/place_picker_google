@@ -54,10 +54,9 @@ class PlacePicker extends StatefulWidget {
   /// Search Input
   final bool showSearchInput;
   final EdgeInsetsGeometry? searchInputPadding;
-  final Widget? searchInputPrefixIcon;
-  final Widget? searchInputSuffixIcon;
-  final TextStyle? searchInputHintStyle;
-  final BorderRadiusGeometry? searchInputBorderRadius;
+  final bool searchInputAutoFocus;
+  final TextStyle? searchInputStyle;
+  final SearchInputDecorationConfig searchInputDecorationConfig;
 
   /// Nearby Places
   final TextStyle? nearbyPlaceItemStyle;
@@ -117,10 +116,9 @@ class PlacePicker extends StatefulWidget {
     this.localizationConfig = const LocalizationConfig.init(),
     this.showSearchInput = true,
     this.searchInputPadding,
-    this.searchInputPrefixIcon,
-    this.searchInputSuffixIcon,
-    this.searchInputHintStyle,
-    this.searchInputBorderRadius,
+    this.searchInputAutoFocus = false,
+    this.searchInputStyle,
+    this.searchInputDecorationConfig = const SearchInputDecorationConfig(),
     this.showNearbyPlaces = true,
     this.nearbyPlaceItemStyle,
     this.nearbyPlaceStyle,
@@ -285,11 +283,9 @@ class PlacePickerState extends State<PlacePicker>
                             child: SearchInput(
                               key: searchInputKey,
                               onSearchInput: searchPlace,
-                              prefixIcon: widget.searchInputPrefixIcon,
-                              suffixIcon: widget.searchInputSuffixIcon,
-                              hintText: widget.localizationConfig.searchHint,
-                              hintStyle: widget.searchInputHintStyle,
-                              borderRadius: widget.searchInputBorderRadius,
+                              style: widget.searchInputStyle,
+                              autoFocus: widget.searchInputAutoFocus,
+                              config: widget.searchInputDecorationConfig,
                             ),
                           ),
                         ),

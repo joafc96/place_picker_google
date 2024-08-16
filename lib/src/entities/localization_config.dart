@@ -4,7 +4,6 @@ class LocalizationConfig {
   final String findingPlace;
   final String noResultsFound;
   final String unnamedLocation;
-  final String? searchHint;
   final String? selectActionLocation;
 
   const LocalizationConfig({
@@ -13,7 +12,6 @@ class LocalizationConfig {
     required this.findingPlace,
     required this.noResultsFound,
     required this.unnamedLocation,
-    required this.searchHint,
     this.selectActionLocation,
   });
 
@@ -23,7 +21,6 @@ class LocalizationConfig {
     this.findingPlace = 'Finding place...',
     this.noResultsFound = 'No results found',
     this.unnamedLocation = 'Unnamed location',
-    this.searchHint = "Search for a building, street or ...",
     this.selectActionLocation = 'Confirm Location',
   });
 }

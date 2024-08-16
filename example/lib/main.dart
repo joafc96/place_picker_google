@@ -64,9 +64,9 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         builder: (context) {
           return Scaffold(
             extendBodyBehindAppBar: true,
-            // appBar: AppBar(
-            //   backgroundColor: Colors.transparent,
-            // ),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+            ),
             body: Column(
               children: [
                 Expanded(
@@ -88,15 +88,16 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    // searchInputBorderRadius: const BorderRadius.all(
-                    //   Radius.circular(12.0),
-                    // ),
+
                     myLocationEnabled: false,
                     myLocationButtonEnabled: true,
 
                     onMapCreated: (controller) {
                       mapController = controller;
                     },
+                    searchInputDecorationConfig: const SearchInputDecorationConfig(
+                      hintText: "Search for a building, street or ...",
+                    ),
                   ),
                 ),
                 // Container(height: 100, )
