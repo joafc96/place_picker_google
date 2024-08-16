@@ -159,6 +159,35 @@ You can use PlacePicker by pushing to a new page using Navigator, OR put as a ch
 When the user picks a place on the map, it will return result to `onPlacePicked` with `LocationResult` type.
 Alternatively, you can build your own way with `selectedPlaceWidgetBuilder` and fetch result from it (See the instruction below).
 
+```dart
+PlacePicker(
+              apiKey: Platform.isAndroid
+                  ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
+                  : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+              onPlacePicked: (LocationResult result) {
+                debugPrint("Place picked: ${result.formattedAddress}");
+              },
+        
+              initialLocation: const LatLng(
+                29.378586,
+                47.990341,
+              ),
+     
+              onMapCreated: (controller) {},
+              searchInputConfig: const SearchInputConfig(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                autofocus: false,
+                textDirection: TextDirection.ltr,
+              ),
+              searchInputDecorationConfig: const SearchInputDecorationConfig(
+                hintText: "Search for a building, street or ...",
+              ),
+            ),
+```
+
 ### Customizing selected place UI
 
 By default, when a user selects a place by using auto complete search or dragging/tapping the map, 
