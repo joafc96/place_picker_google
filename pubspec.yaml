@@ -11,7 +11,6 @@ topics:
   - location-picker
   - flutter-location-picker
   - google-maps-flutter
-  - google-maps
   - place-picker
 
 environment:
