@@ -162,8 +162,8 @@ Alternatively, you can build your own way with `selectedPlaceWidgetBuilder` and 
 ```dart
 PlacePicker(
         apiKey: Platform.isAndroid
-            ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-            : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+            ? 'GOOGLE_MAPS_API_KEY_ANDROID'
+            : 'GOOGLE_MAPS_API_KEY_IOS',
         onPlacePicked: (LocationResult result) {
           debugPrint("Place picked: ${result.formattedAddress}");
         },
@@ -171,11 +171,10 @@ PlacePicker(
           29.378586,
           47.990341,
         ),
-        onMapCreated: (controller) {},
         searchInputConfig: const SearchInputConfig(
           padding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
+            horizontal: 16.0,
+            vertical: 8.0,
           ),
           autofocus: false,
           textDirection: TextDirection.ltr,
