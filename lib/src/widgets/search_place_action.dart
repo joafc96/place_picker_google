@@ -30,37 +30,35 @@ class SelectPlaceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Container(
-        color: Theme.of(context).canvasColor,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+    return Container(
+      color: Theme.of(context).canvasColor,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            locationName,
+            style: locationNameStyle ?? const TextStyle(fontSize: 16),
+          ),
+          if (formattedAddress != null)
             Text(
-              locationName,
-              style: locationNameStyle ?? const TextStyle(fontSize: 16),
+              formattedAddress!,
+              style: formattedAddressStyle ??
+                  const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
             ),
-            if (formattedAddress != null)
-              Text(
-                formattedAddress!,
-                style: formattedAddressStyle ??
-                    const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-              ),
-            if (actionText != null)
-              const SizedBox(
-                height: 12.0,
-              ),
-            if (actionText != null)
-              ElevatedButton(
-                onPressed: onTap,
-                child: actionChild ?? Text(actionText!),
-              ),
-          ],
-        ),
+          if (actionText != null)
+            const SizedBox(
+              height: 12.0,
+            ),
+          if (actionText != null)
+            ElevatedButton(
+              onPressed: onTap,
+              child: actionChild ?? Text(actionText!),
+            ),
+        ],
       ),
     );
   }

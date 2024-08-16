@@ -104,6 +104,9 @@ class PlacePicker extends StatefulWidget {
   ///   * [myLocationEnabled] parameter.
   final bool myLocationButtonEnabled;
 
+  /// The elevation provided for the autocomplete overlay.
+  final double autoCompleteOverlayElevation;
+
   const PlacePicker({
     super.key,
     required this.apiKey,
@@ -124,6 +127,7 @@ class PlacePicker extends StatefulWidget {
     this.selectedActionButtonChild,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = false,
+    this.autoCompleteOverlayElevation = 0,
   });
 
   @override
@@ -236,77 +240,79 @@ class PlacePickerState extends State<PlacePicker>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: !_canLoadMap
-              ? Center(
-                  child: Platform.isAndroid
-                      ? const CircularProgressIndicator()
-                      : const CupertinoActivityIndicator(),
-                )
-              : Stack(
-                  children: [
-                    GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: widget.initialLocation ??
-                            _currentLocation ??
-                            PlacePicker.defaultLocation,
-                        zoom: _currentLocation == null &&
-                                widget.initialLocation == null
-                            ? 4
-                            : 16,
+    return Material(
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: !_canLoadMap
+                ? Center(
+                    child: Platform.isAndroid
+                        ? const CircularProgressIndicator()
+                        : const CupertinoActivityIndicator(),
+                  )
+                : Stack(
+                    children: [
+                      GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: widget.initialLocation ??
+                              _currentLocation ??
+                              PlacePicker.defaultLocation,
+                          zoom: _currentLocation == null &&
+                                  widget.initialLocation == null
+                              ? 4
+                              : 16,
+                        ),
+                        minMaxZoomPreference: widget.minMaxZoomPreference,
+                        myLocationEnabled: widget.myLocationEnabled,
+                        onMapCreated: onMapCreated,
+                        onTap: (latLng) {
+                          _clearOverlay();
+                          moveToLocation(latLng);
+                        },
+                        markers: markers,
+                        myLocationButtonEnabled: false,
+                        mapToolbarEnabled: true,
                       ),
-                      minMaxZoomPreference: widget.minMaxZoomPreference,
-                      myLocationEnabled: widget.myLocationEnabled,
-                      onMapCreated: onMapCreated,
-                      onTap: (latLng) {
-                        _clearOverlay();
-                        moveToLocation(latLng);
-                      },
-                      markers: markers,
-                      myLocationButtonEnabled: false,
-                      mapToolbarEnabled: true,
-                    ),
 
-                    /// Search Input
-                    if (widget.showSearchInput)
-                      SafeArea(
-                        child: Padding(
-                          padding: widget.searchInputConfig.padding ??
-                              EdgeInsets.zero,
-                          child: CompositedTransformTarget(
-                            link: _layerLink,
-                            child: SearchInput(
-                              key: searchInputKey,
-                              inputConfig: widget.searchInputConfig,
-                              onSearchInput: searchPlace,
-                              decorationConfig:
-                                  widget.searchInputDecorationConfig,
+                      /// Search Input
+                      if (widget.showSearchInput)
+                        SafeArea(
+                          child: Padding(
+                            padding: widget.searchInputConfig.padding ??
+                                EdgeInsets.zero,
+                            child: CompositedTransformTarget(
+                              link: _layerLink,
+                              child: SearchInput(
+                                key: searchInputKey,
+                                inputConfig: widget.searchInputConfig,
+                                onSearchInput: searchPlace,
+                                decorationConfig:
+                                    widget.searchInputDecorationConfig,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                    if (widget.myLocationButtonEnabled)
-                      _buildMyLocationButton(),
-                  ],
-                ),
-        ),
-
-        /// Selected Place
-        if (!hasSearchTerm) _buildSelectedPlace(),
-
-        /// Nearby Places
-        if (!hasSearchTerm && widget.showNearbyPlaces)
-          NearbyPlaces(
-            moveToLocation: moveToLocation,
-            nearbyPlaces: nearbyPlaces,
-            nearbyPlaceText: widget.localizationConfig.nearBy,
-            nearbyPlaceStyle: widget.nearbyPlaceStyle,
-            nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
+                      if (widget.myLocationButtonEnabled)
+                        _buildMyLocationButton(),
+                    ],
+                  ),
           ),
-      ],
+
+          /// Selected Place
+          if (!hasSearchTerm) _buildSelectedPlace(),
+
+          /// Nearby Places
+          if (!hasSearchTerm && widget.showNearbyPlaces)
+            NearbyPlaces(
+              moveToLocation: moveToLocation,
+              nearbyPlaces: nearbyPlaces,
+              nearbyPlaceText: widget.localizationConfig.nearBy,
+              nearbyPlaceStyle: widget.nearbyPlaceStyle,
+              nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
+            ),
+        ],
+      ),
     );
   }
 
@@ -317,6 +323,9 @@ class PlacePickerState extends State<PlacePicker>
       right: 8.0,
       child: FloatingActionButton(
         mini: true,
+        tooltip: "Locate Me",
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         onPressed: _locateMe,
         child: const Icon(Icons.gps_fixed),
       ),
@@ -405,10 +414,10 @@ class PlacePickerState extends State<PlacePicker>
         width: searchInputBox?.size.width,
         child: CompositedTransformFollower(
           link: _layerLink,
-          offset: Offset(0, searchInputBox?.size.height ?? 0),
+          offset: Offset(0, (searchInputBox?.size.height ?? 0)),
           showWhenUnlinked: false,
           child: Material(
-            elevation: 1,
+            elevation: widget.autoCompleteOverlayElevation,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Row(
@@ -523,9 +532,9 @@ class PlacePickerState extends State<PlacePicker>
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, searchInputBox?.size.height ?? 0),
+          offset: Offset(0, (searchInputBox?.size.height ?? 0)),
           child: Material(
-            elevation: 1,
+            elevation: widget.autoCompleteOverlayElevation,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: suggestions,

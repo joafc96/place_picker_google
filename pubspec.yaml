@@ -4,6 +4,15 @@ version: 0.0.5
 homepage: https://github.com/joafc96/place_picker_google
 repository: https://github.com/joafc96/place_picker_google
 issue_tracker: https://github.com/joafc96/place_picker_google/issues
+documentation: https://github.com/joafc96/place_picker_google/blob/main/README.md
+
+topics:
+  - map-picker
+  - location-picker
+  - flutter-location-picker
+  - google-maps-flutter
+  - google-maps
+  - place-picker
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
