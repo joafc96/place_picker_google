@@ -1,4 +1,3 @@
-
 /// Legacy address component object provided by google
 class AddressComponent {
 

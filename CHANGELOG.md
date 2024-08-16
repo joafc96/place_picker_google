@@ -1,6 +1,6 @@
 ## [0.0.4] - 16 Aug 2024
 
-* Updated `LocalizationResult` object with correct `AddressComponents`
+* Updated `LocationResult` object with correct `AddressComponents`
 
 ## [0.0.3] - 15 Aug 2024
 
