@@ -69,7 +69,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
               debugPrint("Place picked: ${result.formattedAddress}");
               Navigator.of(context).pop();
             },
-            showNearbyPlaces: false,
+            enableNearbyPlaces: false,
             showSearchInput: true,
             initialLocation: const LatLng(
               29.378586,

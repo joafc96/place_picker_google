@@ -1,5 +1,8 @@
 ## [0.0.6] - 17 Aug 2024
-
+* Added `Web` support.
+* Removed platform specific code.
+* Bumped up the versions of packages used.
+* Breaking change: Updated `showNearbyPlaces` to `enableNearbyPlaces`.
 
 ## [0.0.5] - 17 Aug 2024
 

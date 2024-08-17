@@ -56,7 +56,7 @@ class PlacePicker extends StatefulWidget {
   /// Nearby Places
   final TextStyle? nearbyPlaceItemStyle;
   final TextStyle? nearbyPlaceStyle;
-  final bool showNearbyPlaces;
+  final bool enableNearbyPlaces;
 
   /// Selected Place
   final TextStyle? selectedLocationNameStyle;
@@ -120,7 +120,7 @@ class PlacePicker extends StatefulWidget {
     this.showSearchInput = true,
     this.searchInputConfig = const SearchInputConfig(),
     this.searchInputDecorationConfig = const SearchInputDecorationConfig(),
-    this.showNearbyPlaces = true,
+    this.enableNearbyPlaces = true,
     this.nearbyPlaceItemStyle,
     this.nearbyPlaceStyle,
     this.selectedLocationNameStyle,
@@ -248,10 +248,8 @@ class PlacePickerState extends State<PlacePicker>
         children: <Widget>[
           Expanded(
             child: !_canLoadMap
-                ? Center(
-                    child: Platform.isAndroid
-                        ? const CircularProgressIndicator()
-                        : const CupertinoActivityIndicator(),
+                ? const Center(
+                    child: CircularProgressIndicator(),
                   )
                 : Stack(
                     children: [
@@ -306,7 +304,7 @@ class PlacePickerState extends State<PlacePicker>
           if (!hasSearchTerm) _buildSelectedPlace(),
 
           /// Nearby Places
-          if (!hasSearchTerm && widget.showNearbyPlaces)
+          if (!hasSearchTerm && widget.enableNearbyPlaces)
             NearbyPlaces(
               moveToLocation: moveToLocation,
               nearbyPlaces: nearbyPlaces,
@@ -323,8 +321,7 @@ class PlacePickerState extends State<PlacePicker>
   Widget _buildMyLocationButton() {
     return Positioned(
       top: widget.myLocationFABConfig.top,
-      bottom: widget.myLocationFABConfig.bottom ??
-          (Platform.isAndroid ? 96.0 : 8.0),
+      bottom: widget.myLocationFABConfig.bottom ?? 8.0,
       right: widget.myLocationFABConfig.right ?? 8.0,
       left: widget.myLocationFABConfig.left,
       child: FloatingActionButton(
@@ -347,7 +344,7 @@ class PlacePickerState extends State<PlacePicker>
     if (widget.selectedPlaceWidgetBuilder == null) {
       return SafeArea(
         top: false,
-        bottom: !widget.showNearbyPlaces,
+        bottom: !widget.enableNearbyPlaces,
         child: SelectPlaceWidget(
           locationName: getLocationName(),
           formattedAddress: getFormattedLocationName(),
@@ -432,12 +429,10 @@ class PlacePickerState extends State<PlacePicker>
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Row(
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                     width: 24,
-                    child: Platform.isAndroid
-                        ? const CircularProgressIndicator()
-                        : const CupertinoActivityIndicator(),
+                    child: CircularProgressIndicator(),
                   ),
                   const SizedBox(width: 24),
                   Expanded(
@@ -814,7 +809,7 @@ class PlacePickerState extends State<PlacePicker>
 
       /// if show nearby places flag is false, re-build the app here,
       /// as nearby api wont be called
-      if (!widget.showNearbyPlaces) {
+      if (!widget.enableNearbyPlaces) {
         setState(() {
           hasSearchTerm = false;
         });
@@ -844,7 +839,7 @@ class PlacePickerState extends State<PlacePicker>
     /// Reverse Geocode Lat Lng
     reverseGeocodeLatLng(latLng);
 
-    if (widget.showNearbyPlaces) getNearbyPlaces(latLng);
+    if (widget.enableNearbyPlaces) getNearbyPlaces(latLng);
   }
 
   void moveToCurrentUserLocation() async {
