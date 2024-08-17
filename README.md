@@ -177,7 +177,7 @@ Modify the `<head>` tag of your `web/index.html` to load the Google Maps JavaScr
 </head>
 ```
 
-Check [the `google_maps_flutter_web` README](https://pub.dev/packages/google_maps_flutter_web)
+Check the [`google_maps_flutter_web` README](https://pub.dev/packages/google_maps_flutter_web)
 for the latest information on how to prepare your App to use Google Maps on the
 web.
 
