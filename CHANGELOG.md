@@ -1,3 +1,6 @@
+## [0.0.6] - 17 Aug 2024
+
+
 ## [0.0.5] - 17 Aug 2024
 
 * Added `SearchInputConfig` & `SearchInputDecorationConfig` to help update the UI of `Search Input` if required.

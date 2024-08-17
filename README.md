@@ -14,17 +14,17 @@ Places autocomplete, My Location, and Nearby places from google maps given you h
 
 ### iOS & Android
 
-| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_basic.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/Android_place_picker_google_basic.png" width="350"> | 
-|:---:|:---:|
+| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_basic.png" alt="iOS basic" width="210"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/Android_place_picker_google_basic.png" alt="Android basic" width="210"> | 
+|:----------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------:|
 
 ### Places Autocomplete & Nearby Places
 
-| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_autocomplete.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_nearby_places.png" width="350"> | 
-|:---:|:---:|
+| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_autocomplete.png" width="210"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_nearby_places.png" width="210"> | 
+|:-------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------:|
 
 ### My Location &&  Preview
-| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_my_location.png" width="350"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google.gif" width="350"> |
-|:---:|:---:|
+| <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_my_location.png" width="210"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google.gif" width="210"> |
+|:------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------:|
 
 ## Getting Started
 
@@ -145,7 +145,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  place_picker_google: ^0.0.5
+  place_picker_google: ^0.0.6
 ```
 
 Now in your `Dart` code, you can use:
