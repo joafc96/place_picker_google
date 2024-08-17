@@ -5,7 +5,7 @@ class SearchInputConfig {
   final TextStyle? style;
   final TextAlign textAlign;
   final TextDirection? textDirection;
-  final autofocus;
+  final bool autofocus;
   final bool? showCursor;
   final EdgeInsetsGeometry? padding;
   final TextAlignVertical? textAlignVertical;
