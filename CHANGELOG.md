@@ -1,4 +1,13 @@
+## [0.0.7] - 30 Aug 2024
+
+* Downgraded third party versions due to conflicts.
+* Added camera animation zoom level as an internal state for real time zoom updates.
+* Added `usePinPointingSearch` for toggling between tap selection and pin point (dragging) selection.
+* Removed all platform specific code from `io`. 
+* Added `SearchingState` to `SelectedPlaceWidgetBuilder` so user can update the builder according to `searching` and `idle` state.
+
 ## [0.0.6] - 17 Aug 2024
+
 * Added `Web` support.
 * Removed platform specific code.
 * Breaking change: Updated `showNearbyPlaces` to `enableNearbyPlaces`.
