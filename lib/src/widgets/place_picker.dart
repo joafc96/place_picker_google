@@ -7,10 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:uuid/uuid.dart';
 
 import 'package:place_picker_google/place_picker_google.dart';
-import 'package:place_picker_google/src/platform.dart';
+import 'package:place_picker_google/src/utils/index.dart';
 
 typedef SelectedPlaceWidgetBuilder = Widget Function(
   BuildContext context,
@@ -120,11 +119,11 @@ class PlacePicker extends StatefulWidget {
   final bool usePinPointingSearch;
 
   /// Places api call debounce time in milli seconds
-  /// works only for [usePinPointingSearch] is disabled
-  final int locationDebounce;
+  /// works only for [usePinPointingSearch] is enabled
+  final int pinPointingDebounceDuration;
 
-  /// Builder method for spin widget
-  final PinWidgetBuilder? pinWidgetBuilder;
+  /// Builder method for pinPointing Pin widget
+  final PinWidgetBuilder? pinPointingPinWidgetBuilder;
 
   const PlacePicker({
     super.key,
@@ -149,8 +148,8 @@ class PlacePicker extends StatefulWidget {
     this.myLocationFABConfig = const MyLocationFABConfig(),
     this.autoCompleteOverlayElevation = 0,
     this.usePinPointingSearch = false,
-    this.locationDebounce = 500,
-    this.pinWidgetBuilder,
+    this.pinPointingDebounceDuration = 500,
+    this.pinPointingPinWidgetBuilder,
   });
 
   @override
@@ -181,12 +180,10 @@ class PlacePickerState extends State<PlacePicker>
   List<NearbyPlace> nearbyPlaces = [];
 
   /// Session token required for autocomplete API call
-  String sessionToken = const Uuid().v4();
+  String sessionToken = Uuid().generateV4();
 
   /// To find the render box of search input
   GlobalKey searchInputKey = GlobalKey(debugLabel: "__search_input_box__");
-
-  // bool hasSearchTerm = false;
 
   String previousSearchTerm = '';
 
@@ -196,6 +193,7 @@ class PlacePickerState extends State<PlacePicker>
   /// initial zoom level
   late double _zoom = widget.minMaxZoomPreference.maxZoom ?? 16.0;
 
+  /// debounce timer to stop unwanted places api calls
   Timer? _debounce;
 
   /// internal state to handle the pin
@@ -402,7 +400,8 @@ class PlacePickerState extends State<PlacePicker>
     if (widget.usePinPointingSearch && _pinState == PinState.dragging) {
       /// only if drag to select location is enabled
       if (_debounce?.isActive ?? false) _debounce?.cancel();
-      _debounce = Timer(Duration(milliseconds: widget.locationDebounce), () {
+      _debounce =
+          Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
         /// move to location after debounce time only
         animateToLocation(position.target);
       });
@@ -476,7 +475,7 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Pin Widget for Pin point selection
   Widget _buildPinWidget() {
-    if (widget.pinWidgetBuilder == null) {
+    if (widget.pinPointingPinWidgetBuilder == null) {
       return AnimatedPin(
         state: _pinState,
         child: const Icon(
@@ -487,7 +486,7 @@ class PlacePickerState extends State<PlacePicker>
       );
     } else {
       return Builder(
-        builder: (ctx) => widget.pinWidgetBuilder!(ctx, _pinState),
+        builder: (ctx) => widget.pinPointingPinWidgetBuilder!(ctx, _pinState),
       );
     }
   }
@@ -900,7 +899,6 @@ class PlacePickerState extends State<PlacePicker>
           longName: plusCodeLongName,
           shortName: plusCodeShortName,
         );
-
     } catch (e) {
       debugPrint(e.toString());
     }

@@ -5,6 +5,7 @@
 * Added `usePinPointingSearch` for toggling between tap selection and pin point (dragging) selection.
 * Removed all platform specific code from `io`. 
 * Added `SearchingState` to `SelectedPlaceWidgetBuilder` so user can update the builder according to `searching` and `idle` state.
+* Removed `Uuid` third party package used for `sessionToken` generation.
 
 ## [0.0.6] - 17 Aug 2024
 
