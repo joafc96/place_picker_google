@@ -9,12 +9,6 @@ The package provides common operations for Place picking,
 Places autocomplete, My Location, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
-## Enabling nearby searches
-
-If you do want to fetch places from a custom location or refresh them when the user moves the map, you must enable /nearbysearch queries in `Place Picker`.
-
-To do that, enable `enableNearbyPlaces` flag in the package.
-
 ## Screenshots
 
 ### iOS & Android
@@ -211,6 +205,12 @@ PlacePicker(
         ),
     ),
 ```
+
+## Enabling nearby searches
+
+If you do want to fetch places from a custom location or refresh them when the user moves the map, you must enable /nearbysearch queries in `Place Picker`.
+
+To do that, enable `enableNearbyPlaces` flag in the package.
 
 ### Customizing selected place UI
 
