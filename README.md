@@ -9,21 +9,7 @@ The package provides common operations for Place picking,
 Places autocomplete, My Location, and Nearby places from google maps given you have enabled 
 `Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
-## A key difference
-
-Different than Google's Place Picker, `Place Picker` by default **doesn't** search for places according to where the user is pointing the map to. Instead, it shows only the nearby places in the **current** location.
-
-This was intentional and the reason is simple. By using the **/nearbysearch** from [Google Places Web API](https://developers.google.com/places/web-service/search#PlaceSearchRequests) we are going to be charged *a lot* for each map movement.
-
-![NearbySearch warning](https://github.com/rtchagas/pingplacepicker/blob/master/images/nearby_search_warning.png?raw=true)
-
-According to [Nearby Search pricing](https://developers.google.com/maps/billing/understanding-cost-of-use#nearby-search) each request to the API is going to cost 0.04 USD per each (40.00 USD per 1000).
-
-To avoid the extra cost of **/nearbysearch**, `Place Picker` relies on Place API's **findCurrentPlace()** that is going to cost 0.030 USD per each  (30.00 USD per 1000).
-
-Moreover, we don't fire a new request each time the user moves the map.
-
-### Enabling nearby searches
+## Enabling nearby searches
 
 If you do want to fetch places from a custom location or refresh them when the user moves the map, you must enable /nearbysearch queries in `Place Picker`.
 
