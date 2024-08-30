@@ -228,7 +228,6 @@ Below are the information about the packages used.
 PACKAGE | INFO
 ---|---
 [http](https://pub.dev/packages/http) | To consume HTTP resources
-[uuid](https://pub.dev/packages/uuid) | Generate unique id's
 [geolocator](https://pub.dev/packages/geolocator) | Access to location services
 [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) | Access to Google Maps widget
 
