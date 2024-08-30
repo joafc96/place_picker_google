@@ -62,6 +62,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
       MaterialPageRoute(
         builder: (context) {
           return PlacePicker(
+            usePinPointingSearch: true,
             apiKey: Platform.isAndroid
                 ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
                 : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
@@ -91,6 +92,9 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
             searchInputDecorationConfig: const SearchInputDecorationConfig(
               hintText: "Search for a building, street or ...",
             ),
+            // selectedPlaceWidgetBuilder: (ctx, state, rslt) {
+            //   return const SizedBox.shrink();
+            // },
           );
         },
       ),

@@ -206,7 +206,7 @@ PlacePicker(
     ),
 ```
 
-## Enabling nearby searches
+### Enabling nearby searches
 
 If you do want to fetch places from a custom location or refresh them when the user moves the map, you must enable /nearbysearch queries in `Place Picker`.
 

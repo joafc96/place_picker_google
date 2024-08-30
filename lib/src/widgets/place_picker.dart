@@ -214,7 +214,7 @@ class PlacePickerState extends State<PlacePicker>
 
   @override
   void initState() {
-    _initializeMarkers();
+    _initializePositionAndMarkers();
     super.initState();
   }
 
@@ -224,37 +224,36 @@ class PlacePickerState extends State<PlacePicker>
     super.dispose();
   }
 
-  void _initializeMarkers() async {
-    /// if initial location is not provided
-    if (widget.initialLocation == null) {
-      try {
-        final LatLng position = await _getCurrentLocation();
+  void _initializePositionAndMarkers() async {
+    try {
+      final LatLng position =
+          widget.initialLocation ?? await _getCurrentLocation();
+
+      if (mounted) {
         setState(() {
           _currentLocation = position;
+
+          if (!widget.usePinPointingSearch && widget.initialLocation != null) {
+            markers.add(
+              Marker(
+                position: widget.initialLocation!,
+                markerId: const MarkerId("selected-location"),
+              ),
+            );
+          }
+
           _canLoadMap = true;
         });
-      } catch (e) {
-        if (e is LocationServiceDisabledException) {
-          if (mounted) Navigator.of(context).pop();
-        } else {
-          setState(() {
-            _canLoadMap = true;
-          });
-        }
-        debugPrint(e.toString());
       }
-    } else {
-      setState(() {
-        if (!widget.usePinPointingSearch) {
-          markers.add(
-            Marker(
-              position: widget.initialLocation!,
-              markerId: const MarkerId("selected-location"),
-            ),
-          );
-        }
-        _canLoadMap = true;
-      });
+    } catch (e) {
+      if (e is LocationServiceDisabledException && mounted) {
+        Navigator.of(context).pop();
+      } else {
+        setState(() {
+          _canLoadMap = true;
+        });
+      }
+      debugPrint(e.toString());
     }
   }
 
@@ -270,88 +269,98 @@ class PlacePickerState extends State<PlacePicker>
       child: Column(
         children: <Widget>[
           Expanded(
-            child: !_canLoadMap
-                ? Platform.isiOS
-                    ? const CupertinoActivityIndicator()
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                : Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: widget.initialLocation ??
-                              _currentLocation ??
-                              PlacePicker.defaultLocation,
-                          zoom: _currentLocation == null &&
-                                  widget.initialLocation == null
-                              ? 4
-                              : _zoom,
-                        ),
-                        minMaxZoomPreference: widget.minMaxZoomPreference,
-                        myLocationEnabled: widget.myLocationEnabled,
-                        onTap: onTap,
-                        markers: markers,
-                        myLocationButtonEnabled: false,
-                        mapToolbarEnabled: true,
-                        onMapCreated: onMapCreated,
-                        onCameraIdle: onCameraIdle,
-                        onCameraMoveStarted: onCameraMoveStarted,
-                        onCameraMove: onCameraMove,
-                      ),
-
-                      /// Search Input
-                      if (widget.showSearchInput)
-                        Align(
-                          alignment: AlignmentDirectional.topCenter,
-                          child: SafeArea(
-                            child: Padding(
-                              padding: widget.searchInputConfig.padding ??
-                                  EdgeInsets.zero,
-                              child: CompositedTransformTarget(
-                                link: _layerLink,
-                                child: SearchInput(
-                                  key: searchInputKey,
-                                  inputConfig: widget.searchInputConfig,
-                                  onSearchInput: searchPlace,
-                                  decorationConfig:
-                                      widget.searchInputDecorationConfig,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                      /// my location FAB button
-                      if (widget.myLocationButtonEnabled)
-                        _buildMyLocationButton(),
-
-                      /// Animated Pin rather than marker (at the center of map)
-                      if (widget.usePinPointingSearch)
-                        FractionalTranslation(
-                          /// To make the bottom end of the icon at the center
-                          translation: const Offset(0, -0.5),
-                          child: _buildPinWidget(),
-                        ),
-                    ],
-                  ),
+            child: _canLoadMap ? _buildMapContent() : _buildLoadingIndicator(),
           ),
-
-          /// Selected Place
           _buildSelectedPlace(),
-
-          /// Nearby Places
-          if (widget.enableNearbyPlaces)
-            NearbyPlaces(
-              moveToLocation: animateToLocation,
-              nearbyPlaces: nearbyPlaces,
-              nearbyPlaceText: widget.localizationConfig.nearBy,
-              nearbyPlaceStyle: widget.nearbyPlaceStyle,
-              nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
-            ),
+          if (widget.enableNearbyPlaces) _buildNearbyPlaces(),
         ],
       ),
+    );
+  }
+
+  Widget _buildMapContent() {
+    return Stack(
+      children: [
+        _buildGoogleMap(),
+        if (widget.showSearchInput) _buildSearchInput(),
+        if (widget.myLocationButtonEnabled) _buildMyLocationButton(),
+        if (widget.usePinPointingSearch) _buildPinPointingIndicator(),
+      ],
+    );
+  }
+
+  Widget _buildGoogleMap() {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: widget.initialLocation ??
+            _currentLocation ??
+            PlacePicker.defaultLocation,
+        zoom: _getInitialZoom(),
+      ),
+      minMaxZoomPreference: widget.minMaxZoomPreference,
+      myLocationEnabled: widget.myLocationEnabled,
+      onTap: onTap,
+      markers: markers,
+      myLocationButtonEnabled: false,
+      mapToolbarEnabled: true,
+      onMapCreated: onMapCreated,
+      onCameraIdle: onCameraIdle,
+      onCameraMoveStarted: onCameraMoveStarted,
+      onCameraMove: onCameraMove,
+    );
+  }
+
+  double _getInitialZoom() {
+    return (_currentLocation == null && widget.initialLocation == null)
+        ? 4
+        : _zoom;
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Platform.isiOS
+        ? const CupertinoActivityIndicator()
+        : const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildSearchInput() {
+    return SafeArea(
+      child: Padding(
+        padding: widget.searchInputConfig.padding ?? EdgeInsets.zero,
+        child: CompositedTransformTarget(
+          link: _layerLink,
+          child: SearchInput(
+            key: searchInputKey,
+            inputConfig: widget.searchInputConfig,
+            onSearchInput: searchPlace,
+            decorationConfig: widget.searchInputDecorationConfig,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPinPointingIndicator() {
+    return Positioned.fill(
+      child: UnconstrainedBox(
+        child: ColoredBox(
+          color: Colors.green.withOpacity(0.5),
+          child: FractionalTranslation(
+            translation: const Offset(0, -0.5),
+            child: _buildPinWidget(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Nearby Places
+  Widget _buildNearbyPlaces() {
+    return NearbyPlaces(
+      moveToLocation: animateToLocation,
+      nearbyPlaces: nearbyPlaces,
+      nearbyPlaceText: widget.localizationConfig.nearBy,
+      nearbyPlaceStyle: widget.nearbyPlaceStyle,
+      nearbyPlaceItemStyle: widget.nearbyPlaceItemStyle,
     );
   }
 
@@ -390,6 +399,7 @@ class PlacePickerState extends State<PlacePicker>
     });
   }
 
+  /// On Camera move
   void onCameraMove(CameraPosition position) {
     /// set zoom level
     _zoom = position.zoom;
@@ -398,17 +408,11 @@ class PlacePickerState extends State<PlacePicker>
     /// set pin state as dragging and update and
     /// call the places API after the debounce is completed.
     if (widget.usePinPointingSearch && _pinState == PinState.dragging) {
-      /// only if drag to select location is enabled
-      if (_debounce?.isActive ?? false) _debounce?.cancel();
-      _debounce =
-          Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
-        /// move to location after debounce time only
-        animateToLocation(position.target);
-      });
+      _debouncePinPointing(position.target);
     }
   }
 
-  /// on user taps map
+  /// On user taps map
   onTap(LatLng position) {
     if (!widget.usePinPointingSearch) {
       setState(() {
@@ -418,6 +422,15 @@ class PlacePickerState extends State<PlacePicker>
 
     _clearOverlay();
     animateToLocation(position);
+  }
+
+  /// Debounce function for pin-pointing search
+  void _debouncePinPointing(LatLng target) {
+    _debounce?.cancel();
+    _debounce =
+        Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
+      animateToLocation(target);
+    });
   }
 
   /// My Location Widget
@@ -506,22 +519,28 @@ class PlacePickerState extends State<PlacePicker>
   void searchPlace(String place) {
     /// on keyboard dismissal, the search was being triggered again
     /// this is to cap that.
-    if (place == previousSearchTerm) {
-      return;
-    }
+    if (place == previousSearchTerm) return;
 
     previousSearchTerm = place;
 
     _clearOverlay();
 
-    if (place.isEmpty) {
-      return;
-    }
+    if (place.isEmpty) return;
 
     final RenderBox? searchInputBox =
         searchInputKey.currentContext?.findRenderObject() as RenderBox?;
 
-    _suggestionsOverlayEntry = OverlayEntry(
+    _suggestionsOverlayEntry = _createSuggestionsOverlay(searchInputBox);
+
+    /// Insert the finding places in suggestions overlay entry
+    Overlay.of(context).insert(_suggestionsOverlayEntry!);
+
+    autoCompleteSearch(place);
+  }
+
+  /// Creates the rich suggestions overlay entry
+  OverlayEntry _createSuggestionsOverlay(RenderBox? searchInputBox) {
+    return OverlayEntry(
       builder: (context) => Positioned(
         width: searchInputBox?.size.width,
         child: CompositedTransformFollower(
@@ -539,9 +558,7 @@ class PlacePickerState extends State<PlacePicker>
                     width: 24,
                     child: Platform.isiOS
                         ? const CupertinoActivityIndicator()
-                        : const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                        : const CircularProgressIndicator(),
                   ),
                   const SizedBox(width: 24),
                   Expanded(
@@ -557,11 +574,6 @@ class PlacePickerState extends State<PlacePicker>
         ),
       ),
     );
-
-    /// Insert the finding places in suggestions overlay entry
-    Overlay.of(context).insert(_suggestionsOverlayEntry!);
-
-    autoCompleteSearch(place);
   }
 
   /// Fetches the place autocomplete list with the query [place].
@@ -569,68 +581,68 @@ class PlacePickerState extends State<PlacePicker>
     try {
       place = place.replaceAll(" ", "+");
 
-      var endpoint =
-          "https://maps.googleapis.com/maps/api/place/autocomplete/json?"
-          "key=${widget.apiKey}&"
-          "language=${widget.localizationConfig.languageCode}&"
-          "input={$place}&sessiontoken=$sessionToken";
-
-      if (locationResult != null) {
-        endpoint += "&location=${locationResult!.latLng?.latitude},"
-            "${locationResult!.latLng?.longitude}";
-      }
+      final endpoint = _buildAutoCompleteEndpoint(place);
 
       final response = await http.get(Uri.parse(endpoint));
 
       if (response.statusCode != 200) {
-        throw Error();
+        throw Exception('Failed to load suggestions');
       }
 
       final responseJson = jsonDecode(response.body);
 
-      if (responseJson['predictions'] == null) {
-        throw Error();
-      }
+      final predictions = responseJson['predictions'] as List<dynamic>?;
 
-      List<dynamic> predictions = responseJson['predictions'];
-
-      List<RichSuggestion> suggestions = [];
-
-      if (predictions.isEmpty) {
-        AutoCompleteItem aci = AutoCompleteItem();
-        aci.text = widget.localizationConfig.noResultsFound;
-        aci.offset = 0;
-        aci.length = 0;
-
-        suggestions.add(
-          RichSuggestion(
-            autoCompleteItem: aci,
-          ),
-        );
-      } else {
-        for (dynamic t in predictions) {
-          final aci = AutoCompleteItem()
-            ..id = t['place_id']
-            ..text = t['description']
-            ..offset = t['matched_substrings'][0]['offset']
-            ..length = t['matched_substrings'][0]['length'];
-
-          suggestions.add(
-            RichSuggestion(
-              autoCompleteItem: aci,
-              onTap: () {
-                FocusScope.of(context).requestFocus(FocusNode());
-                decodeAndSelectPlace(aci.id!);
-              },
-            ),
-          );
-        }
-      }
+      final suggestions = _parseAutoCompleteSuggestions(predictions);
 
       displayAutoCompleteSuggestions(suggestions);
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  /// Builds the auto complete search endpoint
+  String _buildAutoCompleteEndpoint(String place) {
+    final locationQuery = locationResult != null
+        ? '&location=${locationResult!.latLng?.latitude},${locationResult!.latLng?.longitude}'
+        : '';
+
+    return 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
+        'key=${widget.apiKey}&'
+        'language=${widget.localizationConfig.languageCode}&'
+        'input=$place&sessiontoken=$sessionToken$locationQuery';
+  }
+
+  /// Parses the `predictions` into `RichSuggestion` array.
+  List<RichSuggestion> _parseAutoCompleteSuggestions(
+      List<dynamic>? predictions) {
+    if (predictions == null || predictions.isEmpty) {
+      return [
+        RichSuggestion(
+          autoCompleteItem: AutoCompleteItem()
+            ..text = widget.localizationConfig.noResultsFound
+            ..offset = 0
+            ..length = 0,
+        ),
+      ];
+    }
+
+    return predictions.map((dynamic t) {
+      final matchedSubstring = t['matched_substrings'][0];
+      final aci = AutoCompleteItem()
+        ..id = t['place_id']
+        ..text = t['description']
+        ..offset = matchedSubstring['offset']
+        ..length = matchedSubstring['length'];
+
+      return RichSuggestion(
+        autoCompleteItem: aci,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+          decodeAndSelectPlace(aci.id!);
+        },
+      );
+    }).toList();
   }
 
   /// Display autocomplete suggestions with the overlay.
@@ -759,8 +771,8 @@ class PlacePickerState extends State<PlacePicker>
       final LatLng position = await _getCurrentLocation();
       animateToLocation(position);
     } catch (e) {
-      if (e is LocationServiceDisabledException) {
-        if (mounted) Navigator.of(context).pop();
+      if (e is LocationServiceDisabledException && mounted) {
+        Navigator.of(context).pop();
       }
       debugPrint(e.toString());
     }
