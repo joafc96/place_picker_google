@@ -342,12 +342,9 @@ class PlacePickerState extends State<PlacePicker>
   Widget _buildPinPointingIndicator() {
     return Positioned.fill(
       child: UnconstrainedBox(
-        child: ColoredBox(
-          color: Colors.green.withOpacity(0.5),
-          child: FractionalTranslation(
-            translation: const Offset(0, -0.5),
-            child: _buildPinWidget(),
-          ),
+        child: FractionalTranslation(
+          translation: const Offset(0, -0.5),
+          child: _buildPinWidget(),
         ),
       ),
     );
