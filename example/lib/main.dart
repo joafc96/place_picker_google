@@ -92,7 +92,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
             searchInputDecorationConfig: const SearchInputDecorationConfig(
               hintText: "Search for a building, street or ...",
             ),
-            // selectedPlaceWidgetBuilder: (ctx, state, rslt) {
+            // selectedPlaceWidgetBuilder: (ctx, state, result) {
             //   return const SizedBox.shrink();
             // },
           );

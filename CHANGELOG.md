@@ -1,4 +1,4 @@
-## [0.0.7] - 30 Aug 2024
+## [0.0.7] - 01 Sep 2024
 
 * Downgraded third party versions due to conflicts.
 * Added camera animation zoom level as an internal state for real time zoom updates.
