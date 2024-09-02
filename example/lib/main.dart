@@ -62,7 +62,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         builder: (context) {
           return PlacePicker(
             usePinPointingSearch: true,
-            apiKey: Platform.isAndroid ? 'AIzaSyBcNLOyuUPUavcBYeALOasoVwn4zfYIlaI' : 'AIzaSyBcNLOyuUPUavcBYeALOasoVwn4zfYIlaI',
+            apiKey: Platform.isAndroid ? '' : '',
             onPlacePicked: (LocationResult result) {
               debugPrint("Place picked: ${result.formattedAddress}");
               Navigator.of(context).pop();
