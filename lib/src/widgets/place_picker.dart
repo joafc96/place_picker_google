@@ -53,6 +53,12 @@ class PlacePicker extends StatefulWidget {
   /// Callback with `LocationResult` for when user clicks the confirm button
   final ValueChanged<LocationResult>? onPlacePicked;
 
+  final Color? confirmBtnBgColor;
+
+  final Color? confirmBtnTextColor;
+
+  final TextStyle? confirmBtnTextStyle;
+
   /// Search Input
   final bool showSearchInput;
   final SearchInputConfig searchInputConfig;
@@ -150,6 +156,9 @@ class PlacePicker extends StatefulWidget {
     this.usePinPointingSearch = false,
     this.pinPointingDebounceDuration = 500,
     this.pinPointingPinWidgetBuilder,
+    this.confirmBtnBgColor,
+    this.confirmBtnTextColor,
+    this.confirmBtnTextStyle,
   });
 
   @override
@@ -157,8 +166,7 @@ class PlacePicker extends StatefulWidget {
 }
 
 /// Place picker state
-class PlacePickerState extends State<PlacePicker>
-    with TickerProviderStateMixin {
+class PlacePickerState extends State<PlacePicker> with TickerProviderStateMixin {
   final Completer<GoogleMapController> mapController = Completer();
 
   /// Current location of the marker
@@ -226,8 +234,7 @@ class PlacePickerState extends State<PlacePicker>
 
   void _initializePositionAndMarkers() async {
     try {
-      final LatLng position =
-          widget.initialLocation ?? await _getCurrentLocation();
+      final LatLng position = widget.initialLocation ?? await _getCurrentLocation();
 
       if (mounted) {
         setState(() {
@@ -292,9 +299,7 @@ class PlacePickerState extends State<PlacePicker>
   Widget _buildGoogleMap() {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: widget.initialLocation ??
-            _currentLocation ??
-            PlacePicker.defaultLocation,
+        target: widget.initialLocation ?? _currentLocation ?? PlacePicker.defaultLocation,
         zoom: _getInitialZoom(),
       ),
       minMaxZoomPreference: widget.minMaxZoomPreference,
@@ -311,15 +316,11 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   double _getInitialZoom() {
-    return (_currentLocation == null && widget.initialLocation == null)
-        ? 4
-        : _zoom;
+    return (_currentLocation == null && widget.initialLocation == null) ? 4 : _zoom;
   }
 
   Widget _buildLoadingIndicator() {
-    return Platform.isiOS
-        ? const CupertinoActivityIndicator()
-        : const Center(child: CircularProgressIndicator());
+    return Platform.isiOS ? const CupertinoActivityIndicator() : const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildSearchInput() {
@@ -424,8 +425,7 @@ class PlacePickerState extends State<PlacePicker>
   /// Debounce function for pin-pointing search
   void _debouncePinPointing(LatLng target) {
     _debounce?.cancel();
-    _debounce =
-        Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
+    _debounce = Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
       animateToLocation(target);
     });
   }
@@ -442,10 +442,8 @@ class PlacePickerState extends State<PlacePicker>
         elevation: widget.myLocationFABConfig.elevation,
         mini: widget.myLocationFABConfig.mini,
         tooltip: widget.myLocationFABConfig.tooltip,
-        backgroundColor: widget.myLocationFABConfig.backgroundColor ??
-            Theme.of(context).primaryColor,
-        foregroundColor: widget.myLocationFABConfig.foregroundColor ??
-            Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: widget.myLocationFABConfig.backgroundColor ?? Theme.of(context).primaryColor,
+        foregroundColor: widget.myLocationFABConfig.foregroundColor ?? Theme.of(context).colorScheme.onPrimary,
         onPressed: _locateMe,
         child: widget.myLocationFABConfig.child ?? const Icon(Icons.gps_fixed),
       ),
@@ -470,6 +468,9 @@ class PlacePickerState extends State<PlacePicker>
           locationNameStyle: widget.selectedLocationNameStyle,
           formattedAddressStyle: widget.selectedFormattedAddressStyle,
           actionChild: widget.selectedActionButtonChild,
+          confirmBtnBgColor: widget.confirmBtnBgColor,
+          confirmBtnTextColor: widget.confirmBtnTextColor,
+          confirmBtnTextStyle: widget.confirmBtnTextStyle,
         ),
       );
     } else {
@@ -524,8 +525,7 @@ class PlacePickerState extends State<PlacePicker>
 
     if (place.isEmpty) return;
 
-    final RenderBox? searchInputBox =
-        searchInputKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? searchInputBox = searchInputKey.currentContext?.findRenderObject() as RenderBox?;
 
     _suggestionsOverlayEntry = _createSuggestionsOverlay(searchInputBox);
 
@@ -553,9 +553,7 @@ class PlacePickerState extends State<PlacePicker>
                   SizedBox(
                     height: 24,
                     width: 24,
-                    child: Platform.isiOS
-                        ? const CupertinoActivityIndicator()
-                        : const CircularProgressIndicator(),
+                    child: Platform.isiOS ? const CupertinoActivityIndicator() : const CircularProgressIndicator(),
                   ),
                   const SizedBox(width: 24),
                   Expanded(
@@ -600,9 +598,8 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Builds the auto complete search endpoint
   String _buildAutoCompleteEndpoint(String place) {
-    final locationQuery = locationResult != null
-        ? '&location=${locationResult!.latLng?.latitude},${locationResult!.latLng?.longitude}'
-        : '';
+    final locationQuery =
+        locationResult != null ? '&location=${locationResult!.latLng?.latitude},${locationResult!.latLng?.longitude}' : '';
 
     return 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
         'key=${widget.apiKey}&'
@@ -611,8 +608,7 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   /// Parses the `predictions` into `RichSuggestion` array.
-  List<RichSuggestion> _parseAutoCompleteSuggestions(
-      List<dynamic>? predictions) {
+  List<RichSuggestion> _parseAutoCompleteSuggestions(List<dynamic>? predictions) {
     if (predictions == null || predictions.isEmpty) {
       return [
         RichSuggestion(
@@ -644,8 +640,7 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Display autocomplete suggestions with the overlay.
   void displayAutoCompleteSuggestions(List<RichSuggestion> suggestions) {
-    final RenderBox? searchInputBox =
-        searchInputKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? searchInputBox = searchInputKey.currentContext?.findRenderObject() as RenderBox?;
 
     _clearOverlay();
 
@@ -916,8 +911,7 @@ class PlacePickerState extends State<PlacePicker>
   /// Fetches and updates the nearby places to the provided lat,lng
   Future<void> getNearbyPlaces(LatLng latLng) async {
     try {
-      final url = Uri.parse(
-          "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+      final url = Uri.parse("https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
           "key=${widget.apiKey}&location=${latLng.latitude},${latLng.longitude}"
           "&radius=150&language=${widget.localizationConfig.languageCode}");
 
@@ -939,8 +933,7 @@ class PlacePickerState extends State<PlacePicker>
         final nearbyPlace = NearbyPlace()
           ..name = item['name']
           ..icon = item['icon']
-          ..latLng = LatLng(item['geometry']['location']['lat'],
-              item['geometry']['location']['lng']);
+          ..latLng = LatLng(item['geometry']['location']['lat'], item['geometry']['location']['lng']);
 
         nearbyPlaces.add(nearbyPlace);
       }
@@ -984,8 +977,7 @@ class PlacePickerState extends State<PlacePicker>
     if (permission == LocationPermission.deniedForever) {
       /// Permissions are denied forever, handle appropriately.
       /// return widget.defaultLocation;
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
     }
     try {
       final locationData = await Geolocator.getCurrentPosition(
@@ -1011,8 +1003,7 @@ class PlacePickerState extends State<PlacePicker>
           builder: (BuildContext ctx) {
             return CupertinoAlertDialog(
               title: const Text("Location is disabled"),
-              content: const Text(
-                  "To use location, go to your Settings App > Privacy > Location Services."),
+              content: const Text("To use location, go to your Settings App > Privacy > Location Services."),
               actions: [
                 CupertinoDialogAction(
                   child: const Text("Cancel"),
@@ -1035,8 +1026,7 @@ class PlacePickerState extends State<PlacePicker>
         builder: (BuildContext ctx) {
           return AlertDialog(
             title: const Text("Location is disabled"),
-            content: const Text(
-                "The app needs to access your location. Please enable location service."),
+            content: const Text("The app needs to access your location. Please enable location service."),
             actions: [
               TextButton(
                 child: const Text("Cancel"),
@@ -1070,8 +1060,7 @@ class PlacePickerState extends State<PlacePicker>
     }
 
     for (NearbyPlace np in nearbyPlaces) {
-      if (np.latLng == locationResult?.latLng &&
-          np.name != locationResult?.locality?.shortName) {
+      if (np.latLng == locationResult?.latLng && np.name != locationResult?.locality?.shortName) {
         locationResult?.name = np.name;
         return "${np.name}, ${locationResult?.locality}";
       }

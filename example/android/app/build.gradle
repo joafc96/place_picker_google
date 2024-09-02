@@ -26,7 +26,7 @@ apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 android {
     namespace "com.example.example"
-    compileSdk flutter.compileSdkVersion
+    compileSdk  31
     ndkVersion flutter.ndkVersion
 
     compileOptions {

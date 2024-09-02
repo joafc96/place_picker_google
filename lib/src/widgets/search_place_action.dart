@@ -10,6 +10,12 @@ class SelectPlaceWidget extends StatelessWidget {
   /// Text that has to be shown on the select action button
   final String? actionText;
 
+  final Color? confirmBtnBgColor;
+
+  final Color? confirmBtnTextColor;
+
+  final TextStyle? confirmBtnTextStyle;
+
   /// Optional void call back of the button
   final VoidCallback? onTap;
 
@@ -26,6 +32,9 @@ class SelectPlaceWidget extends StatelessWidget {
     this.locationNameStyle,
     this.formattedAddressStyle,
     this.actionChild,
+    this.confirmBtnBgColor,
+    this.confirmBtnTextColor,
+    this.confirmBtnTextStyle,
   });
 
   @override
@@ -56,7 +65,14 @@ class SelectPlaceWidget extends StatelessWidget {
           if (actionText != null)
             ElevatedButton(
               onPressed: onTap,
-              child: actionChild ?? Text(actionText!),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmBtnBgColor ?? Theme.of(context).colorScheme.onPrimary,
+              ),
+              child: actionChild ??
+                  Text(
+                    actionText!,
+                    style: confirmBtnTextStyle,
+                  ),
             ),
         ],
       ),

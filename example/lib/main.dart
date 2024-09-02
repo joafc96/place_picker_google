@@ -36,8 +36,7 @@ class GooglePlacePickerExample extends StatefulWidget {
   const GooglePlacePickerExample({super.key});
 
   @override
-  State<GooglePlacePickerExample> createState() =>
-      _GooglePlacePickerExampleState();
+  State<GooglePlacePickerExample> createState() => _GooglePlacePickerExampleState();
 }
 
 class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
@@ -63,9 +62,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         builder: (context) {
           return PlacePicker(
             usePinPointingSearch: true,
-            apiKey: Platform.isAndroid
-                ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-                : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+            apiKey: Platform.isAndroid ? 'AIzaSyBcNLOyuUPUavcBYeALOasoVwn4zfYIlaI' : 'AIzaSyBcNLOyuUPUavcBYeALOasoVwn4zfYIlaI',
             onPlacePicked: (LocationResult result) {
               debugPrint("Place picked: ${result.formattedAddress}");
               Navigator.of(context).pop();
