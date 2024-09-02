@@ -452,27 +452,29 @@ class PlacePickerState extends State<PlacePicker> with TickerProviderStateMixin 
 
   /// Selected Place Widget
   Widget _buildSelectedPlace() {
-    if (widget.selectedPlaceWidgetBuilder == null && locationResult != null) {
-      return SafeArea(
-        top: false,
-        bottom: !widget.enableNearbyPlaces,
-        child: SelectPlaceWidget(
-          locationName: getLocationName(),
-          formattedAddress: getFormattedLocationName(),
-          onTap: locationResult != null
-              ? () {
-                  widget.onPlacePicked?.call(locationResult!);
-                }
-              : null,
-          actionText: widget.localizationConfig.selectActionLocation,
-          locationNameStyle: widget.selectedLocationNameStyle,
-          formattedAddressStyle: widget.selectedFormattedAddressStyle,
-          actionChild: widget.selectedActionButtonChild,
-          confirmBtnBgColor: widget.confirmBtnBgColor,
-          confirmBtnTextColor: widget.confirmBtnTextColor,
-          confirmBtnTextStyle: widget.confirmBtnTextStyle,
-        ),
-      );
+    if (widget.selectedPlaceWidgetBuilder == null) {
+      return locationResult != null
+          ? SafeArea(
+              top: false,
+              bottom: !widget.enableNearbyPlaces,
+              child: SelectPlaceWidget(
+                locationName: getLocationName(),
+                formattedAddress: getFormattedLocationName(),
+                onTap: locationResult != null
+                    ? () {
+                        widget.onPlacePicked?.call(locationResult!);
+                      }
+                    : null,
+                actionText: widget.localizationConfig.selectActionLocation,
+                locationNameStyle: widget.selectedLocationNameStyle,
+                formattedAddressStyle: widget.selectedFormattedAddressStyle,
+                actionChild: widget.selectedActionButtonChild,
+                confirmBtnBgColor: widget.confirmBtnBgColor,
+                confirmBtnTextColor: widget.confirmBtnTextColor,
+                confirmBtnTextStyle: widget.confirmBtnTextStyle,
+              ),
+            )
+          : const SizedBox.shrink();
     } else {
       return Builder(
         builder: (ctx) => widget.selectedPlaceWidgetBuilder!(
