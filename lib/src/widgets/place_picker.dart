@@ -452,7 +452,7 @@ class PlacePickerState extends State<PlacePicker> with TickerProviderStateMixin 
 
   /// Selected Place Widget
   Widget _buildSelectedPlace() {
-    if (widget.selectedPlaceWidgetBuilder == null) {
+    if (widget.selectedPlaceWidgetBuilder == null && locationResult != null) {
       return SafeArea(
         top: false,
         bottom: !widget.enableNearbyPlaces,
