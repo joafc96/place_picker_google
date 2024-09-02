@@ -542,12 +542,15 @@ class PlacePickerState extends State<PlacePicker> with TickerProviderStateMixin 
         width: searchInputBox?.size.width,
         child: CompositedTransformFollower(
           link: _layerLink,
-          offset: Offset(0, (searchInputBox?.size.height ?? 0)),
+          offset: Offset(0, ((searchInputBox?.size.height ?? 0) + 10.0)),
           showWhenUnlinked: false,
           child: Material(
             elevation: widget.autoCompleteOverlayElevation,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
               child: Row(
                 children: <Widget>[
                   SizedBox(

@@ -94,8 +94,7 @@ class SearchInputState extends State<SearchInput> {
         prefixStyle: widget.decorationConfig.prefixStyle,
         suffixIcon: hasSearchEntry
             ? GestureDetector(
-                child: widget.decorationConfig.suffixIcon ??
-                    const Icon(Icons.clear),
+                child: widget.decorationConfig.suffixIcon ?? const Icon(Icons.clear),
                 onTap: () {
                   editController.clear();
                   setState(() {
@@ -116,8 +115,7 @@ class SearchInputState extends State<SearchInput> {
         border: widget.decorationConfig.border ?? InputBorder.none,
         isDense: widget.decorationConfig.isDense,
         filled: widget.decorationConfig.filled,
-        fillColor:
-            widget.decorationConfig.fillColor ?? Theme.of(context).canvasColor,
+        fillColor: widget.decorationConfig.fillColor ?? Theme.of(context).canvasColor,
         contentPadding: widget.decorationConfig.contentPadding,
         enabled: widget.decorationConfig.enabled,
         constraints: widget.decorationConfig.constraints,
