@@ -67,7 +67,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                 ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
                 : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
             onPlacePicked: (LocationResult result) {
-              debugPrint("Place picked: ${result.route?.longName}");
+              debugPrint("Place picked: ${result.formattedAddress}");
               Navigator.of(context).pop();
             },
             enableNearbyPlaces: false,
