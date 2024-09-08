@@ -9,15 +9,18 @@ class AddressComponentGG {
     this.types,
   });
 
-  factory AddressComponentGG.fromJson(Map<String, dynamic> json) => AddressComponentGG(
-    longName: json["long_name"],
-    shortName: json["short_name"],
-    types: json["types"] == null ? [] : List<String>.from(json["types"]!.map((x) => x)),
-  );
+  factory AddressComponentGG.fromJson(Map<String, dynamic> json) =>
+      AddressComponentGG(
+        longName: json["long_name"],
+        shortName: json["short_name"],
+        types: json["types"] == null
+            ? []
+            : List<String>.from(json["types"]!.map((x) => x)),
+      );
 
   Map<String, dynamic> toJson() => {
-    "long_name": longName,
-    "short_name": shortName,
-    "types": types == null ? [] : List<dynamic>.from(types!.map((x) => x)),
-  };
+        "long_name": longName,
+        "short_name": shortName,
+        "types": types == null ? [] : List<dynamic>.from(types!.map((x) => x)),
+      };
 }

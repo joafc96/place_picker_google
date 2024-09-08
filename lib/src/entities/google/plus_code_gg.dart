@@ -8,12 +8,12 @@ class PlusCodeGG {
   });
 
   factory PlusCodeGG.fromJson(Map<String, dynamic> json) => PlusCodeGG(
-    compoundCode: json["compound_code"],
-    globalCode: json["global_code"],
-  );
+        compoundCode: json["compound_code"],
+        globalCode: json["global_code"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "compound_code": compoundCode,
-    "global_code": globalCode,
-  };
+        "compound_code": compoundCode,
+        "global_code": globalCode,
+      };
 }
