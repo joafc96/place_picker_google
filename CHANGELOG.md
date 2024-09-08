@@ -1,3 +1,9 @@
+## [0.0.8] - 08 Sep 2024
+
+* Created dart classes for geocoding api results to make the code null safe and concise.
+* Updated the logic to fetch and convert the json to dart classes. 
+* Added `route` and `streetNumber` as fields in `LocalizationResult`.
+
 ## [0.0.7] - 01 Sep 2024
 
 * Downgraded third party versions due to conflicts.

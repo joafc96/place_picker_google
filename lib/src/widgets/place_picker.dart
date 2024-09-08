@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:place_picker_google/place_picker_google.dart';
 import 'package:place_picker_google/src/utils/index.dart';
+import 'package:place_picker_google/src/entities/google/index.dart';
 
 typedef SelectedPlaceWidgetBuilder = Widget Function(
   BuildContext context,
@@ -170,8 +171,11 @@ class PlacePickerState extends State<PlacePicker>
   /// Indicator for the selected location
   final Set<Marker> markers = {};
 
-  /// Result returned after user completes selection
-  LocationResult? locationResult;
+  /// GeoCoding result returned after user completes selection
+  LocationResult? _geocodingResult;
+
+  /// GeoCoding results list for further use
+  late List<LocationResult> _geocodingResultList = [];
 
   /// Overlay to display autocomplete suggestions
   OverlayEntry? _suggestionsOverlayEntry;
@@ -461,9 +465,9 @@ class PlacePickerState extends State<PlacePicker>
         child: SelectPlaceWidget(
           locationName: getLocationName(),
           formattedAddress: getFormattedLocationName(),
-          onTap: locationResult != null
+          onTap: _geocodingResult != null
               ? () {
-                  widget.onPlacePicked?.call(locationResult!);
+                  widget.onPlacePicked?.call(_geocodingResult!);
                 }
               : null,
           actionText: widget.localizationConfig.selectActionLocation,
@@ -477,7 +481,7 @@ class PlacePickerState extends State<PlacePicker>
         builder: (ctx) => widget.selectedPlaceWidgetBuilder!(
           ctx,
           _searchingState,
-          locationResult,
+          _geocodingResult,
         ),
       );
     }
@@ -600,8 +604,8 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Builds the auto complete search endpoint
   String _buildAutoCompleteEndpoint(String place) {
-    final locationQuery = locationResult != null
-        ? '&location=${locationResult!.latLng?.latitude},${locationResult!.latLng?.longitude}'
+    final locationQuery = _geocodingResult != null
+        ? '&location=${_geocodingResult!.latLng?.latitude},${_geocodingResult!.latLng?.longitude}'
         : '';
 
     return 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
@@ -796,118 +800,178 @@ class PlacePickerState extends State<PlacePicker>
         throw Error();
       }
 
-      final result = responseJson['results'][0];
+      /// clear the geocodingResultList
+      _geocodingResultList.clear();
 
-      String name = "";
-      String? localityShortName,
-          postalCodeShortName,
-          plusCodeShortName,
-          countryShortName,
-          administrativeAreaLevel1ShortName,
-          administrativeAreaLevel2ShortName,
-          subLocalityLevel1ShortName,
-          subLocalityLevel2ShortName;
+      final geocodingResponse = geocodingResponseFromJson(response.body);
 
-      String? localityLongName,
-          postalCodeLongName,
-          plusCodeLongName,
-          countryLongName,
-          administrativeAreaLevel1LongName,
-          administrativeAreaLevel2LongName,
-          subLocalityLevel1LongName,
-          subLocalityLevel2LongName;
-      bool isOnStreet = false;
-      if (result['address_components'] is List<dynamic> &&
-          result['address_components'].length != null &&
-          result['address_components'].length > 0) {
-        for (var i = 0; i < result['address_components'].length; i++) {
-          var tmp = result['address_components'][i];
-          var types = tmp["types"] as List<dynamic>;
+      if (geocodingResponse.results != null &&
+          geocodingResponse.results!.isNotEmpty) {
+        /// Loop through all the results provided by google geocoding API
+        for (int resultIdx = 0;
+            resultIdx < geocodingResponse.results!.length;
+            resultIdx++) {
+          final GeocodingResultGG geocodingResultRaw =
+              geocodingResponse.results![resultIdx];
 
-          /// `short` and `long` names from google api
-          var shortName = tmp['short_name'];
-          var longName = tmp['long_name'];
+          if (geocodingResultRaw.addressComponents != null &&
+              geocodingResultRaw.addressComponents!.isNotEmpty) {
+            /// Initialize the short and long variables
+            String name = "";
+            String? routeShortName,
+                streetNumberShortName,
+                localityShortName,
+                postalCodeShortName,
+                plusCodeShortName,
+                countryShortName,
+                administrativeAreaLevel1ShortName,
+                administrativeAreaLevel2ShortName,
+                subLocalityLevel1ShortName,
+                subLocalityLevel2ShortName;
 
-          if (i == 0) {
-            /// [street_number]
-            name = shortName;
-            isOnStreet = types.contains('street_number');
+            String? routeLongName,
+                streetNumberLongName,
+                localityLongName,
+                postalCodeLongName,
+                plusCodeLongName,
+                countryLongName,
+                administrativeAreaLevel1LongName,
+                administrativeAreaLevel2LongName,
+                subLocalityLevel1LongName,
+                subLocalityLevel2LongName;
 
-            /// other index 0 types
-            /// [establishment, point_of_interest, subway_station, transit_station]
-            /// [premise]
-            /// [route]
-          } else if (i == 1 && isOnStreet) {
-            if (types.contains('route')) {
-              name += ", $shortName";
+            bool isOnStreet = false;
+
+            /// initialize geocoding result
+            LocationResult? geocodingResult;
+
+            /// Loop through all the address components for each results
+            for (int addressComponentsIdx = 0;
+                addressComponentsIdx <
+                    geocodingResultRaw.addressComponents!.length;
+                addressComponentsIdx++) {
+              final AddressComponentGG addressComponentRaw =
+                  geocodingResultRaw.addressComponents![addressComponentsIdx];
+
+              /// Types provided for each address components by geocoding API from google
+              final types = addressComponentRaw.types;
+
+              /// continue if types is either null or empty
+              if (types == null && types!.isEmpty) continue;
+
+              /// `short` and `long` names from google api
+              final shortName = addressComponentRaw.shortName;
+              final longName = addressComponentRaw.longName;
+
+              /// Create the human readable name
+              if (addressComponentsIdx == 0) {
+                /// [street_number]
+                name = shortName ?? "";
+                isOnStreet = types.contains('street_number');
+
+                /// other index 0 types
+                /// [establishment, point_of_interest, subway_station, transit_station]
+                /// [premise]
+                /// [route]
+              } else if (addressComponentsIdx == 1 && isOnStreet) {
+                if (types.contains('route')) {
+                  name += ", $shortName";
+                }
+              }
+
+              if (types.contains("street_number")) {
+                streetNumberLongName = longName;
+                streetNumberShortName = shortName;
+              } else if (types.contains("route")) {
+                routeLongName = longName;
+                routeShortName = shortName;
+              } else if (types.contains("country")) {
+                countryLongName = longName;
+                countryShortName = shortName;
+              } else if (types.contains("locality")) {
+                localityLongName = longName;
+                localityShortName = shortName;
+              } else if (types.contains("sublocality_level_1")) {
+                subLocalityLevel1LongName = longName;
+                subLocalityLevel1ShortName = shortName;
+              } else if (types.contains("sublocality_level_2")) {
+                subLocalityLevel2LongName = longName;
+                subLocalityLevel2ShortName = shortName;
+              } else if (types.contains("administrative_area_level_1")) {
+                administrativeAreaLevel1LongName = longName;
+                administrativeAreaLevel1ShortName = shortName;
+              } else if (types.contains("administrative_area_level_2")) {
+                administrativeAreaLevel2LongName = longName;
+                administrativeAreaLevel2ShortName = shortName;
+              } else if (types.contains('postal_code')) {
+                postalCodeLongName = longName;
+                postalCodeShortName = shortName;
+              } else if (types.contains('plus_code')) {
+                plusCodeLongName = longName;
+                plusCodeShortName = shortName;
+              }
+
+              geocodingResult = LocationResult()
+                ..name = name
+                ..latLng = latLng
+                ..formattedAddress = geocodingResultRaw.formattedAddress
+                ..placeId = geocodingResultRaw.placeId
+                ..streetNumber = AddressComponent(
+                  longName: streetNumberLongName,
+                  shortName: streetNumberShortName,
+                )
+                ..route = AddressComponent(
+                  longName: routeLongName,
+                  shortName: routeShortName,
+                )
+                ..country = AddressComponent(
+                  longName: countryLongName,
+                  shortName: countryShortName,
+                )
+                ..locality = AddressComponent(
+                  longName:
+                      localityLongName ?? administrativeAreaLevel1LongName,
+                  shortName:
+                      localityShortName ?? administrativeAreaLevel1ShortName,
+                )
+                ..administrativeAreaLevel1 = AddressComponent(
+                  longName: administrativeAreaLevel1LongName,
+                  shortName: administrativeAreaLevel1ShortName,
+                )
+                ..administrativeAreaLevel2 = AddressComponent(
+                  longName: administrativeAreaLevel2LongName,
+                  shortName: administrativeAreaLevel2ShortName,
+                )
+                ..subLocalityLevel1 = AddressComponent(
+                  longName: subLocalityLevel1LongName,
+                  shortName: subLocalityLevel1ShortName,
+                )
+                ..subLocalityLevel2 = AddressComponent(
+                  longName: subLocalityLevel2LongName,
+                  shortName: subLocalityLevel2ShortName,
+                )
+                ..postalCode = AddressComponent(
+                  longName: postalCodeLongName,
+                  shortName: postalCodeShortName,
+                )
+                ..plusCode = AddressComponent(
+                  longName: plusCodeLongName,
+                  shortName: plusCodeShortName,
+                );
             }
-          } else {
-            if (types.contains("country")) {
-              countryLongName = longName;
-              countryShortName = shortName;
-            } else if (types.contains("locality")) {
-              localityLongName = longName;
-              localityShortName = shortName;
-            } else if (types.contains("sublocality_level_1")) {
-              subLocalityLevel1LongName = longName;
-              subLocalityLevel1ShortName = shortName;
-            } else if (types.contains("sublocality_level_2")) {
-              subLocalityLevel2LongName = longName;
-              subLocalityLevel2ShortName = shortName;
-            } else if (types.contains("administrative_area_level_1")) {
-              administrativeAreaLevel1LongName = longName;
-              administrativeAreaLevel1ShortName = shortName;
-            } else if (types.contains("administrative_area_level_2")) {
-              administrativeAreaLevel2LongName = longName;
-              administrativeAreaLevel2ShortName = shortName;
-            } else if (types.contains('postal_code')) {
-              postalCodeLongName = longName;
-              postalCodeShortName = shortName;
-            } else if (types.contains('plus_code')) {
-              plusCodeLongName = longName;
-              plusCodeShortName = shortName;
+
+            if (geocodingResult != null) {
+              _geocodingResultList.add(geocodingResult);
             }
           }
         }
       }
 
-      locationResult = LocationResult()
-        ..name = name
-        ..latLng = latLng
-        ..formattedAddress = result['formatted_address']
-        ..placeId = result['place_id']
-        ..country = AddressComponent(
-          longName: countryLongName,
-          shortName: countryShortName,
-        )
-        ..locality = AddressComponent(
-          longName: localityLongName ?? administrativeAreaLevel1LongName,
-          shortName: localityShortName ?? administrativeAreaLevel1ShortName,
-        )
-        ..administrativeAreaLevel1 = AddressComponent(
-          longName: administrativeAreaLevel1LongName,
-          shortName: administrativeAreaLevel1ShortName,
-        )
-        ..administrativeAreaLevel2 = AddressComponent(
-          longName: administrativeAreaLevel2LongName,
-          shortName: administrativeAreaLevel2ShortName,
-        )
-        ..subLocalityLevel1 = AddressComponent(
-          longName: subLocalityLevel1LongName,
-          shortName: subLocalityLevel1ShortName,
-        )
-        ..subLocalityLevel2 = AddressComponent(
-          longName: subLocalityLevel2LongName,
-          shortName: subLocalityLevel2ShortName,
-        )
-        ..postalCode = AddressComponent(
-          longName: postalCodeLongName,
-          shortName: postalCodeShortName,
-        )
-        ..plusCode = AddressComponent(
-          longName: plusCodeLongName,
-          shortName: plusCodeShortName,
-        );
+      /// if the geocoding result is list is not empty
+      /// set _geocodingResult as the first element of the list
+      if (_geocodingResultList.isNotEmpty) {
+        _geocodingResult = _geocodingResultList.first;
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -1064,28 +1128,20 @@ class PlacePickerState extends State<PlacePicker>
   /// that the user selects from the nearby list (and expects to see that as a
   /// result, instead of road name). If no name is found from the nearby list,
   /// then the road name returned is used instead.
-  String getLocationName() {
-    if (locationResult == null) {
+  String? getLocationName() {
+    if (_geocodingResult == null) {
       return widget.localizationConfig.unnamedLocation;
     }
 
-    for (NearbyPlace np in nearbyPlaces) {
-      if (np.latLng == locationResult?.latLng &&
-          np.name != locationResult?.locality?.shortName) {
-        locationResult?.name = np.name;
-        return "${np.name}, ${locationResult?.locality}";
-      }
-    }
-
-    return "${locationResult?.name}";
+    return _geocodingResult?.name;
   }
 
   /// Utility function to get clean readable formatted address of a location.
   String getFormattedLocationName() {
-    if (locationResult == null) {
+    if (_geocodingResult == null) {
       return widget.localizationConfig.unnamedLocation;
     }
 
-    return "${locationResult?.formattedAddress}";
+    return "${_geocodingResult?.formattedAddress}";
   }
 }

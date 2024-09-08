@@ -33,6 +33,10 @@ class LocationResult {
 
   AddressComponent? postalCode;
 
+  AddressComponent? route;
+
+  AddressComponent? streetNumber;
+
   AddressComponent? plusCode;
 
   AddressComponent? country;
