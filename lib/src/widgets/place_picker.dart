@@ -175,7 +175,7 @@ class PlacePickerState extends State<PlacePicker>
   LocationResult? _geocodingResult;
 
   /// GeoCoding results list for further use
-  late List<LocationResult> _geocodingResultList = [];
+  late final List<LocationResult> _geocodingResultList = [];
 
   /// Overlay to display autocomplete suggestions
   OverlayEntry? _suggestionsOverlayEntry;
