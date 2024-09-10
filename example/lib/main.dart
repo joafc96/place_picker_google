@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:place_picker_google/place_picker_google.dart';
@@ -8,7 +9,10 @@ import 'dart:io' show Platform;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterConfig.loadEnvVariables();
+
+  if (!kIsWeb) {
+    await FlutterConfig.loadEnvVariables();
+  }
 
   runApp(
     const MyApp(),
@@ -62,10 +66,15 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
       MaterialPageRoute(
         builder: (context) {
           return PlacePicker(
+            baseUrl: kIsWeb
+                ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api'
+                : "https://maps.googleapis.com/maps/api/",
             usePinPointingSearch: true,
-            apiKey: Platform.isAndroid
-                ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
-                : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
+            apiKey: kIsWeb
+                ? "GOOGLE_API_KEY"
+                : Platform.isAndroid
+                    ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
+                    : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
             onPlacePicked: (LocationResult result) {
               debugPrint("Place picked: ${result.formattedAddress}");
               Navigator.of(context).pop();

@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:place_picker_google/place_picker_google.dart';
+import 'package:place_picker_google/src/services/google_maps_places_service.dart';
 import 'package:place_picker_google/src/utils/index.dart';
 import 'package:place_picker_google/src/entities/google/index.dart';
 
@@ -35,6 +36,9 @@ class PlacePicker extends StatefulWidget {
   /// API key generated from Google Cloud Console. You can get an API key
   /// [here](https://cloud.google.com/maps-platform/)
   final String apiKey;
+
+  /// GeoCoding base url
+  final String baseUrl;
 
   /// Callback method for when the map is ready to be used.
   ///
@@ -129,6 +133,7 @@ class PlacePicker extends StatefulWidget {
   const PlacePicker({
     super.key,
     required this.apiKey,
+    this.baseUrl = "https://maps.googleapis.com/maps/api/",
     this.onMapCreated,
     this.initialLocation,
     this.onPlacePicked,
@@ -582,9 +587,13 @@ class PlacePickerState extends State<PlacePicker>
     try {
       place = place.replaceAll(" ", "+");
 
-      final endpoint = _buildAutoCompleteEndpoint(place);
-
-      final response = await http.get(Uri.parse(endpoint));
+    final response = await GoogleMapsPlaces(apiKey: widget.apiKey, baseUrl: widget.baseUrl,)
+          .autocomplete(
+        place,
+        sessionToken: sessionToken,
+        language: widget.localizationConfig.languageCode,
+        location: _geocodingResult?.latLng,
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Failed to load suggestions');
@@ -600,18 +609,6 @@ class PlacePickerState extends State<PlacePicker>
     } catch (e) {
       debugPrint(e.toString());
     }
-  }
-
-  /// Builds the auto complete search endpoint
-  String _buildAutoCompleteEndpoint(String place) {
-    final locationQuery = _geocodingResult != null
-        ? '&location=${_geocodingResult!.latLng?.latitude},${_geocodingResult!.latLng?.longitude}'
-        : '';
-
-    return 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
-        'key=${widget.apiKey}&'
-        'language=${widget.localizationConfig.languageCode}&'
-        'input=$place&sessiontoken=$sessionToken$locationQuery';
   }
 
   /// Parses the `predictions` into `RichSuggestion` array.
@@ -683,7 +680,7 @@ class PlacePickerState extends State<PlacePicker>
 
     try {
       final url = Uri.parse(
-          "https://maps.googleapis.com/maps/api/place/details/json?key=${widget.apiKey}&language=${widget.localizationConfig.languageCode}&placeid=$placeId");
+          "${widget.baseUrl}place/details/json?key=${widget.apiKey}&language=${widget.localizationConfig.languageCode}&placeid=$placeId");
 
       final response = await http.get(url);
 
@@ -783,7 +780,7 @@ class PlacePickerState extends State<PlacePicker>
   /// to be the road name and the locality.
   Future<void> reverseGeocodeLatLng(LatLng latLng) async {
     try {
-      final url = Uri.parse("https://maps.googleapis.com/maps/api/geocode/json?"
+      final url = Uri.parse("${widget.baseUrl}geocode/json?"
           "latlng=${latLng.latitude},${latLng.longitude}&"
           "language=${widget.localizationConfig.languageCode}&"
           "key=${widget.apiKey}");
@@ -980,8 +977,7 @@ class PlacePickerState extends State<PlacePicker>
   /// Fetches and updates the nearby places to the provided lat,lng
   Future<void> getNearbyPlaces(LatLng latLng) async {
     try {
-      final url = Uri.parse(
-          "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+      final url = Uri.parse("${widget.baseUrl}place/nearbysearch/json?"
           "key=${widget.apiKey}&location=${latLng.latitude},${latLng.longitude}"
           "&radius=150&language=${widget.localizationConfig.languageCode}");
 

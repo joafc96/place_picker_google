@@ -160,6 +160,25 @@ Check the [`google_maps_flutter_web` README](https://pub.dev/packages/google_map
 for the latest information on how to prepare your App to use Google Maps on the
 web.
 
+### Note
+
+Google places API prevents CORS. So we can't make a request from client-side. 
+And As the PlacesAutocomplete widget makes http request to the Google places API like this:
+
+```dart
+"https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Search-Query}&key=${API-Key}"
+```
+
+This client-side request will be prevented.
+The Google API was not made to be call from browser. 
+You need to use a proxy server that add the CORS to your request. e.g cors-anywhere.
+
+Deploy the proxy server in Heroku or Vercel. You'll get a URL after deployment. 
+After that you need to add the URL before your API endpoint while making the calls. i.e "proxy_server_url/google_api_endpoint". 
+The proxy server will add the necessary headers.
+
+(For example set the baseUrl in PlacePicker as https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api)
+
 ## Setup
 
 Add this to your package's `pubspec.yaml` file:
