@@ -46,34 +46,33 @@ abstract class GoogleMapsHTTPService {
 
   @protected
   String buildQuery(Map<String, dynamic> params) {
-    final query = [];
-    params.forEach((key, val) {
-      if (val != null) {
-        if (val is Iterable) {
-          query.add("$key=${val.map((v) => v.toString()).join("|")}");
-        } else {
-          query.add('$key=${val.toString()}');
-        }
+    return params.entries
+        .where((entry) => entry.value != null)
+        .map((entry) {
+      final value = entry.value;
+      if (value is Iterable) {
+        return '${entry.key}=${value.map((v) => v.toString()).join("|")}';
       }
-    });
-    return query.join('&');
+      return '${entry.key}=$value';
+    })
+        .join('&');
   }
 
   @protected
-  Future<Response> doGet(String url, {Map<String, String>? headers}) {
+  Future<Response> doGet(String url, {Map<String, String>? headers}) async {
     return httpClient.get(Uri.parse(url), headers: headers);
   }
 
   @protected
   Future<Response> doPost(
-    String url,
-    String body, {
-    Map<String, String>? headers,
-  }) {
+      String url,
+      String body, {
+        Map<String, String>? headers,
+      }) async {
     final postHeaders = {
       'Content-type': 'application/json',
+      if (headers != null) ...headers,
     };
-    if (headers != null) postHeaders.addAll(headers);
     return httpClient.post(Uri.parse(url), body: body, headers: postHeaders);
   }
 

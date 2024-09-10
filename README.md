@@ -177,7 +177,16 @@ Deploy the proxy server in Heroku or Vercel. You'll get a URL after deployment.
 After that you need to add the URL before your API endpoint while making the calls. i.e "proxy_server_url/google_api_endpoint". 
 The proxy server will add the necessary headers.
 
-(For example set the baseUrl in PlacePicker as https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api)
+For example with the proxy server it would look like
+```dart
+"https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Search-Query}&key=${API-Key}"
+```
+
+Therefore set the web baseUrl as
+
+```dart
+"https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/"
+```
 
 ## Setup
 

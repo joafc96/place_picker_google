@@ -695,10 +695,11 @@ class PlacePickerState extends State<PlacePicker>
     _clearOverlay();
 
     try {
-      final url = Uri.parse(
-          "${widget.mapsBaseUrl}place/details/json?key=${widget.apiKey}&language=${widget.localizationConfig.languageCode}&placeid=$placeId");
-
-      final response = await http.get(url);
+     final response = await googlePlacePickerService.details(
+        placeId,
+        language: widget.localizationConfig.languageCode,
+        sessionToken: sessionToken,
+      );
 
       if (response.statusCode != 200) {
         throw Error();

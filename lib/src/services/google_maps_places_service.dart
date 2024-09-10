@@ -42,10 +42,6 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     /// Types for restricting results to a set of place types
     List<String> types = const [],
 
-    /// Components set results to be restricted to a specific area
-    /// components: [Component(Component.country, "us")]
-    List<Component> components = const [],
-
     /// Bounds for restricting results to a set of bounds
     bool strictbounds = false,
 
@@ -62,7 +58,6 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
       if (origin != null) 'origin': origin.toString(),
       if (radius != null) 'radius': radius.toString(),
       if (types.isNotEmpty) 'types': types.join('|'),
-      if (components.isNotEmpty) 'components': components.join('|'),
       if (strictbounds) 'strictbounds': strictbounds.toString(),
       if (offset != null) 'offset': offset.toString(),
       if (region != null) 'region': region,
@@ -76,7 +71,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
         )
         .toString();
 
-    debugPrint(autocompleteUrl);
+    debugPrint("autocomplete: $autocompleteUrl");
 
     return await doGet(autocompleteUrl, headers: apiHeaders);
   }
@@ -113,24 +108,42 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
         )
         .toString();
 
-    debugPrint(nearbySearchUrl);
+    debugPrint("nearbySearch: $nearbySearchUrl");
 
     return await doGet(nearbySearchUrl, headers: apiHeaders);
   }
-}
 
-class Component {
-  static const route = 'route';
-  static const locality = 'locality';
-  static const administrativeArea = 'administrative_area';
-  static const postalCode = 'postal_code';
-  static const country = 'country';
+  Future<http.Response> details(
+    /// Place ID provided google to decode and get the details.
+    String placeId, {
+    /// Session token for Google Places API
 
-  final String component;
-  final String value;
+    String? sessionToken,
+    List<String> fields = const [],
 
-  Component(this.component, this.value);
+    /// Language code for Places API results
+    /// language: 'en',
+    String? language,
+    String? region,
+  }) async {
+    final params = {
+      'placeid': placeId,
+      if (apiKey != null) 'key': apiKey!,
+      if (sessionToken != null) 'sessiontoken': sessionToken,
+      if (language != null) 'language': language,
+      if (region != null) 'region': region,
+      if (fields.isNotEmpty) 'fields': fields.join(','),
+    };
 
-  @override
-  String toString() => '$component:$value';
+    final detailsUrl = url
+        .replace(
+          path: '${url.path}details/json',
+          queryParameters: params,
+        )
+        .toString();
+
+    debugPrint("details: $detailsUrl");
+
+    return await doGet(detailsUrl, headers: apiHeaders);
+  }
 }
