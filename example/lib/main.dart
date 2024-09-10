@@ -67,7 +67,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
         builder: (context) {
           return PlacePicker(
             mapsBaseUrl: kIsWeb
-                ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api'
+                ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/'
                 : "https://maps.googleapis.com/maps/api/",
             usePinPointingSearch: true,
             apiKey: kIsWeb

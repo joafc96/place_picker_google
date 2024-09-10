@@ -9,7 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:place_picker_google/place_picker_google.dart';
-import 'package:place_picker_google/src/services/google_maps_places_service.dart';
+import 'package:place_picker_google/src/services/index.dart';
 import 'package:place_picker_google/src/utils/index.dart';
 import 'package:place_picker_google/src/entities/google/index.dart';
 
@@ -139,7 +139,7 @@ class PlacePicker extends StatefulWidget {
   const PlacePicker({
     super.key,
     required this.apiKey,
-    this.mapsBaseUrl,
+    this.mapsBaseUrl = 'https://maps.googleapis.com/maps/api/',
     this.mapsApiHeaders,
     this.mapsHttpClient,
     this.onMapCreated,
@@ -612,7 +612,7 @@ class PlacePickerState extends State<PlacePicker>
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to load suggestions');
+        throw Exception('Failed to load auto complete predictions of place: $place.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -695,14 +695,14 @@ class PlacePickerState extends State<PlacePicker>
     _clearOverlay();
 
     try {
-     final response = await googlePlacePickerService.details(
+      final response = await googlePlacePickerService.details(
         placeId,
         language: widget.localizationConfig.languageCode,
         sessionToken: sessionToken,
       );
 
       if (response.statusCode != 200) {
-        throw Error();
+        throw Exception('Failed to fetch details of placeId: $placeId.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -805,7 +805,7 @@ class PlacePickerState extends State<PlacePicker>
       final response = await http.get(url);
 
       if (response.statusCode != 200) {
-        throw Error();
+        throw Exception('Failed to geocode of location: $latLng.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -1000,7 +1000,7 @@ class PlacePickerState extends State<PlacePicker>
       );
 
       if (response.statusCode != 200) {
-        throw Error();
+        throw Exception('Failed to fetch nearby places of location: $latLng.');
       }
 
       final responseJson = jsonDecode(response.body);
