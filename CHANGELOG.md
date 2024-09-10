@@ -1,3 +1,10 @@
+## [0.0.9] - 10 Sep 2024
+
+* Exposed `mapsBaseUrl` in the package so web users can use a proxy server to adding necessary headers.
+* Exposed `mapsHttpClient` in the package so users can provide their own http client.
+* Exposed `mapsApiHeaders` in the package so users can provide their own http headers.
+* Abstracted networking code out from the main package.
+
 ## [0.0.8] - 08 Sep 2024
 
 * Created dart classes for geocoding api results to make the code null safe and concise.

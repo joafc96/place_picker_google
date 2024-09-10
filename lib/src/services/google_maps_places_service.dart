@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -54,16 +55,17 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
   }) async {
     final params = {
       'input': query,
+      if (apiKey != null) 'key': apiKey,
+      if (location != null)
+        'location': "${location.latitude}, ${location.longitude}",
       if (language != null) 'language': language,
       if (origin != null) 'origin': origin.toString(),
-      if (location != null) 'location': location.toString(),
       if (radius != null) 'radius': radius.toString(),
       if (types.isNotEmpty) 'types': types.join('|'),
       if (components.isNotEmpty) 'components': components.join('|'),
       if (strictbounds) 'strictbounds': strictbounds.toString(),
       if (offset != null) 'offset': offset.toString(),
       if (region != null) 'region': region,
-      if (apiKey != null) 'key': apiKey!,
       if (sessionToken != null) 'sessiontoken': sessionToken,
     };
 
@@ -74,7 +76,46 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
         )
         .toString();
 
+    debugPrint(autocompleteUrl);
+
     return await doGet(autocompleteUrl, headers: apiHeaders);
+  }
+
+  Future<http.Response> nearbySearch(
+    /// Location bounds for restricting results to a radius around a location
+    /// location: Location(lat: -33.867, lng: 151.195)
+    LatLng location, {
+    /// Radius for restricting results to a radius around a location
+    /// radius: Radius in meters
+    num radius = 150,
+
+    /// Type for restricting results to a set of place types
+    String? type,
+    String? keyword,
+
+    /// Language code for Places API results
+    /// language: 'en',
+    String? language,
+  }) async {
+    final params = {
+      if (apiKey != null) 'key': apiKey,
+      'location': "${location.latitude}, ${location.longitude}",
+      'radius': radius.toString(),
+      if (language != null) 'language': language,
+      if (type != null) 'type': type,
+      if (keyword != null) 'keyword': keyword,
+    };
+
+    final nearbySearchUrl = url
+        .replace(
+          path: '${url.path}nearbysearch/json',
+          queryParameters: params,
+        )
+        .toString();
+
+    debugPrint(nearbySearchUrl);
+
+    return await doGet(nearbySearchUrl, headers: apiHeaders);
   }
 }
 

@@ -37,8 +37,14 @@ class PlacePicker extends StatefulWidget {
   /// [here](https://cloud.google.com/maps-platform/)
   final String apiKey;
 
-  /// GeoCoding base url
-  final String baseUrl;
+  /// Maps base url
+  final String? mapsBaseUrl;
+
+  /// Maps http client
+  final http.Client? mapsHttpClient;
+
+  /// Maps api headers
+  final Map<String, String>? mapsApiHeaders;
 
   /// Callback method for when the map is ready to be used.
   ///
@@ -133,7 +139,9 @@ class PlacePicker extends StatefulWidget {
   const PlacePicker({
     super.key,
     required this.apiKey,
-    this.baseUrl = "https://maps.googleapis.com/maps/api/",
+    this.mapsBaseUrl,
+    this.mapsApiHeaders,
+    this.mapsHttpClient,
     this.onMapCreated,
     this.initialLocation,
     this.onPlacePicked,
@@ -165,7 +173,16 @@ class PlacePicker extends StatefulWidget {
 /// Place picker state
 class PlacePickerState extends State<PlacePicker>
     with TickerProviderStateMixin {
+  /// Map Controller Completer
   final Completer<GoogleMapController> mapController = Completer();
+
+  /// Google Place Picker Service
+  late final googlePlacePickerService = GoogleMapsPlaces(
+    apiKey: widget.apiKey,
+    baseUrl: widget.mapsBaseUrl,
+    httpClient: widget.mapsHttpClient,
+    apiHeaders: widget.mapsApiHeaders,
+  );
 
   /// Current location of the marker
   LatLng? _currentLocation;
@@ -587,8 +604,7 @@ class PlacePickerState extends State<PlacePicker>
     try {
       place = place.replaceAll(" ", "+");
 
-    final response = await GoogleMapsPlaces(apiKey: widget.apiKey, baseUrl: widget.baseUrl,)
-          .autocomplete(
+      final response = await googlePlacePickerService.autocomplete(
         place,
         sessionToken: sessionToken,
         language: widget.localizationConfig.languageCode,
@@ -680,7 +696,7 @@ class PlacePickerState extends State<PlacePicker>
 
     try {
       final url = Uri.parse(
-          "${widget.baseUrl}place/details/json?key=${widget.apiKey}&language=${widget.localizationConfig.languageCode}&placeid=$placeId");
+          "${widget.mapsBaseUrl}place/details/json?key=${widget.apiKey}&language=${widget.localizationConfig.languageCode}&placeid=$placeId");
 
       final response = await http.get(url);
 
@@ -780,7 +796,7 @@ class PlacePickerState extends State<PlacePicker>
   /// to be the road name and the locality.
   Future<void> reverseGeocodeLatLng(LatLng latLng) async {
     try {
-      final url = Uri.parse("${widget.baseUrl}geocode/json?"
+      final url = Uri.parse("${widget.mapsBaseUrl}geocode/json?"
           "latlng=${latLng.latitude},${latLng.longitude}&"
           "language=${widget.localizationConfig.languageCode}&"
           "key=${widget.apiKey}");
@@ -977,11 +993,10 @@ class PlacePickerState extends State<PlacePicker>
   /// Fetches and updates the nearby places to the provided lat,lng
   Future<void> getNearbyPlaces(LatLng latLng) async {
     try {
-      final url = Uri.parse("${widget.baseUrl}place/nearbysearch/json?"
-          "key=${widget.apiKey}&location=${latLng.latitude},${latLng.longitude}"
-          "&radius=150&language=${widget.localizationConfig.languageCode}");
-
-      final response = await http.get(url);
+      final response = await googlePlacePickerService.nearbySearch(
+        latLng,
+        language: widget.localizationConfig.languageCode,
+      );
 
       if (response.statusCode != 200) {
         throw Error();

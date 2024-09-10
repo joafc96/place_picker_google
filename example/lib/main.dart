@@ -66,12 +66,12 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
       MaterialPageRoute(
         builder: (context) {
           return PlacePicker(
-            baseUrl: kIsWeb
+            mapsBaseUrl: kIsWeb
                 ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api'
                 : "https://maps.googleapis.com/maps/api/",
             usePinPointingSearch: true,
             apiKey: kIsWeb
-                ? "GOOGLE_API_KEY"
+                ? "GOOGLE_MAPS_API_KEY_WEB"
                 : Platform.isAndroid
                     ? FlutterConfig.get('GOOGLE_MAPS_API_KEY_ANDROID')
                     : FlutterConfig.get('GOOGLE_MAPS_API_KEY_IOS'),
