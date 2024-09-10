@@ -136,6 +136,10 @@ class PlacePicker extends StatefulWidget {
   /// Builder method for pinPointing Pin widget
   final PinWidgetBuilder? pinPointingPinWidgetBuilder;
 
+  /// Radius in meters to narrow down the autocomplete places search results
+  /// according to the current location
+  final num? autocompletePlacesSearchRadius;
+
   const PlacePicker({
     super.key,
     required this.apiKey,
@@ -164,6 +168,7 @@ class PlacePicker extends StatefulWidget {
     this.usePinPointingSearch = false,
     this.pinPointingDebounceDuration = 500,
     this.pinPointingPinWidgetBuilder,
+    this.autocompletePlacesSearchRadius,
   });
 
   @override
@@ -230,6 +235,11 @@ class PlacePickerState extends State<PlacePicker>
 
   /// simple getter to check whether searchingState is searching
   bool get isSearching => _searchingState == SearchingState.searching;
+
+  /// To prevent infinite loop
+  /// The onCameraIdle callback in Google Maps Flutter for Android,
+  /// can be triggered infinitely if there is some unintended feedback loop in the code.
+  bool _isAnimating = false;
 
   @override
   void setState(fn) {
@@ -407,6 +417,8 @@ class PlacePickerState extends State<PlacePicker>
 
   /// On Camera idle
   void onCameraIdle() {
+    if (_isAnimating) return;
+
     setState(() {
       _pinState = PinState.idle;
     });
@@ -414,6 +426,8 @@ class PlacePickerState extends State<PlacePicker>
 
   /// On Camera move started
   void onCameraMoveStarted() {
+    if (_isAnimating) return;
+
     setState(() {
       _pinState = PinState.dragging;
       if (widget.usePinPointingSearch) {
@@ -424,6 +438,8 @@ class PlacePickerState extends State<PlacePicker>
 
   /// On Camera move
   void onCameraMove(CameraPosition position) {
+    if (_isAnimating) return;
+
     /// set zoom level
     _zoom = position.zoom;
 
@@ -609,10 +625,12 @@ class PlacePickerState extends State<PlacePicker>
         sessionToken: sessionToken,
         language: widget.localizationConfig.languageCode,
         location: _geocodingResult?.latLng,
+        radius: widget.autocompletePlacesSearchRadius,
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to load auto complete predictions of place: $place.');
+        throw Exception(
+            'Failed to load auto complete predictions of place: $place.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -737,7 +755,11 @@ class PlacePickerState extends State<PlacePicker>
   /// updates other UI features to
   /// match the location.
   Future<void> animateToLocation(LatLng latLng) async {
+    _isAnimating = true;
+
     final controller = await mapController.future;
+
+    print("animateToLocation");
 
     await controller.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -755,6 +777,8 @@ class PlacePickerState extends State<PlacePicker>
     await reverseGeocodeLatLng(latLng);
 
     if (widget.enableNearbyPlaces) await getNearbyPlaces(latLng);
+
+    _isAnimating = false;
 
     /// set searching state to idle
     setState(() {

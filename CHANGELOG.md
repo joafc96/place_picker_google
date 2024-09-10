@@ -4,6 +4,8 @@
 * Exposed `mapsHttpClient` in the package so users can provide their own http client.
 * Exposed `mapsApiHeaders` in the package so users can provide their own http headers.
 * Abstracted networking code out from the main package.
+* Fixed infinite loop caused due to `animateCamera` and `onCameraMove` callback.
+* Added new prop `autocompletePlacesSearchRadius` to narrow down the autocomplete search results to current location by providing radius in meters if needed.
 
 ## [0.0.8] - 08 Sep 2024
 

@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 final kGMapsBaseUrl = Uri.parse('https://maps.googleapis.com/maps/api/');
 
 abstract class GoogleMapsHTTPService {
   @protected
-  final Client _httpClient;
+  final http.Client _httpClient;
 
   @protected
   late final Uri _url;
@@ -20,7 +20,7 @@ abstract class GoogleMapsHTTPService {
 
   Uri get url => _url;
 
-  Client get httpClient => _httpClient;
+  http.Client get httpClient => _httpClient;
 
   String? get apiKey => _apiKey;
 
@@ -30,9 +30,9 @@ abstract class GoogleMapsHTTPService {
     required String apiPath,
     String? apiKey,
     String? baseUrl,
-    Client? httpClient,
+    http.Client? httpClient,
     Map<String, String>? apiHeaders,
-  })  : _httpClient = httpClient ?? Client(),
+  })  : _httpClient = httpClient ?? http.Client(),
         _apiKey = apiKey,
         _apiHeaders = apiHeaders {
     var uri = kGMapsBaseUrl;
@@ -59,12 +59,12 @@ abstract class GoogleMapsHTTPService {
   }
 
   @protected
-  Future<Response> doGet(String url, {Map<String, String>? headers}) async {
+  Future<http.Response> doGet(String url, {Map<String, String>? headers}) async {
     return httpClient.get(Uri.parse(url), headers: headers);
   }
 
   @protected
-  Future<Response> doPost(
+  Future<http.Response> doPost(
       String url,
       String body, {
         Map<String, String>? headers,

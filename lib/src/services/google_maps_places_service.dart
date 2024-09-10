@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -43,7 +42,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     List<String> types = const [],
 
     /// Bounds for restricting results to a set of bounds
-    bool strictbounds = false,
+    bool strictBounds = false,
 
     /// Region for restricting results to a set of regions
     /// region: "us"
@@ -58,7 +57,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
       if (origin != null) 'origin': origin.toString(),
       if (radius != null) 'radius': radius.toString(),
       if (types.isNotEmpty) 'types': types.join('|'),
-      if (strictbounds) 'strictbounds': strictbounds.toString(),
+      if (strictBounds) 'strictbounds': strictBounds.toString(),
       if (offset != null) 'offset': offset.toString(),
       if (region != null) 'region': region,
       if (sessionToken != null) 'sessiontoken': sessionToken,
@@ -70,8 +69,6 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
           queryParameters: params,
         )
         .toString();
-
-    debugPrint("autocomplete: $autocompleteUrl");
 
     return await doGet(autocompleteUrl, headers: apiHeaders);
   }
@@ -108,8 +105,6 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
         )
         .toString();
 
-    debugPrint("nearbySearch: $nearbySearchUrl");
-
     return await doGet(nearbySearchUrl, headers: apiHeaders);
   }
 
@@ -117,13 +112,15 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     /// Place ID provided google to decode and get the details.
     String placeId, {
     /// Session token for Google Places API
-
     String? sessionToken,
     List<String> fields = const [],
 
     /// Language code for Places API results
     /// language: 'en',
     String? language,
+
+    /// Region for restricting results to a set of regions
+    /// region: "us"
     String? region,
   }) async {
     final params = {
@@ -141,8 +138,6 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
           queryParameters: params,
         )
         .toString();
-
-    debugPrint("details: $detailsUrl");
 
     return await doGet(detailsUrl, headers: apiHeaders);
   }

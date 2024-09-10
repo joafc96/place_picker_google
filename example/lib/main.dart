@@ -104,6 +104,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
             // selectedPlaceWidgetBuilder: (ctx, state, result) {
             //   return const SizedBox.shrink();
             // },
+            autocompletePlacesSearchRadius: 150,
           );
         },
       ),
