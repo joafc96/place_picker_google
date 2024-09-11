@@ -241,6 +241,8 @@ class PlacePickerState extends State<PlacePicker>
   /// can be triggered infinitely if there is some unintended feedback loop in the code.
   bool _isAnimating = false;
 
+  CameraPosition? cameraPosition;
+
   @override
   void setState(fn) {
     if (mounted) {
@@ -419,6 +421,15 @@ class PlacePickerState extends State<PlacePicker>
   void onCameraIdle() {
     if (_isAnimating) return;
 
+    /// if not pin pointing search
+    /// set pin state as dragging and update and
+    /// call the places API after the debounce is completed.
+    if (widget.usePinPointingSearch &&
+        _pinState == PinState.dragging &&
+        cameraPosition != null) {
+      _debouncePinPointing(cameraPosition!.target);
+    }
+
     setState(() {
       _pinState = PinState.idle;
     });
@@ -440,15 +451,11 @@ class PlacePickerState extends State<PlacePicker>
   void onCameraMove(CameraPosition position) {
     if (_isAnimating) return;
 
+    /// set current camera position
+    /// when map is dragging
+    cameraPosition = position;
     /// set zoom level
     _zoom = position.zoom;
-
-    /// if not pin pointing search
-    /// set pin state as dragging and update and
-    /// call the places API after the debounce is completed.
-    if (widget.usePinPointingSearch && _pinState == PinState.dragging) {
-      _debouncePinPointing(position.target);
-    }
   }
 
   /// On user taps map
