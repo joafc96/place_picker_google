@@ -454,6 +454,7 @@ class PlacePickerState extends State<PlacePicker>
     /// set current camera position
     /// when map is dragging
     cameraPosition = position;
+
     /// set zoom level
     _zoom = position.zoom;
   }
