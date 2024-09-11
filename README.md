@@ -162,8 +162,10 @@ web.
 
 ### Note
 
-- Important: Browser-based apps can't use `dart:io` library for the `Platform` API.
+- Browser-based apps can't use `dart:io` library for the `Platform` API.
   Only servers, command-line scripts, and Flutter mobile apps can import and use `dart:io`.
+
+  A native solution to switch between the platforms would be to use the `flutter/foundation` library.
 
 ```dart
 import 'package:flutter/foundation.dart';

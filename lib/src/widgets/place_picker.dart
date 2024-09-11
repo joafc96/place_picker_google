@@ -759,8 +759,6 @@ class PlacePickerState extends State<PlacePicker>
 
     final controller = await mapController.future;
 
-    print("animateToLocation");
-
     await controller.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
