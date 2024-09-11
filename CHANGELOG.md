@@ -1,4 +1,4 @@
-## [0.0.9] - 10 Sep 2024
+## [0.0.9] - 11 Sep 2024
 
 * Exposed `mapsBaseUrl` in the package so web users can use a proxy server to adding necessary headers.
 * Exposed `mapsHttpClient` in the package so users can provide their own http client.

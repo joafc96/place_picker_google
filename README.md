@@ -162,7 +162,21 @@ web.
 
 ### Note
 
-Google places API prevents CORS. So we can't make a request from client-side. 
+- Important: Browser-based apps can't use `dart:io` library for the `Platform` API.
+  Only servers, command-line scripts, and Flutter mobile apps can import and use `dart:io`.
+
+```dart
+import 'package:flutter/foundation.dart';
+
+if (kIsWeb) {
+/// Web specific code
+}
+else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android) {
+/// Android/iOS specific code
+}
+```
+
+- Google places API prevents `CORS`. So we can't make a request from client-side. 
 And As the PlacesAutocomplete widget makes http request to the Google places API like this:
 
 ```dart
