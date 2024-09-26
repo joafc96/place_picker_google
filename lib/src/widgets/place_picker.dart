@@ -598,6 +598,7 @@ class PlacePickerState extends State<PlacePicker>
             elevation: widget.autoCompleteOverlayElevation,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+              color: Theme.of(context).canvasColor,
               child: Row(
                 children: <Widget>[
                   SizedBox(
@@ -701,9 +702,12 @@ class PlacePickerState extends State<PlacePicker>
           offset: Offset(0, (searchInputBox?.size.height ?? 0)),
           child: Material(
             elevation: widget.autoCompleteOverlayElevation,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: suggestions,
+            child: ColoredBox(
+              color: Theme.of(context).canvasColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: suggestions,
+              ),
             ),
           ),
         ),

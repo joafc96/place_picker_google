@@ -1,3 +1,7 @@
+## [0.0.10] - 26 Sep 2024
+
+* Updated background color of auto place suggestions to `Theme.of(context).canvasColor`.
+
 ## [0.0.9] - 11 Sep 2024
 
 * Exposed `mapsBaseUrl` in the package so web users can use a proxy server to adding necessary headers.
