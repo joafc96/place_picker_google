@@ -1,3 +1,8 @@
+## [0.0.11] - 09 Oct 2024
+
+* Bumped up the versions of third party packages used (`http`, `google_maps_flutter`, & `geolocator`).
+* Updated the flutter and dart sdk versions.
+
 ## [0.0.10] - 26 Sep 2024
 
 * Updated background color of auto place suggestions to `Theme.of(context).canvasColor`.
