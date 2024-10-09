@@ -1098,7 +1098,9 @@ class PlacePickerState extends State<PlacePicker>
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     try {
-      final locationData = await Geolocator.getCurrentPosition();
+      final locationData = await Geolocator.getCurrentPosition(
+        timeLimit: const Duration(seconds: 30),
+      );
       LatLng target = LatLng(locationData.latitude, locationData.longitude);
       debugPrint('target:$target');
       return target;

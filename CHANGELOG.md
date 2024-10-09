@@ -2,6 +2,8 @@
 
 * Bumped up the versions of third party packages used (`http`, `google_maps_flutter`, & `geolocator`).
 * Updated the flutter and dart sdk versions.
+* Removed `timeLimit: const Duration(seconds: 30)` from `getCurrentPosition` method of `geolocator` package.
+  `
 
 ## [0.0.10] - 26 Sep 2024
 
