@@ -51,6 +51,9 @@ class PlacePicker extends StatefulWidget {
   /// Used to receive a [GoogleMapController] for this [GoogleMap].
   final MapCreatedCallback? onMapCreated;
 
+  /// Type of map to be displayed
+  ///
+  /// Defaults to [MapType.normal]
   final MapType? mapType;
 
   /// Location to be displayed when screen is showed. If this is set or not null, the
