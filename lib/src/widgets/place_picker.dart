@@ -51,6 +51,8 @@ class PlacePicker extends StatefulWidget {
   /// Used to receive a [GoogleMapController] for this [GoogleMap].
   final MapCreatedCallback? onMapCreated;
 
+  final MapType? mapType;
+
   /// Location to be displayed when screen is showed. If this is set or not null, the
   /// map does not pan to the user's current location.
   final LatLng? initialLocation;
@@ -149,6 +151,7 @@ class PlacePicker extends StatefulWidget {
     this.onMapCreated,
     this.initialLocation,
     this.onPlacePicked,
+    this.mapType,
     this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16.0),
     this.localizationConfig = const LocalizationConfig.init(),
     this.showSearchInput = true,
@@ -337,6 +340,7 @@ class PlacePickerState extends State<PlacePicker>
       ),
       minMaxZoomPreference: widget.minMaxZoomPreference,
       myLocationEnabled: widget.myLocationEnabled,
+      mapType: widget.mapType ?? MapType.normal,
       onTap: onTap,
       markers: markers,
       myLocationButtonEnabled: false,
