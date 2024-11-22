@@ -1,3 +1,10 @@
+## [0.0.12] - 22 Nov 2024
+
+* Added `MapType` to support different types of map.
+* Updated minimum supported SDK version to Flutter 3.22.0 & Dart 3.4.0.
+* Updated `google_maps_flutter` to 2.10.0.
+* Updated `geolocator` to 13.0.2.
+
 ## [0.0.11] - 09 Oct 2024
 
 * Bumped up the versions of third party packages used (`http`, `google_maps_flutter`, & `geolocator`).

@@ -54,7 +54,7 @@ class PlacePicker extends StatefulWidget {
   /// Type of map to be displayed
   ///
   /// Defaults to [MapType.normal]
-  final MapType? mapType;
+  final MapType mapType;
 
   /// Location to be displayed when screen is showed. If this is set or not null, the
   /// map does not pan to the user's current location.
@@ -154,7 +154,7 @@ class PlacePicker extends StatefulWidget {
     this.onMapCreated,
     this.initialLocation,
     this.onPlacePicked,
-    this.mapType,
+    this.mapType = MapType.normal,
     this.minMaxZoomPreference = const MinMaxZoomPreference(0, 16.0),
     this.localizationConfig = const LocalizationConfig.init(),
     this.showSearchInput = true,
@@ -343,7 +343,7 @@ class PlacePickerState extends State<PlacePicker>
       ),
       minMaxZoomPreference: widget.minMaxZoomPreference,
       myLocationEnabled: widget.myLocationEnabled,
-      mapType: widget.mapType ?? MapType.normal,
+      mapType: widget.mapType,
       onTap: onTap,
       markers: markers,
       myLocationButtonEnabled: false,
