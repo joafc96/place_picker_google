@@ -210,7 +210,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  place_picker_google: ^0.0.12
+  place_picker_google: <latest_version>
 ```
 
 Now in your `Dart` code, you can use:

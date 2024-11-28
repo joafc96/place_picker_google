@@ -1,3 +1,7 @@
+## [0.0.13] - 28 Nov 2024
+
+* Added dart serialization `fromJson` and `toJson` to `LocationResult` & `AddressComponent` [#11](https://github.com/joafc96/place_picker_google/issues/11).
+
 ## [0.0.12] - 22 Nov 2024
 
 * Added `MapType` to support different types of map.
