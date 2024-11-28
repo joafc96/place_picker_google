@@ -72,7 +72,9 @@ class LocationResult {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'latLng': latLng != null ? {'lat': latLng?.latitude, 'lng': latLng?.longitude} : null,
+      'latLng': latLng != null
+          ? {'lat': latLng?.latitude, 'lng': latLng?.longitude}
+          : null,
       'placeId': placeId,
       'formattedAddress': formattedAddress,
       'postalCode': postalCode?.toJson(),
