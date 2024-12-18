@@ -4,7 +4,7 @@ homepage: https://github.com/joafc96/place_picker_google
 repository: https://github.com/joafc96/place_picker_google
 issue_tracker: https://github.com/joafc96/place_picker_google/issues
 documentation: https://github.com/joafc96/place_picker_google/blob/main/README.md
-version: 0.0.13
+version: 0.0.14
 
 environment:
   sdk: ^3.4.0

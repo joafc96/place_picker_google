@@ -1,3 +1,8 @@
+## [0.0.14] - 18 Dec 2024
+
+* Added Logs/Future.Error for Errors from cloud console like Billing Not enabled or others. [#14](https://github.com/joafc96/place_picker_google/issues/14).
+* Updated `SearchInputConfig` with `FocusNode`, `autofocus` etc
+
 ## [0.0.13] - 28 Nov 2024
 
 * Added dart serialization `fromJson` and `toJson` to `LocationResult` & `AddressComponent` [#11](https://github.com/joafc96/place_picker_google/issues/11).

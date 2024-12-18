@@ -656,6 +656,10 @@ class PlacePickerState extends State<PlacePicker>
       final suggestions = _parseAutoCompleteSuggestions(predictions);
 
       displayAutoCompleteSuggestions(suggestions);
+
+      if (responseJson["status"] != PlacesAutocompleteStatus.ok.status) {
+        Future.error(responseJson.toString());
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -852,7 +856,11 @@ class PlacePickerState extends State<PlacePicker>
       final responseJson = jsonDecode(response.body);
 
       if (responseJson['results'] == null) {
-        throw Error();
+        throw Future.error("No results found.");
+      }
+
+      if (responseJson["status"] != PlacesDetailsStatus.ok.status) {
+        Future.error(responseJson.toString());
       }
 
       /// clear the geocodingResultList
@@ -1047,7 +1055,11 @@ class PlacePickerState extends State<PlacePicker>
       final responseJson = jsonDecode(response.body);
 
       if (responseJson['results'] == null) {
-        throw Error();
+        throw Future.error("No results found.");
+      }
+
+      if (responseJson["status"] != NearbySearchStatus.ok.status) {
+        Future.error(responseJson.toString());
       }
 
       nearbyPlaces.clear();
@@ -1082,7 +1094,7 @@ class PlacePickerState extends State<PlacePicker>
         if (isOk ?? false) {
           return Future.error(const LocationServiceDisabledException());
         } else {
-          return Future.error('Location Services is not enabled');
+          return Future.error('Location Services is not enabled.');
         }
       }
     }
@@ -1095,7 +1107,7 @@ class PlacePickerState extends State<PlacePicker>
         /// Android's shouldShowRequestPermissionRationale
         /// returned true. According to Android guidelines
         /// your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+        return Future.error('Location permissions are denied.');
       }
     }
     if (permission == LocationPermission.deniedForever) {
