@@ -33,6 +33,10 @@ class LocationResult {
 
   AddressComponent? postalCode;
 
+  AddressComponent? route;
+
+  AddressComponent? streetNumber;
+
   AddressComponent? plusCode;
 
   AddressComponent? country;
@@ -46,4 +50,85 @@ class LocationResult {
   AddressComponent? subLocalityLevel1;
 
   AddressComponent? subLocalityLevel2;
+
+  LocationResult({
+    this.name,
+    this.latLng,
+    this.placeId,
+    this.formattedAddress,
+    this.postalCode,
+    this.route,
+    this.streetNumber,
+    this.plusCode,
+    this.country,
+    this.locality,
+    this.administrativeAreaLevel1,
+    this.administrativeAreaLevel2,
+    this.subLocalityLevel1,
+    this.subLocalityLevel2,
+  });
+
+  /// Converts a LocationResult object to a Map (for JSON serialization).
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'latLng': latLng != null
+          ? {'lat': latLng?.latitude, 'lng': latLng?.longitude}
+          : null,
+      'placeId': placeId,
+      'formattedAddress': formattedAddress,
+      'postalCode': postalCode?.toJson(),
+      'route': route?.toJson(),
+      'streetNumber': streetNumber?.toJson(),
+      'plusCode': plusCode?.toJson(),
+      'country': country?.toJson(),
+      'locality': locality?.toJson(),
+      'administrativeAreaLevel1': administrativeAreaLevel1?.toJson(),
+      'administrativeAreaLevel2': administrativeAreaLevel2?.toJson(),
+      'subLocalityLevel1': subLocalityLevel1?.toJson(),
+      'subLocalityLevel2': subLocalityLevel2?.toJson(),
+    };
+  }
+
+  /// Converts a Map (from JSON) into LocationResult object.
+  factory LocationResult.fromJson(Map<String, dynamic> json) {
+    return LocationResult(
+      name: json['name'],
+      latLng: json['latLng'] != null
+          ? LatLng(json['latLng']['lat'], json['latLng']['lng'])
+          : null,
+      placeId: json['placeId'],
+      formattedAddress: json['formattedAddress'],
+      postalCode: json['postalCode'] != null
+          ? AddressComponent.fromJson(json['postalCode'])
+          : null,
+      route: json['route'] != null
+          ? AddressComponent.fromJson(json['route'])
+          : null,
+      streetNumber: json['streetNumber'] != null
+          ? AddressComponent.fromJson(json['streetNumber'])
+          : null,
+      plusCode: json['plusCode'] != null
+          ? AddressComponent.fromJson(json['plusCode'])
+          : null,
+      country: json['country'] != null
+          ? AddressComponent.fromJson(json['country'])
+          : null,
+      locality: json['locality'] != null
+          ? AddressComponent.fromJson(json['locality'])
+          : null,
+      administrativeAreaLevel1: json['administrativeAreaLevel1'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel1'])
+          : null,
+      administrativeAreaLevel2: json['administrativeAreaLevel2'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel2'])
+          : null,
+      subLocalityLevel1: json['subLocalityLevel1'] != null
+          ? AddressComponent.fromJson(json['subLocalityLevel1'])
+          : null,
+      subLocalityLevel2: json['subLocalityLevel2'] != null
+          ? AddressComponent.fromJson(json['subLocalityLevel2'])
+          : null,
+    );
+  }
 }

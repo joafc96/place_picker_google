@@ -14,7 +14,16 @@ class AddressComponent {
     this.shortName,
   });
 
-  static AddressComponent fromJson(dynamic json) {
+  /// Converts an AddressComponent object to a Map (for JSON serialization).
+  Map<String, dynamic> toJson() {
+    return {
+      'long_name': longName,
+      'short_name': shortName,
+    };
+  }
+
+  /// Converts a Map (from JSON) into an AddressComponent object.
+  factory AddressComponent.fromJson(Map<String, dynamic> json) {
     return AddressComponent(
       longName: json['long_name'],
       shortName: json['short_name'],

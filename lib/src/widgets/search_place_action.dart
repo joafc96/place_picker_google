@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class SelectPlaceWidget extends StatelessWidget {
   /// Name of the selected place
-  final String locationName;
+  final String? locationName;
 
   /// Formatted address of the selected place
   final String? formattedAddress;
@@ -25,7 +25,7 @@ class SelectPlaceWidget extends StatelessWidget {
 
   const SelectPlaceWidget({
     super.key,
-    required this.locationName,
+    this.locationName,
     required this.onTap,
     this.formattedAddress,
     this.actionText,
@@ -45,10 +45,11 @@ class SelectPlaceWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            locationName,
-            style: locationNameStyle ?? const TextStyle(fontSize: 16),
-          ),
+          if (locationName != null)
+            Text(
+              locationName!,
+              style: locationNameStyle ?? const TextStyle(fontSize: 16),
+            ),
           if (formattedAddress != null)
             Text(
               formattedAddress!,

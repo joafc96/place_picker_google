@@ -21,7 +21,7 @@ Places autocomplete, My Location, and Nearby places from google maps given you h
 | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_autocomplete.png" width="210"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_nearby_places.png" width="210"> | 
 |:---:|:---:|
 
-### My Location &&  Preview
+### My Location & Preview
 | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/iOS_place_picker_google_my_location.png" width="210"> | <img src="https://github.com/joafc96/place_picker_google/raw/main/assets/place_picker_google.gif" width="210"> |
 |:---:|:---:|
 
@@ -160,13 +160,57 @@ Check the [`google_maps_flutter_web` README](https://pub.dev/packages/google_map
 for the latest information on how to prepare your App to use Google Maps on the
 web.
 
+### Note
+
+- Browser-based apps can't use `dart:io` library for the `Platform` API.
+  Only servers, command-line scripts, and Flutter mobile apps can import and use `dart:io`.
+
+  A native solution to switch between the platforms would be to use the `flutter/foundation` library.
+
+```dart
+import 'package:flutter/foundation.dart';
+
+if (kIsWeb) {
+/// Web specific code
+}
+else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android) {
+/// Android/iOS specific code
+}
+```
+
+- Google places API prevents `CORS`. So we can't make a request from client-side. 
+And As the PlacesAutocomplete widget makes http request to the Google places API like this:
+
+```dart
+"https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Search-Query}&key=${API-Key}"
+```
+
+This client-side request will be prevented.
+The Google API was not made to be call from browser. 
+You need to use a proxy server that add the CORS to your request. e.g cors-anywhere.
+
+Deploy the proxy server in Heroku or Vercel. You'll get a URL after deployment. 
+After that you need to add the URL before your API endpoint while making the calls. i.e "proxy_server_url/google_api_endpoint". 
+The proxy server will add the necessary headers.
+
+For example with the proxy server it would look like
+```dart
+"https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Search-Query}&key=${API-Key}"
+```
+
+Therefore set the web baseUrl as
+
+```dart
+"https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/"
+```
+
 ## Setup
 
 Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  place_picker_google: ^0.0.7
+  place_picker_google: <latest_version>
 ```
 
 Now in your `Dart` code, you can use:

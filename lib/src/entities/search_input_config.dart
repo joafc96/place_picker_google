@@ -9,15 +9,19 @@ class SearchInputConfig {
   final bool? showCursor;
   final EdgeInsetsGeometry? padding;
   final TextAlignVertical? textAlignVertical;
+  final FocusNode? focusNode;
+  final TextInputType? keyboardType;
 
   const SearchInputConfig({
-    this.textAlignVertical = TextAlignVertical.center,
-    this.textCapitalization = TextCapitalization.none,
     this.style,
-    this.textAlign = TextAlign.start,
     this.textDirection,
-    this.autofocus = false,
     this.showCursor,
     this.padding,
+    this.focusNode,
+    this.keyboardType,
+    this.textAlignVertical = TextAlignVertical.center,
+    this.textCapitalization = TextCapitalization.none,
+    this.textAlign = TextAlign.start,
+    this.autofocus = false,
   });
 }
