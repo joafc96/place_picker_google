@@ -495,6 +495,7 @@ class PlacePickerState extends State<PlacePicker>
       right: widget.myLocationFABConfig.right ?? 8.0,
       left: widget.myLocationFABConfig.left,
       child: FloatingActionButton(
+        heroTag: widget.myLocationFABConfig.heroTag,
         shape: widget.myLocationFABConfig.shape,
         elevation: widget.myLocationFABConfig.elevation,
         mini: widget.myLocationFABConfig.mini,
