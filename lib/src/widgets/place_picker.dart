@@ -848,7 +848,7 @@ class PlacePickerState extends State<PlacePicker>
           "language=${widget.localizationConfig.languageCode}&"
           "key=${widget.apiKey}");
 
-      final response = await http.get(url);
+      final response = await http.get(url, headers: widget.mapsApiHeaders);
 
       if (response.statusCode != 200) {
         throw Exception('Failed to geocode of location: $latLng.');
