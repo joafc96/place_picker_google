@@ -4,6 +4,7 @@
 * Updated dart and flutter sdk versions.
 * Added hero tag for floating action button.
 * Added new administrative and sub locality levels.
+* Added selected place config and updated selected place widget UI handling.
 
 ## [0.0.14] - 18 Dec 2024
 
