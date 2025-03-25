@@ -1,5 +1,5 @@
 [![Pub Version](https://img.shields.io/pub/v/place_picker_google?color=8A2BE2)](https://pub.dev/packages/place_picker_google)
-[![popularity](https://img.shields.io/pub/popularity/place_picker_google?color=8A2BE2)](https://pub.dev/packages/place_picker_google/score)
+[![Pub Likes](https://img.shields.io/pub/likes/place_picker_google?color=8A2BE2)](https://pub.dev/packages/place_picker_google/score)
 
 # Place Picker Google
 

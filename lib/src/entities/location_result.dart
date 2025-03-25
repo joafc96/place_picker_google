@@ -47,9 +47,25 @@ class LocationResult {
 
   AddressComponent? administrativeAreaLevel2;
 
+  AddressComponent? administrativeAreaLevel3;
+
+  AddressComponent? administrativeAreaLevel4;
+
+  AddressComponent? administrativeAreaLevel5;
+
+  AddressComponent? administrativeAreaLevel6;
+
+  AddressComponent? administrativeAreaLevel7;
+
   AddressComponent? subLocalityLevel1;
 
   AddressComponent? subLocalityLevel2;
+
+  AddressComponent? subLocalityLevel3;
+
+  AddressComponent? subLocalityLevel4;
+
+  AddressComponent? subLocalityLevel5;
 
   LocationResult({
     this.name,
@@ -64,8 +80,16 @@ class LocationResult {
     this.locality,
     this.administrativeAreaLevel1,
     this.administrativeAreaLevel2,
+    this.administrativeAreaLevel3,
+    this.administrativeAreaLevel4,
+    this.administrativeAreaLevel5,
+    this.administrativeAreaLevel6,
+    this.administrativeAreaLevel7,
     this.subLocalityLevel1,
     this.subLocalityLevel2,
+    this.subLocalityLevel3,
+    this.subLocalityLevel4,
+    this.subLocalityLevel5,
   });
 
   /// Converts a LocationResult object to a Map (for JSON serialization).
@@ -85,8 +109,16 @@ class LocationResult {
       'locality': locality?.toJson(),
       'administrativeAreaLevel1': administrativeAreaLevel1?.toJson(),
       'administrativeAreaLevel2': administrativeAreaLevel2?.toJson(),
+      'administrativeAreaLevel3': administrativeAreaLevel3?.toJson(),
+      'administrativeAreaLevel4': administrativeAreaLevel4?.toJson(),
+      'administrativeAreaLevel5': administrativeAreaLevel5?.toJson(),
+      'administrativeAreaLevel6': administrativeAreaLevel6?.toJson(),
+      'administrativeAreaLevel7': administrativeAreaLevel7?.toJson(),
       'subLocalityLevel1': subLocalityLevel1?.toJson(),
       'subLocalityLevel2': subLocalityLevel2?.toJson(),
+      'subLocalityLevel3': subLocalityLevel3?.toJson(),
+      'subLocalityLevel4': subLocalityLevel4?.toJson(),
+      'subLocalityLevel5': subLocalityLevel5?.toJson(),
     };
   }
 
@@ -123,12 +155,36 @@ class LocationResult {
       administrativeAreaLevel2: json['administrativeAreaLevel2'] != null
           ? AddressComponent.fromJson(json['administrativeAreaLevel2'])
           : null,
+      administrativeAreaLevel3: json['administrativeAreaLevel3'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel3'])
+          : null,
+      administrativeAreaLevel4: json['administrativeAreaLevel4'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel4'])
+          : null,
+      administrativeAreaLevel5: json['administrativeAreaLevel5'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel5'])
+          : null,
+      administrativeAreaLevel6: json['administrativeAreaLevel6'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel6'])
+          : null,
+      administrativeAreaLevel7: json['administrativeAreaLevel7'] != null
+          ? AddressComponent.fromJson(json['administrativeAreaLevel7'])
+          : null,
       subLocalityLevel1: json['subLocalityLevel1'] != null
           ? AddressComponent.fromJson(json['subLocalityLevel1'])
           : null,
       subLocalityLevel2: json['subLocalityLevel2'] != null
           ? AddressComponent.fromJson(json['subLocalityLevel2'])
           : null,
+      subLocalityLevel3: json['subLocalityLevel3'] != null
+          ? AddressComponent.fromJson(json['subLocalityLevel3'])
+          : null,
+      subLocalityLevel4: json['subLocalityLevel4'] != null
+        ? AddressComponent.fromJson(json['subLocalityLevel4'])
+        : null,
+      subLocalityLevel5: json['subLocalityLevel5'] != null
+        ? AddressComponent.fromJson(json['subLocalityLevel5'])
+        : null,
     );
   }
 }

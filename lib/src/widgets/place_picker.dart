@@ -495,6 +495,7 @@ class PlacePickerState extends State<PlacePicker>
       right: widget.myLocationFABConfig.right ?? 8.0,
       left: widget.myLocationFABConfig.left,
       child: FloatingActionButton(
+        heroTag: widget.myLocationFABConfig.heroTag,
         shape: widget.myLocationFABConfig.shape,
         elevation: widget.myLocationFABConfig.elevation,
         mini: widget.myLocationFABConfig.mini,
@@ -847,7 +848,7 @@ class PlacePickerState extends State<PlacePicker>
           "language=${widget.localizationConfig.languageCode}&"
           "key=${widget.apiKey}");
 
-      final response = await http.get(url);
+      final response = await http.get(url, headers: widget.mapsApiHeaders);
 
       if (response.statusCode != 200) {
         throw Exception('Failed to geocode of location: $latLng.');
@@ -889,8 +890,16 @@ class PlacePickerState extends State<PlacePicker>
                 countryShortName,
                 administrativeAreaLevel1ShortName,
                 administrativeAreaLevel2ShortName,
+                administrativeAreaLevel3ShortName,
+                administrativeAreaLevel4ShortName,
+                administrativeAreaLevel5ShortName,
+                administrativeAreaLevel6ShortName,
+                administrativeAreaLevel7ShortName,
                 subLocalityLevel1ShortName,
-                subLocalityLevel2ShortName;
+                subLocalityLevel2ShortName,
+                subLocalityLevel3ShortName,
+                subLocalityLevel4ShortName,
+                subLocalityLevel5ShortName;
 
             String? routeLongName,
                 streetNumberLongName,
@@ -900,8 +909,16 @@ class PlacePickerState extends State<PlacePicker>
                 countryLongName,
                 administrativeAreaLevel1LongName,
                 administrativeAreaLevel2LongName,
+                administrativeAreaLevel3LongName,
+                administrativeAreaLevel4LongName,
+                administrativeAreaLevel5LongName,
+                administrativeAreaLevel6LongName,
+                administrativeAreaLevel7LongName,
                 subLocalityLevel1LongName,
-                subLocalityLevel2LongName;
+                subLocalityLevel2LongName,
+                subLocalityLevel3LongName,
+                subLocalityLevel4LongName,
+                subLocalityLevel5LongName;
 
             bool isOnStreet = false;
 
@@ -960,12 +977,36 @@ class PlacePickerState extends State<PlacePicker>
               } else if (types.contains("sublocality_level_2")) {
                 subLocalityLevel2LongName = longName;
                 subLocalityLevel2ShortName = shortName;
+              } else if (types.contains("sublocality_level_3")) {
+                subLocalityLevel3LongName = longName;
+                subLocalityLevel3ShortName = shortName;
+              } else if (types.contains("sublocality_level_4")) {
+                subLocalityLevel4LongName = longName;
+                subLocalityLevel4ShortName = shortName;
+              } else if (types.contains("sublocality_level_5")) {
+                subLocalityLevel5LongName = longName;
+                subLocalityLevel5ShortName = shortName;
               } else if (types.contains("administrative_area_level_1")) {
                 administrativeAreaLevel1LongName = longName;
                 administrativeAreaLevel1ShortName = shortName;
               } else if (types.contains("administrative_area_level_2")) {
                 administrativeAreaLevel2LongName = longName;
                 administrativeAreaLevel2ShortName = shortName;
+              } else if (types.contains("administrative_area_level_3")) {
+                administrativeAreaLevel3LongName = longName;
+                administrativeAreaLevel3ShortName = shortName;
+              } else if (types.contains("administrative_area_level_4")) {
+                administrativeAreaLevel4LongName = longName;
+                administrativeAreaLevel4ShortName = shortName;
+              } else if (types.contains("administrative_area_level_5")) {
+                administrativeAreaLevel5LongName = longName;
+                administrativeAreaLevel5ShortName = shortName;
+              } else if (types.contains("administrative_area_level_6")) {
+                administrativeAreaLevel6LongName = longName;
+                administrativeAreaLevel6ShortName = shortName;
+              } else if (types.contains("administrative_area_level_7")) {
+                administrativeAreaLevel7LongName = longName;
+                administrativeAreaLevel7ShortName = shortName;
               } else if (types.contains('postal_code')) {
                 postalCodeLongName = longName;
                 postalCodeShortName = shortName;
@@ -1005,6 +1046,26 @@ class PlacePickerState extends State<PlacePicker>
                   longName: administrativeAreaLevel2LongName,
                   shortName: administrativeAreaLevel2ShortName,
                 )
+                ..administrativeAreaLevel3 = AddressComponent(
+                  longName: administrativeAreaLevel3LongName,
+                  shortName: administrativeAreaLevel3ShortName,
+                )
+                ..administrativeAreaLevel4 = AddressComponent(
+                  longName: administrativeAreaLevel4LongName,
+                  shortName: administrativeAreaLevel4ShortName,
+                )
+                ..administrativeAreaLevel5 = AddressComponent(
+                  longName: administrativeAreaLevel5LongName,
+                  shortName: administrativeAreaLevel5ShortName,
+                )
+                ..administrativeAreaLevel6 = AddressComponent(
+                  longName: administrativeAreaLevel6LongName,
+                  shortName: administrativeAreaLevel6ShortName,
+                )
+                ..administrativeAreaLevel7 = AddressComponent(
+                  longName: administrativeAreaLevel7LongName,
+                  shortName: administrativeAreaLevel7ShortName,
+                )
                 ..subLocalityLevel1 = AddressComponent(
                   longName: subLocalityLevel1LongName,
                   shortName: subLocalityLevel1ShortName,
@@ -1012,6 +1073,18 @@ class PlacePickerState extends State<PlacePicker>
                 ..subLocalityLevel2 = AddressComponent(
                   longName: subLocalityLevel2LongName,
                   shortName: subLocalityLevel2ShortName,
+                )
+                ..subLocalityLevel3 = AddressComponent(
+                  longName: subLocalityLevel3LongName,
+                  shortName: subLocalityLevel3ShortName,
+                )
+                ..subLocalityLevel4 = AddressComponent(
+                  longName: subLocalityLevel4LongName,
+                  shortName: subLocalityLevel4ShortName,
+                )
+                ..subLocalityLevel5 = AddressComponent(
+                  longName: subLocalityLevel5LongName,
+                  shortName: subLocalityLevel5ShortName,
                 )
                 ..postalCode = AddressComponent(
                   longName: postalCodeLongName,

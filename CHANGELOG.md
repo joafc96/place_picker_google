@@ -1,3 +1,10 @@
+## [0.0.15] - 25 Mar 2025
+
+* Updated third party packages versions to the latest ones.
+* Updated dart and flutter sdk versions.
+* Added hero tag for floating action button.
+* Added new administrative and sub locality levels.
+
 ## [0.0.14] - 18 Dec 2024
 
 * Added Logs/Future.Error for Errors from cloud console like Billing Not enabled or others. [#14](https://github.com/joafc96/place_picker_google/issues/14).

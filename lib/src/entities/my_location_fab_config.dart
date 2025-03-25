@@ -8,6 +8,7 @@ class MyLocationFABConfig {
   final bool mini;
   final double? elevation;
   final ShapeBorder? shape;
+  final Object? heroTag;
 
   /// Position in main Stack
   final double? top;
@@ -23,6 +24,7 @@ class MyLocationFABConfig {
     this.mini = false,
     this.elevation,
     this.shape,
+    this.heroTag,
     this.top,
     this.bottom,
     this.left,
