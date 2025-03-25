@@ -4,6 +4,7 @@ class LocalizationConfig {
   final String findingPlace;
   final String noResultsFound;
   final String unnamedLocation;
+  @Deprecated("Use SelectedPlaceConfig.actionButtonText from 0.0.15")
   final String? selectActionLocation;
 
   const LocalizationConfig({

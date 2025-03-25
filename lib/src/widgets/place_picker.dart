@@ -80,9 +80,13 @@ class PlacePicker extends StatefulWidget {
   final bool enableNearbyPlaces;
 
   /// Selected Place
+  @Deprecated("Use SelectedPlaceConfig.locationNameStyle from 0.0.15")
   final TextStyle? selectedLocationNameStyle;
+  @Deprecated("Use SelectedPlaceConfig.formattedAddressStyle from 0.0.15")
   final TextStyle? selectedFormattedAddressStyle;
+  @Deprecated("Use SelectedPlaceConfig.actionButtonText from 0.0.15")
   final Widget? selectedActionButtonChild;
+  final SelectedPlaceConfig selectedPlaceConfig;
 
   /// Builder method for selected place widget
   final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
@@ -167,6 +171,7 @@ class PlacePicker extends StatefulWidget {
     this.selectedFormattedAddressStyle,
     this.selectedPlaceWidgetBuilder,
     this.selectedActionButtonChild,
+    this.selectedPlaceConfig = const SelectedPlaceConfig.init(),
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = false,
     this.myLocationFABConfig = const MyLocationFABConfig(),
@@ -516,7 +521,7 @@ class PlacePickerState extends State<PlacePicker>
       return SafeArea(
         top: false,
         bottom: !widget.enableNearbyPlaces,
-        child: SelectPlaceWidget(
+        child: SelectedPlace(
           locationName: getLocationName(),
           formattedAddress: getFormattedLocationName(),
           onTap: _geocodingResult != null
@@ -524,10 +529,7 @@ class PlacePickerState extends State<PlacePicker>
                   widget.onPlacePicked?.call(_geocodingResult!);
                 }
               : null,
-          actionText: widget.localizationConfig.selectActionLocation,
-          locationNameStyle: widget.selectedLocationNameStyle,
-          formattedAddressStyle: widget.selectedFormattedAddressStyle,
-          actionChild: widget.selectedActionButtonChild,
+          selectedPlaceConfig: widget.selectedPlaceConfig,
         ),
       );
     } else {
