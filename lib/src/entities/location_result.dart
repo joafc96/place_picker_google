@@ -180,11 +180,11 @@ class LocationResult {
           ? AddressComponent.fromJson(json['subLocalityLevel3'])
           : null,
       subLocalityLevel4: json['subLocalityLevel4'] != null
-        ? AddressComponent.fromJson(json['subLocalityLevel4'])
-        : null,
+          ? AddressComponent.fromJson(json['subLocalityLevel4'])
+          : null,
       subLocalityLevel5: json['subLocalityLevel5'] != null
-        ? AddressComponent.fromJson(json['subLocalityLevel5'])
-        : null,
+          ? AddressComponent.fromJson(json['subLocalityLevel5'])
+          : null,
     );
   }
 }
