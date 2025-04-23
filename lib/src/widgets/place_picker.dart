@@ -9,9 +9,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:place_picker_google/place_picker_google.dart';
+import 'package:place_picker_google/src/entities/google/index.dart';
 import 'package:place_picker_google/src/services/index.dart';
 import 'package:place_picker_google/src/utils/index.dart';
-import 'package:place_picker_google/src/entities/google/index.dart';
 
 typedef SelectedPlaceWidgetBuilder = Widget Function(
   BuildContext context,
@@ -149,6 +149,38 @@ class PlacePicker extends StatefulWidget {
   /// according to the current location
   final num? autocompletePlacesSearchRadius;
 
+  /// True if the map view should respond to rotate gestures.
+  final bool rotateGesturesEnabled;
+
+  /// True if the map view should respond to scroll gestures.
+  final bool scrollGesturesEnabled;
+
+  /// True if the map view should show zoom controls. This includes two buttons
+  /// to zoom in and zoom out. The default value is to show zoom controls.
+  ///
+  /// This is only supported on Android. And this field is silently ignored on iOS.
+  final bool zoomControlsEnabled;
+
+  /// True if the map view should respond to zoom gestures.
+  final bool zoomGesturesEnabled;
+
+  /// True if the map view should be in lite mode. Android only.
+  ///
+  /// See https://developers.google.com/maps/documentation/android-sdk/lite#overview_of_lite_mode for more details.
+  final bool liteModeEnabled;
+
+  /// True if the map view should respond to tilt gestures.
+  final bool tiltGesturesEnabled;
+
+  /// True if 45 degree imagery should be enabled. Web only.
+  final bool fortyFiveDegreeImageryEnabled;
+
+  /// True if the map should show a compass when rotated.
+  final bool compassEnabled;
+
+  /// True if the map should show a toolbar when you interact with the map. Android only.
+  final bool mapToolbarEnabled;
+
   const PlacePicker({
     super.key,
     required this.apiKey,
@@ -172,14 +204,23 @@ class PlacePicker extends StatefulWidget {
     this.selectedPlaceWidgetBuilder,
     this.selectedActionButtonChild,
     this.selectedPlaceConfig = const SelectedPlaceConfig.init(),
-    this.myLocationEnabled = false,
-    this.myLocationButtonEnabled = false,
     this.myLocationFABConfig = const MyLocationFABConfig(),
     this.autoCompleteOverlayElevation = 0,
     this.usePinPointingSearch = false,
     this.pinPointingDebounceDuration = 500,
     this.pinPointingPinWidgetBuilder,
     this.autocompletePlacesSearchRadius,
+    this.rotateGesturesEnabled = true,
+    this.scrollGesturesEnabled = true,
+    this.zoomControlsEnabled = true,
+    this.zoomGesturesEnabled = true,
+    this.liteModeEnabled = false,
+    this.tiltGesturesEnabled = true,
+    this.fortyFiveDegreeImageryEnabled = false,
+    this.myLocationEnabled = false,
+    this.myLocationButtonEnabled = false,
+    this.compassEnabled = true,
+    this.mapToolbarEnabled = true,
   });
 
   @override
@@ -347,16 +388,24 @@ class PlacePickerState extends State<PlacePicker>
         zoom: _getInitialZoom(),
       ),
       minMaxZoomPreference: widget.minMaxZoomPreference,
-      myLocationEnabled: widget.myLocationEnabled,
       mapType: widget.mapType,
       onTap: onTap,
       markers: markers,
-      myLocationButtonEnabled: false,
-      mapToolbarEnabled: true,
       onMapCreated: onMapCreated,
       onCameraIdle: onCameraIdle,
       onCameraMoveStarted: onCameraMoveStarted,
       onCameraMove: onCameraMove,
+      rotateGesturesEnabled: widget.rotateGesturesEnabled,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled,
+      zoomControlsEnabled: widget.zoomControlsEnabled,
+      zoomGesturesEnabled: widget.zoomGesturesEnabled,
+      liteModeEnabled: widget.liteModeEnabled,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled,
+      fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
+      myLocationEnabled: widget.myLocationEnabled,
+      myLocationButtonEnabled: widget.myLocationButtonEnabled,
+      compassEnabled: widget.compassEnabled,
+      mapToolbarEnabled: widget.mapToolbarEnabled,
     );
   }
 
@@ -654,17 +703,28 @@ class PlacePickerState extends State<PlacePicker>
 
       final responseJson = jsonDecode(response.body);
 
+      final status = responseJson["status"] as String?;
       final predictions = responseJson['predictions'] as List<dynamic>?;
 
-      final suggestions = _parseAutoCompleteSuggestions(predictions);
-
-      displayAutoCompleteSuggestions(suggestions);
-
-      if (responseJson["status"] != PlacesAutocompleteStatus.ok.status) {
-        Future.error(responseJson.toString());
+      if (status == PlacesAutocompleteStatus.zeroResults.status) {
+        /// Handle ZERO_RESULTS gracefully
+        displayAutoCompleteSuggestions([]);
+        debugPrint('No autocomplete predictions found for query: $place');
+        return;
       }
-    } catch (e) {
-      debugPrint(e.toString());
+
+      if (status != PlacesAutocompleteStatus.ok.status) {
+        /// Log other non-OK statuses and clear suggestions
+        debugPrint('Google Places API returned status: $status');
+        displayAutoCompleteSuggestions([]);
+      }
+
+      final suggestions = _parseAutoCompleteSuggestions(predictions);
+      displayAutoCompleteSuggestions(suggestions);
+    } catch (e, stack) {
+      /// Log error and clear suggestions as fallback
+      debugPrint('Error in autoCompleteSearch: $e\n$stack');
+      displayAutoCompleteSuggestions([]);
     }
   }
 

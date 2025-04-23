@@ -1,3 +1,8 @@
+## [0.0.16] - 23 Apr 2025
+
+* Handled ZERO_RESULTS gracefully for autoCompleteSearch. @giorgio79
+* Added `zoomControlsEnabled` and some other Google Maps property. @KD-Dhiren
+
 ## [0.0.15] - 25 Mar 2025
 
 * Updated third party packages versions to the latest ones.
