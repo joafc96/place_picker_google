@@ -1,3 +1,8 @@
+## [0.0.17] - 23 Apr 2025
+
+* Updated `google_maps_flutter` version from 2.11.0 to 2.12.1
+* Updated `geolocator` version from 13.0.3 to 14.0.0
+
 ## [0.0.16] - 23 Apr 2025
 
 * Handled ZERO_RESULTS gracefully for autoCompleteSearch. @giorgio79
