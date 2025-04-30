@@ -1,7 +1,9 @@
-## [0.0.17] - 23 Apr 2025
+## [0.0.17] - 30 Apr 2025
 
 * Updated `google_maps_flutter` version from 2.11.0 to 2.12.1
-* Updated `geolocator` version from 13.0.3 to 14.0.0
+* Updated `geolocator` version from 13.0.3 to 13.0.4
+* Added `nearbyPlace` to `LocationResult` @stact
+* Updated `name` in `LocationResult` when a nearbyPlace is selected @stact
 
 ## [0.0.16] - 23 Apr 2025
 

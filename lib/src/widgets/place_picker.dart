@@ -293,7 +293,12 @@ class PlacePickerState extends State<PlacePicker>
   /// can be triggered infinitely if there is some unintended feedback loop in the code.
   bool _isAnimating = false;
 
+  /// Camera Position
+  /// The position of the map "camera", the view point from which the world is shown in the map view.
   CameraPosition? cameraPosition;
+
+  /// The selected nearby place if enabled.
+  NearbyPlace? selectedNearbyPlace;
 
   @override
   void setState(fn) {
@@ -418,7 +423,9 @@ class PlacePickerState extends State<PlacePicker>
   Widget _buildLoadingIndicator() {
     return Platform.isiOS
         ? const CupertinoActivityIndicator()
-        : const Center(child: CircularProgressIndicator());
+        : const Center(
+            child: CircularProgressIndicator(),
+          );
   }
 
   Widget _buildSearchInput() {
@@ -452,7 +459,11 @@ class PlacePickerState extends State<PlacePicker>
   /// Nearby Places
   Widget _buildNearbyPlaces() {
     return NearbyPlaces(
-      moveToLocation: animateToLocation,
+      onNearbyPlaceClicked: (NearbyPlace nearbyPlace) {
+        /// update the nearby place state variable and animate to location.
+        selectedNearbyPlace = nearbyPlace;
+        animateToLocation(nearbyPlace.latLng!);
+      },
       nearbyPlaces: nearbyPlaces,
       nearbyPlaceText: widget.localizationConfig.nearBy,
       nearbyPlaceStyle: widget.nearbyPlaceStyle,
@@ -529,6 +540,8 @@ class PlacePickerState extends State<PlacePicker>
     }
 
     _clearOverlay();
+    /// remove selected nearby place
+    selectedNearbyPlace = null;
     animateToLocation(position);
   }
 
@@ -537,6 +550,8 @@ class PlacePickerState extends State<PlacePicker>
     _debounce?.cancel();
     _debounce =
         Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
+      /// remove selected nearby place
+      selectedNearbyPlace = null;
       animateToLocation(target);
     });
   }
@@ -817,6 +832,8 @@ class PlacePickerState extends State<PlacePicker>
 
       final location = responseJson['result']['geometry']['location'];
       if (mapController.isCompleted) {
+        /// remove selected nearby place
+        selectedNearbyPlace = null;
         await animateToLocation(LatLng(location['lat'], location['lng']));
       }
     } catch (e) {
@@ -892,6 +909,8 @@ class PlacePickerState extends State<PlacePicker>
 
       /// get the current location of user
       final LatLng position = await _getCurrentLocation();
+      /// remove selected nearby place
+      selectedNearbyPlace = null;
       animateToLocation(position);
     } catch (e) {
       if (e is LocationServiceDisabledException && mounted) {
@@ -1081,6 +1100,7 @@ class PlacePickerState extends State<PlacePicker>
                 ..name = name
                 ..latLng = latLng
                 ..formattedAddress = geocodingResultRaw.formattedAddress
+                ..nearbyPlace = selectedNearbyPlace
                 ..placeId = geocodingResultRaw.placeId
                 ..streetNumber = AddressComponent(
                   longName: streetNumberLongName,
@@ -1329,6 +1349,10 @@ class PlacePickerState extends State<PlacePicker>
   String? getLocationName() {
     if (_geocodingResult == null) {
       return widget.localizationConfig.unnamedLocation;
+    }
+
+    if (selectedNearbyPlace != null) {
+      return selectedNearbyPlace?.name;
     }
 
     return _geocodingResult?.name;
