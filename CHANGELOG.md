@@ -1,9 +1,14 @@
-## [0.0.17] - 30 Apr 2025
+## [0.0.17] - 23 May 2025
 
-* Updated `google_maps_flutter` version from 2.11.0 to 2.12.1
-* Updated `geolocator` version from 13.0.3 to 13.0.4
+* Updated `google_maps_flutter` version from 2.11.0 to 2.12.2
+* Updated `geolocator` version from 13.0.3 to 14.0.0
+* Updated `http` version from 1.3.0 to 1.4.0
 * Added `nearbyPlace` to `LocationResult` @stact
 * Updated `name` in `LocationResult` when a nearbyPlace is selected @stact
+* Added builder method for back button widget `BackWidgetBuilder`
+* Added `cloudMapId` and other fields
+* Separated common API services to `GoogleMapsCommonService`
+* Added `GoogleAPIParameters` that can be added as optional params for different Maps APIs @Mithunms1234
 
 ## [0.0.16] - 23 Apr 2025
 
