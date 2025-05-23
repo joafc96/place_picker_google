@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:place_picker_google/src/widgets/index.dart';
 import 'package:place_picker_google/src/entities/index.dart';
 
 class NearbyPlaces extends StatelessWidget {
   final List<NearbyPlace> nearbyPlaces;
-  final Function(LatLng)? moveToLocation;
+  final Function(NearbyPlace)? onNearbyPlaceClicked;
 
   /// Text to display nearby place
   final String? nearbyPlaceText;
@@ -18,7 +17,7 @@ class NearbyPlaces extends StatelessWidget {
     super.key,
     required this.nearbyPlaces,
     required this.nearbyPlaceText,
-    this.moveToLocation,
+    this.onNearbyPlaceClicked,
     this.nearbyPlaceStyle,
     this.nearbyPlaceItemStyle,
   });
@@ -51,8 +50,8 @@ class NearbyPlaces extends StatelessWidget {
                     (it) => NearbyPlaceItem(
                       nearbyPlace: it,
                       onTap: () {
-                        if (it.latLng != null) {
-                          moveToLocation?.call(it.latLng!);
+                        if (it.latLng != null && it.name != null) {
+                          onNearbyPlaceClicked?.call(it);
                         }
                       },
                       nearbyPlaceStyle: nearbyPlaceItemStyle,

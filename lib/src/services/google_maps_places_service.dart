@@ -1,10 +1,11 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
-import 'google_maps_http_service.dart';
+import 'package:place_picker_google/src/entities/component.dart';
+import 'package:place_picker_google/src/services/google_maps_http_service.dart';
 
-class GoogleMapsPlaces extends GoogleMapsHTTPService {
-  GoogleMapsPlaces({
+class GoogleMapsPlacesService extends GoogleMapsHTTPService {
+  GoogleMapsPlacesService({
     super.apiKey,
     super.baseUrl,
     super.httpClient,
@@ -14,7 +15,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
 
   Future<http.Response> autocomplete(
     /// final String input,
-    String query, {
+    String input, {
     /// Session token for Google Places API
     String? sessionToken,
 
@@ -40,6 +41,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
 
     /// Types for restricting results to a set of place types
     List<String> types = const [],
+    List<Component> components = const [],
 
     /// Bounds for restricting results to a set of bounds
     bool strictBounds = false,
@@ -48,20 +50,53 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     /// region: "us"
     String? region,
   }) async {
-    final params = {
-      'input': query,
-      if (apiKey != null) 'key': apiKey,
-      if (location != null)
-        'location': "${location.latitude}, ${location.longitude}",
-      if (language != null) 'language': language,
-      if (origin != null) 'origin': origin.toString(),
-      if (radius != null) 'radius': radius.toString(),
-      if (types.isNotEmpty) 'types': types.join('|'),
-      if (strictBounds) 'strictbounds': strictBounds.toString(),
-      if (offset != null) 'offset': offset.toString(),
-      if (region != null) 'region': region,
-      if (sessionToken != null) 'sessiontoken': sessionToken,
+    final params = <String, String>{
+      'input': input,
     };
+
+    if (language != null) {
+      params['language'] = language;
+    }
+
+    if (origin != null) {
+      params['origin'] = origin.toString();
+    }
+
+    if (location != null) {
+      params['location'] = location.toString();
+    }
+
+    if (radius != null) {
+      params['radius'] = radius.toString();
+    }
+
+    if (types.isNotEmpty) {
+      params['types'] = types.join('|');
+    }
+
+    if (components.isNotEmpty) {
+      params['components'] = components.join('|');
+    }
+
+    if (strictBounds) {
+      params['strictbounds'] = strictBounds.toString();
+    }
+
+    if (offset != null) {
+      params['offset'] = offset.toString();
+    }
+
+    if (region != null) {
+      params['region'] = region;
+    }
+
+    if (apiKey != null) {
+      params['key'] = apiKey!;
+    }
+
+    if (sessionToken != null) {
+      params['sessiontoken'] = sessionToken;
+    }
 
     final autocompleteUrl = url
         .replace(
@@ -89,14 +124,26 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     /// language: 'en',
     String? language,
   }) async {
-    final params = {
-      if (apiKey != null) 'key': apiKey,
-      'location': "${location.latitude}, ${location.longitude}",
-      'radius': radius.toString(),
-      if (language != null) 'language': language,
-      if (type != null) 'type': type,
-      if (keyword != null) 'keyword': keyword,
-    };
+    final params = <String, String>{};
+
+    if (apiKey != null) {
+      params['key'] = apiKey!;
+    }
+
+    params['location'] = location.toString();
+    params['radius'] = radius.toString();
+
+    if (keyword != null) {
+      params['keyword'] = keyword;
+    }
+
+    if (type != null) {
+      params['type'] = type;
+    }
+
+    if (language != null) {
+      params['language'] = language;
+    }
 
     final nearbySearchUrl = url
         .replace(
@@ -110,6 +157,7 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
 
   Future<http.Response> details(
     /// Place ID provided google to decode and get the details.
+    /// A textual identifier that uniquely identifies a place, returned from a Place Search.
     String placeId, {
     /// Session token for Google Places API
     String? sessionToken,
@@ -123,14 +171,29 @@ class GoogleMapsPlaces extends GoogleMapsHTTPService {
     /// region: "us"
     String? region,
   }) async {
-    final params = {
-      'placeid': placeId,
-      if (apiKey != null) 'key': apiKey!,
-      if (sessionToken != null) 'sessiontoken': sessionToken,
-      if (language != null) 'language': language,
-      if (region != null) 'region': region,
-      if (fields.isNotEmpty) 'fields': fields.join(','),
-    };
+    final params = <String, String>{};
+
+    if (apiKey != null) {
+      params['key'] = apiKey!;
+    }
+
+    params['placeid'] = placeId;
+
+    if (language != null) {
+      params['language'] = language;
+    }
+
+    if (region != null) {
+      params['region'] = region;
+    }
+
+    if (fields.isNotEmpty) {
+      params['fields'] = fields.join(',');
+    }
+
+    if (sessionToken != null) {
+      params['sessiontoken'] = sessionToken;
+    }
 
     final detailsUrl = url
         .replace(

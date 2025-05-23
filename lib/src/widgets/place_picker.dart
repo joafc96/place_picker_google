@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:geolocator/geolocator.dart';
@@ -22,6 +24,10 @@ typedef SelectedPlaceWidgetBuilder = Widget Function(
 typedef PinWidgetBuilder = Widget Function(
   BuildContext context,
   PinState state,
+);
+
+typedef BackWidgetBuilder = Widget Function(
+  BuildContext context,
 );
 
 /// Google place picker widget made with map widget from
@@ -145,8 +151,12 @@ class PlacePicker extends StatefulWidget {
   /// Builder method for pinPointing Pin widget
   final PinWidgetBuilder? pinPointingPinWidgetBuilder;
 
+  /// Builder method for back button widget
+  final BackWidgetBuilder? backWidgetBuilder;
+
   /// Radius in meters to narrow down the autocomplete places search results
   /// according to the current location
+  @Deprecated("Use GoogleAPIParameters.radius from 0.0.17")
   final num? autocompletePlacesSearchRadius;
 
   /// True if the map view should respond to rotate gestures.
@@ -180,6 +190,57 @@ class PlacePicker extends StatefulWidget {
 
   /// True if the map should show a toolbar when you interact with the map. Android only.
   final bool mapToolbarEnabled;
+
+  /// Enables or disables the indoor view from the map
+  final bool indoorViewEnabled;
+
+  /// Enables or disables showing 3D buildings where available
+  final bool buildingsEnabled;
+
+  /// Enables or disables the traffic layer of the map
+  final bool trafficEnabled;
+
+  /// Identifier that's associated with a specific cloud-based map style.
+  ///
+  /// See https://developers.google.com/maps/documentation/get-map-id
+  /// for more details.
+  final String? cloudMapId;
+
+  /// Called every time a [GoogleMap] is long pressed.
+  final ArgumentCallback<LatLng>? onLongPress;
+
+  /// Polygons to be placed on the map.
+  final Set<Polygon> polygons;
+
+  /// Polylines to be placed on the map.
+  final Set<Polyline> polylines;
+
+  /// Tile overlays to be placed on the map.
+  final Set<TileOverlay> tileOverlays;
+
+  /// Circles to be placed on the map.
+  final Set<Circle> circles;
+
+  /// This setting controls how the API handles gestures on the map. Web only.
+  ///
+  /// See [WebGestureHandling] for more details.
+  final WebGestureHandling? webGestureHandling;
+
+  /// Which gestures should be consumed by the map.
+  ///
+  /// It is possible for other gesture recognizers to be competing with the map on pointer
+  /// events, e.g if the map is inside a [ListView] the [ListView] will want to handle
+  /// vertical drags. The map will claim gestures that are recognized by any of the
+  /// recognizers on this list.
+  ///
+  /// When this set is empty, the map will only handle pointer events for gestures that
+  /// were not claimed by any other gesture recognizer.
+  final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
+
+  /// Geographical bounding box for the camera target.
+  final CameraTargetBounds cameraTargetBounds;
+
+  final GoogleAPIParameters googleAPIParameters;
 
   const PlacePicker({
     super.key,
@@ -221,6 +282,20 @@ class PlacePicker extends StatefulWidget {
     this.myLocationButtonEnabled = false,
     this.compassEnabled = true,
     this.mapToolbarEnabled = true,
+    this.buildingsEnabled = true,
+    this.indoorViewEnabled = false,
+    this.trafficEnabled = false,
+    this.cloudMapId,
+    this.onLongPress,
+    this.polygons = const <Polygon>{},
+    this.polylines = const <Polyline>{},
+    this.tileOverlays = const <TileOverlay>{},
+    this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
+    this.circles = const <Circle>{},
+    this.webGestureHandling,
+    this.cameraTargetBounds = CameraTargetBounds.unbounded,
+    this.googleAPIParameters = const GoogleAPIParameters(),
+    this.backWidgetBuilder,
   });
 
   @override
@@ -234,7 +309,15 @@ class PlacePickerState extends State<PlacePicker>
   final Completer<GoogleMapController> mapController = Completer();
 
   /// Google Place Picker Service
-  late final googlePlacePickerService = GoogleMapsPlaces(
+  late final googleMapsPlacesService = GoogleMapsPlacesService(
+    apiKey: widget.apiKey,
+    baseUrl: widget.mapsBaseUrl,
+    httpClient: widget.mapsHttpClient,
+    apiHeaders: widget.mapsApiHeaders,
+  );
+
+  /// Google Common Service
+  late final googleCommonService = GoogleMapsCommonService(
     apiKey: widget.apiKey,
     baseUrl: widget.mapsBaseUrl,
     httpClient: widget.mapsHttpClient,
@@ -293,7 +376,12 @@ class PlacePickerState extends State<PlacePicker>
   /// can be triggered infinitely if there is some unintended feedback loop in the code.
   bool _isAnimating = false;
 
+  /// Camera Position
+  /// The position of the map "camera", the view point from which the world is shown in the map view.
   CameraPosition? cameraPosition;
+
+  /// The selected nearby place if enabled.
+  NearbyPlace? selectedNearbyPlace;
 
   @override
   void setState(fn) {
@@ -406,6 +494,15 @@ class PlacePickerState extends State<PlacePicker>
       myLocationButtonEnabled: widget.myLocationButtonEnabled,
       compassEnabled: widget.compassEnabled,
       mapToolbarEnabled: widget.mapToolbarEnabled,
+      trafficEnabled: widget.trafficEnabled,
+      cloudMapId: widget.cloudMapId,
+      onLongPress: widget.onLongPress,
+      polygons: widget.polygons,
+      circles: widget.circles,
+      cameraTargetBounds: widget.cameraTargetBounds,
+      tileOverlays: widget.tileOverlays,
+      gestureRecognizers: widget.gestureRecognizers,
+      indoorViewEnabled: widget.indoorViewEnabled,
     );
   }
 
@@ -418,22 +515,34 @@ class PlacePickerState extends State<PlacePicker>
   Widget _buildLoadingIndicator() {
     return Platform.isiOS
         ? const CupertinoActivityIndicator()
-        : const Center(child: CircularProgressIndicator());
+        : const Center(
+            child: CircularProgressIndicator(),
+          );
   }
 
   Widget _buildSearchInput() {
     return SafeArea(
-      child: Padding(
-        padding: widget.searchInputConfig.padding ?? EdgeInsets.zero,
-        child: CompositedTransformTarget(
-          link: _layerLink,
-          child: SearchInput(
-            key: searchInputKey,
-            inputConfig: widget.searchInputConfig,
-            onSearchInput: searchPlace,
-            decorationConfig: widget.searchInputDecorationConfig,
+      child: Row(
+        children: [
+          if (widget.backWidgetBuilder != null)
+            Builder(
+              builder: (ctx) => widget.backWidgetBuilder!(ctx),
+            ),
+          Expanded(
+            child: Padding(
+              padding: widget.searchInputConfig.padding ?? EdgeInsets.zero,
+              child: CompositedTransformTarget(
+                link: _layerLink,
+                child: SearchInput(
+                  key: searchInputKey,
+                  inputConfig: widget.searchInputConfig,
+                  onSearchInput: searchPlace,
+                  decorationConfig: widget.searchInputDecorationConfig,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -452,7 +561,11 @@ class PlacePickerState extends State<PlacePicker>
   /// Nearby Places
   Widget _buildNearbyPlaces() {
     return NearbyPlaces(
-      moveToLocation: animateToLocation,
+      onNearbyPlaceClicked: (NearbyPlace nearbyPlace) {
+        /// update the nearby place state variable and animate to location.
+        selectedNearbyPlace = nearbyPlace;
+        animateToLocation(nearbyPlace.latLng!);
+      },
       nearbyPlaces: nearbyPlaces,
       nearbyPlaceText: widget.localizationConfig.nearBy,
       nearbyPlaceStyle: widget.nearbyPlaceStyle,
@@ -529,6 +642,9 @@ class PlacePickerState extends State<PlacePicker>
     }
 
     _clearOverlay();
+
+    /// remove selected nearby place
+    selectedNearbyPlace = null;
     animateToLocation(position);
   }
 
@@ -537,6 +653,8 @@ class PlacePickerState extends State<PlacePicker>
     _debounce?.cancel();
     _debounce =
         Timer(Duration(milliseconds: widget.pinPointingDebounceDuration), () {
+      /// remove selected nearby place
+      selectedNearbyPlace = null;
       animateToLocation(target);
     });
   }
@@ -683,51 +801,6 @@ class PlacePickerState extends State<PlacePicker>
     );
   }
 
-  /// Fetches the place autocomplete list with the query [place].
-  void autoCompleteSearch(String place) async {
-    try {
-      place = place.replaceAll(" ", "+");
-
-      final response = await googlePlacePickerService.autocomplete(
-        place,
-        sessionToken: sessionToken,
-        language: widget.localizationConfig.languageCode,
-        location: _geocodingResult?.latLng,
-        radius: widget.autocompletePlacesSearchRadius,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to load auto complete predictions of place: $place.');
-      }
-
-      final responseJson = jsonDecode(response.body);
-
-      final status = responseJson["status"] as String?;
-      final predictions = responseJson['predictions'] as List<dynamic>?;
-
-      if (status == PlacesAutocompleteStatus.zeroResults.status) {
-        /// Handle ZERO_RESULTS gracefully
-        displayAutoCompleteSuggestions([]);
-        debugPrint('No autocomplete predictions found for query: $place');
-        return;
-      }
-
-      if (status != PlacesAutocompleteStatus.ok.status) {
-        /// Log other non-OK statuses and clear suggestions
-        debugPrint('Google Places API returned status: $status');
-        displayAutoCompleteSuggestions([]);
-      }
-
-      final suggestions = _parseAutoCompleteSuggestions(predictions);
-      displayAutoCompleteSuggestions(suggestions);
-    } catch (e, stack) {
-      /// Log error and clear suggestions as fallback
-      debugPrint('Error in autoCompleteSearch: $e\n$stack');
-      displayAutoCompleteSuggestions([]);
-    }
-  }
-
   /// Parses the `predictions` into `RichSuggestion` array.
   List<RichSuggestion> _parseAutoCompleteSuggestions(
       List<dynamic>? predictions) {
@@ -754,7 +827,7 @@ class PlacePickerState extends State<PlacePicker>
         autoCompleteItem: aci,
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
-          decodeAndSelectPlace(aci.id!);
+          getDetailsAndSelectPlace(aci.id!);
         },
       );
     }).toList();
@@ -792,38 +865,6 @@ class PlacePickerState extends State<PlacePicker>
     Overlay.of(context).insert(_suggestionsOverlayEntry!);
   }
 
-  /// To navigate to the selected place from the autocomplete list to the map,
-  /// the lat,lng is required. This method fetches the lat,lng of the place and
-  /// proceeds to moving the map to that location.
-  void decodeAndSelectPlace(String placeId) async {
-    _clearOverlay();
-
-    try {
-      final response = await googlePlacePickerService.details(
-        placeId,
-        language: widget.localizationConfig.languageCode,
-        sessionToken: sessionToken,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to fetch details of placeId: $placeId.');
-      }
-
-      final responseJson = jsonDecode(response.body);
-
-      if (responseJson['result'] == null) {
-        throw Error();
-      }
-
-      final location = responseJson['result']['geometry']['location'];
-      if (mapController.isCompleted) {
-        await animateToLocation(LatLng(location['lat'], location['lng']));
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
   /// Moves the marker to the indicated lat,lng
   void setMarker(LatLng latLng) {
     setState(() {
@@ -858,9 +899,9 @@ class PlacePickerState extends State<PlacePicker>
     if (!widget.usePinPointingSearch) setMarker(latLng);
 
     /// Reverse Geocode Lat Lng
-    await reverseGeocodeLatLng(latLng);
+    await _reverseGeocodeLatLng(latLng);
 
-    if (widget.enableNearbyPlaces) await getNearbyPlaces(latLng);
+    if (widget.enableNearbyPlaces) await _getNearbyPlaces(latLng);
 
     _isAnimating = false;
 
@@ -892,6 +933,9 @@ class PlacePickerState extends State<PlacePicker>
 
       /// get the current location of user
       final LatLng position = await _getCurrentLocation();
+
+      /// remove selected nearby place
+      selectedNearbyPlace = null;
       animateToLocation(position);
     } catch (e) {
       if (e is LocationServiceDisabledException && mounted) {
@@ -903,14 +947,13 @@ class PlacePickerState extends State<PlacePicker>
 
   /// This method gets the human readable name of the location. Mostly appears
   /// to be the road name and the locality.
-  Future<void> reverseGeocodeLatLng(LatLng latLng) async {
+  Future<void> _reverseGeocodeLatLng(LatLng latLng) async {
     try {
-      final url = Uri.parse("${widget.mapsBaseUrl}geocode/json?"
-          "latlng=${latLng.latitude},${latLng.longitude}&"
-          "language=${widget.localizationConfig.languageCode}&"
-          "key=${widget.apiKey}");
-
-      final response = await http.get(url, headers: widget.mapsApiHeaders);
+      final response = await googleCommonService.geocode(
+        latLng: latLng,
+        language: widget.googleAPIParameters.language,
+        region: widget.googleAPIParameters.region,
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Failed to geocode of location: $latLng.');
@@ -1081,6 +1124,7 @@ class PlacePickerState extends State<PlacePicker>
                 ..name = name
                 ..latLng = latLng
                 ..formattedAddress = geocodingResultRaw.formattedAddress
+                ..nearbyPlace = selectedNearbyPlace
                 ..placeId = geocodingResultRaw.placeId
                 ..streetNumber = AddressComponent(
                   longName: streetNumberLongName,
@@ -1175,12 +1219,100 @@ class PlacePickerState extends State<PlacePicker>
     }
   }
 
-  /// Fetches and updates the nearby places to the provided lat,lng
-  Future<void> getNearbyPlaces(LatLng latLng) async {
+  /// Fetches the place autocomplete list with the query [place].
+  Future<void> autoCompleteSearch(String place) async {
     try {
-      final response = await googlePlacePickerService.nearbySearch(
+      place = place.replaceAll(" ", "+");
+
+      final response = await googleMapsPlacesService.autocomplete(
+        place,
+        sessionToken: widget.googleAPIParameters.sessionToken ?? sessionToken,
+        offset: widget.googleAPIParameters.offset,
+        origin: widget.googleAPIParameters.origin,
+        radius: widget.googleAPIParameters.radius ??
+            widget.autocompletePlacesSearchRadius,
+        language: widget.googleAPIParameters.language,
+        region: widget.googleAPIParameters.region,
+        components: widget.googleAPIParameters.components,
+        types: widget.googleAPIParameters.types,
+        location: _geocodingResult?.latLng,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to load auto complete predictions of place: $place.');
+      }
+
+      final responseJson = jsonDecode(response.body);
+
+      final status = responseJson["status"] as String?;
+      final predictions = responseJson['predictions'] as List<dynamic>?;
+
+      if (status == PlacesAutocompleteStatus.zeroResults.status) {
+        /// Handle ZERO_RESULTS gracefully
+        displayAutoCompleteSuggestions([]);
+        debugPrint('No autocomplete predictions found for query: $place');
+        return;
+      }
+
+      if (status != PlacesAutocompleteStatus.ok.status) {
+        /// Log other non-OK statuses and clear suggestions
+        debugPrint('Google Places API returned status: $status');
+        displayAutoCompleteSuggestions([]);
+      }
+
+      final suggestions = _parseAutoCompleteSuggestions(predictions);
+      displayAutoCompleteSuggestions(suggestions);
+    } catch (e, stack) {
+      /// Log error and clear suggestions as fallback
+      debugPrint('Error in autoCompleteSearch: $e\n$stack');
+      displayAutoCompleteSuggestions([]);
+    }
+  }
+
+  /// To navigate to the selected place from the autocomplete list to the map,
+  /// the lat,lng is required. This method fetches the lat,lng of the place and
+  /// proceeds to moving the map to that location.
+  Future<void> getDetailsAndSelectPlace(String placeId) async {
+    _clearOverlay();
+
+    try {
+      final response = await googleMapsPlacesService.details(
+        placeId,
+        sessionToken: widget.googleAPIParameters.sessionToken ?? sessionToken,
+        fields: widget.googleAPIParameters.fields,
+        language: widget.googleAPIParameters.language,
+        region: widget.googleAPIParameters.region,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to fetch details of placeId: $placeId.');
+      }
+
+      final responseJson = jsonDecode(response.body);
+
+      if (responseJson['result'] == null) {
+        throw Error();
+      }
+
+      final location = responseJson['result']['geometry']['location'];
+      if (mapController.isCompleted) {
+        /// remove selected nearby place
+        selectedNearbyPlace = null;
+        await animateToLocation(LatLng(location['lat'], location['lng']));
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Fetches and updates the nearby places to the provided lat,lng
+  Future<void> _getNearbyPlaces(LatLng latLng) async {
+    try {
+      final response = await googleMapsPlacesService.nearbySearch(
         latLng,
-        language: widget.localizationConfig.languageCode,
+        radius: widget.googleAPIParameters.radius ?? 150,
+        language: widget.googleAPIParameters.language,
       );
 
       if (response.statusCode != 200) {
@@ -1215,11 +1347,12 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Get current location API
   Future<LatLng> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    const fallbackLocation = PlacePicker.defaultLocation;
+    const timeoutDuration = Duration(seconds: 10);
 
+    /// 1. Ensure location services are enabled
     /// Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       /// Location services are not enabled don't continue
       /// accessing the position and request users of the
@@ -1233,7 +1366,9 @@ class PlacePickerState extends State<PlacePicker>
         }
       }
     }
-    permission = await Geolocator.checkPermission();
+
+    /// 2. Check permissions
+    var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -1251,8 +1386,11 @@ class PlacePickerState extends State<PlacePicker>
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
+
+    /// 3. Try to get current location
     try {
-      final locationData = await Geolocator.getCurrentPosition();
+      final locationData =
+          await Geolocator.getCurrentPosition().timeout(timeoutDuration);
       LatLng target = LatLng(locationData.latitude, locationData.longitude);
       debugPrint('target:$target');
       return target;
@@ -1261,8 +1399,11 @@ class PlacePickerState extends State<PlacePicker>
       if (locationData != null) {
         return LatLng(locationData.latitude, locationData.longitude);
       } else {
-        return PlacePicker.defaultLocation;
+        return fallbackLocation;
       }
+    } catch (e) {
+      debugPrint('Location fetch error: $e');
+      return fallbackLocation;
     }
   }
 
@@ -1274,7 +1415,8 @@ class PlacePickerState extends State<PlacePicker>
             return CupertinoAlertDialog(
               title: const Text("Location is disabled"),
               content: const Text(
-                  "To use location, go to your Settings App > Privacy > Location Services."),
+                "To use location, go to your Settings App > Privacy > Location Services.",
+              ),
               actions: [
                 CupertinoDialogAction(
                   child: const Text("Cancel"),
@@ -1298,7 +1440,8 @@ class PlacePickerState extends State<PlacePicker>
           return AlertDialog(
             title: const Text("Location is disabled"),
             content: const Text(
-                "The app needs to access your location. Please enable location service."),
+              "The app needs to access your location. Please enable location service.",
+            ),
             actions: [
               TextButton(
                 child: const Text("Cancel"),
@@ -1308,8 +1451,8 @@ class PlacePickerState extends State<PlacePicker>
               ),
               TextButton(
                 child: const Text("OK"),
-                onPressed: () async {
-                  await Geolocator.openLocationSettings().then((value) {
+                onPressed: () {
+                  Geolocator.openLocationSettings().then((value) {
                     if (mounted) Navigator.of(context).pop(true);
                   });
                 },
@@ -1329,6 +1472,10 @@ class PlacePickerState extends State<PlacePicker>
   String? getLocationName() {
     if (_geocodingResult == null) {
       return widget.localizationConfig.unnamedLocation;
+    }
+
+    if (selectedNearbyPlace != null) {
+      return selectedNearbyPlace?.name;
     }
 
     return _geocodingResult?.name;

@@ -1,5 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:place_picker_google/src/entities/address_component.dart';
+import 'package:place_picker_google/place_picker_google.dart';
 
 /// The result returned after completing location selection.
 class LocationResult {
@@ -30,6 +30,8 @@ class LocationResult {
   /// consists of the following components: "111" (the street number),
   /// "8th Avenue" (the route), "New York" (the city) and "NY" (the US state).
   String? formattedAddress;
+
+  NearbyPlace? nearbyPlace;
 
   AddressComponent? postalCode;
 
@@ -72,6 +74,7 @@ class LocationResult {
     this.latLng,
     this.placeId,
     this.formattedAddress,
+    this.nearbyPlace,
     this.postalCode,
     this.route,
     this.streetNumber,
@@ -101,6 +104,7 @@ class LocationResult {
           : null,
       'placeId': placeId,
       'formattedAddress': formattedAddress,
+      'nearbyPlace': nearbyPlace?.toJson(),
       'postalCode': postalCode?.toJson(),
       'route': route?.toJson(),
       'streetNumber': streetNumber?.toJson(),
@@ -131,6 +135,9 @@ class LocationResult {
           : null,
       placeId: json['placeId'],
       formattedAddress: json['formattedAddress'],
+      nearbyPlace: json['nearbyPlace'] != null
+          ? NearbyPlace.fromJson(json['nearbyPlace'])
+          : null,
       postalCode: json['postalCode'] != null
           ? AddressComponent.fromJson(json['postalCode'])
           : null,
@@ -180,11 +187,11 @@ class LocationResult {
           ? AddressComponent.fromJson(json['subLocalityLevel3'])
           : null,
       subLocalityLevel4: json['subLocalityLevel4'] != null
-        ? AddressComponent.fromJson(json['subLocalityLevel4'])
-        : null,
+          ? AddressComponent.fromJson(json['subLocalityLevel4'])
+          : null,
       subLocalityLevel5: json['subLocalityLevel5'] != null
-        ? AddressComponent.fromJson(json['subLocalityLevel5'])
-        : null,
+          ? AddressComponent.fromJson(json['subLocalityLevel5'])
+          : null,
     );
   }
 }

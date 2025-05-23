@@ -18,4 +18,16 @@ class NearbyPlace {
     this.icon,
     this.latLng,
   });
+
+  factory NearbyPlace.fromJson(Map<String, dynamic> json) => NearbyPlace(
+        name: json["name"],
+        icon: json["icon"],
+        latLng: json["latLng"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "icon": icon,
+        "latLng": latLng,
+      };
 }
