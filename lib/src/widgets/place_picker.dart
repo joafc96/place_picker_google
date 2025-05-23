@@ -1229,8 +1229,7 @@ class PlacePickerState extends State<PlacePicker>
         sessionToken: widget.googleAPIParameters.sessionToken ?? sessionToken,
         offset: widget.googleAPIParameters.offset,
         origin: widget.googleAPIParameters.origin,
-        radius: widget.googleAPIParameters.radius ??
-            widget.autocompletePlacesSearchRadius,
+        radius: widget.googleAPIParameters.radius,
         language: widget.googleAPIParameters.language,
         region: widget.googleAPIParameters.region,
         components: widget.googleAPIParameters.components,
