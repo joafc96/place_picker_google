@@ -63,7 +63,7 @@ class GoogleMapsPlacesService extends GoogleMapsHTTPService {
     }
 
     if (location != null) {
-      params['location'] = location.toString();
+      params['location'] = '${location.latitude},${location.longitude}';
     }
 
     if (radius != null) {
@@ -130,7 +130,7 @@ class GoogleMapsPlacesService extends GoogleMapsHTTPService {
       params['key'] = apiKey!;
     }
 
-    params['location'] = location.toString();
+    params['location'] = '${location.latitude},${location.longitude}';
     params['radius'] = radius.toString();
 
     if (keyword != null) {
