@@ -174,6 +174,9 @@ class PlacePicker extends StatefulWidget {
   /// True if the map view should respond to zoom gestures.
   final bool zoomGesturesEnabled;
 
+  /// True if the map view should respond to tap gestures.
+  final bool tapGesturesEnabled;
+
   /// True if the map view should be in lite mode. Android only.
   ///
   /// See https://developers.google.com/maps/documentation/android-sdk/lite#overview_of_lite_mode for more details.
@@ -275,6 +278,7 @@ class PlacePicker extends StatefulWidget {
     this.scrollGesturesEnabled = true,
     this.zoomControlsEnabled = true,
     this.zoomGesturesEnabled = true,
+    this.tapGesturesEnabled = true,
     this.liteModeEnabled = false,
     this.tiltGesturesEnabled = true,
     this.fortyFiveDegreeImageryEnabled = false,
@@ -457,9 +461,11 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   Widget _buildMapContent() {
+    Widget mapWidget = _buildGoogleMap();
+    mapWidget = widget.tapGesturesEnabled ? mapWidget : IgnorePointer(child: mapWidget);
     return Stack(
       children: [
-        _buildGoogleMap(),
+        mapWidget,
         if (widget.showSearchInput) _buildSearchInput(),
         if (widget.myLocationButtonEnabled) _buildMyLocationButton(),
         if (widget.usePinPointingSearch) _buildPinPointingIndicator(),
