@@ -332,7 +332,7 @@ class PlacePickerState extends State<PlacePicker>
   late final FocusNode? _focusNode;
 
   /// Controller for the search input
-  late final TextEditingController _searchController = TextEditingController(text: widget.searchInputConfig.initialValue);
+  late final TextEditingController _searchController = TextEditingController(text: widget.searchInputConfig.initialValue ?? '');
 
   /// Current location of the marker
   LatLng? _currentLocation;
