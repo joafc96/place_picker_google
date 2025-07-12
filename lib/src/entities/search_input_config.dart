@@ -11,6 +11,7 @@ class SearchInputConfig {
   final TextAlignVertical? textAlignVertical;
   final FocusNode? focusNode;
   final TextInputType? keyboardType;
+  final String? initialValue;
 
   const SearchInputConfig({
     this.style,
@@ -23,5 +24,6 @@ class SearchInputConfig {
     this.textCapitalization = TextCapitalization.none,
     this.textAlign = TextAlign.start,
     this.autofocus = false,
+    this.initialValue,
   });
 }

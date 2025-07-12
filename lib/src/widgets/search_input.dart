@@ -69,6 +69,7 @@ class SearchInputState extends State<SearchInput> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: widget.inputConfig.initialValue,
       keyboardType: widget.inputConfig.keyboardType,
       focusNode: widget.inputConfig.focusNode,
       textAlignVertical: widget.inputConfig.textAlignVertical,
