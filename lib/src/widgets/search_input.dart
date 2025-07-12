@@ -38,7 +38,7 @@ class SearchInputState extends State<SearchInput> {
   @override
   void initState() {
     super.initState();
-    editController = widget.editController ?? TextEditingController();
+    editController = widget.editController ?? TextEditingController(text: widget.inputConfig.initialValue);
     editController.addListener(onSearchInputChange);
   }
 
@@ -69,7 +69,6 @@ class SearchInputState extends State<SearchInput> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      initialValue: widget.inputConfig.initialValue,
       keyboardType: widget.inputConfig.keyboardType,
       focusNode: widget.inputConfig.focusNode,
       textAlignVertical: widget.inputConfig.textAlignVertical,
