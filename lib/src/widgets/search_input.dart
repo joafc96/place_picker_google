@@ -14,11 +14,14 @@ class SearchInput extends StatefulWidget {
   ///  Search input config
   final SearchInputConfig inputConfig;
 
+  final TextEditingController? editController;
+
   const SearchInput({
     super.key,
     required this.onSearchInput,
     required this.decorationConfig,
     required this.inputConfig,
+    this.editController,
   });
 
   @override
@@ -26,7 +29,7 @@ class SearchInput extends StatefulWidget {
 }
 
 class SearchInputState extends State<SearchInput> {
-  TextEditingController editController = TextEditingController();
+  late final TextEditingController editController;
 
   Timer? debouncer;
 
@@ -35,6 +38,7 @@ class SearchInputState extends State<SearchInput> {
   @override
   void initState() {
     super.initState();
+    editController = widget.editController ?? TextEditingController();
     editController.addListener(onSearchInputChange);
   }
 
