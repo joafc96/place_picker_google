@@ -328,6 +328,12 @@ class PlacePickerState extends State<PlacePicker>
     apiHeaders: widget.mapsApiHeaders,
   );
 
+  /// Focus node to help with keyboard dismissal
+  late final FocusNode? _focusNode;
+
+  /// Controller for the search input
+  late final TextEditingController _searchController = TextEditingController(text: widget.searchInputConfig.initialValue ?? '');
+
   /// Current location of the marker
   LatLng? _currentLocation;
 
@@ -396,6 +402,7 @@ class PlacePickerState extends State<PlacePicker>
 
   @override
   void initState() {
+    _focusNode = widget.searchInputConfig.focusNode ?? FocusNode();
     _initializePositionAndMarkers();
     super.initState();
   }
@@ -403,6 +410,7 @@ class PlacePickerState extends State<PlacePicker>
   @override
   void dispose() {
     _hideOverlay();
+    _focusNode?.dispose();
     super.dispose();
   }
 
@@ -445,27 +453,42 @@ class PlacePickerState extends State<PlacePicker>
     _suggestionsOverlayEntry = null;
   }
 
+  void _dismissKeyboard(BuildContext context) {
+    // Get the current focus scope
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    // If the current focus is not on the  primary focus (which is usually the case
+    // when a text field has focus) and the keyboard is visible, then unfocus.
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+    _searchController.clear();
+    _hideOverlay();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: _canLoadMap ? _buildMapContent() : _buildLoadingIndicator(),
-          ),
-          _buildSelectedPlace(),
-          if (widget.enableNearbyPlaces) _buildNearbyPlaces(),
-        ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => _dismissKeyboard(context),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: _canLoadMap ? _buildMapContent() : _buildLoadingIndicator(),
+            ),
+            _buildSelectedPlace(),
+            if (widget.enableNearbyPlaces) _buildNearbyPlaces(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildMapContent() {
-    Widget mapWidget = _buildGoogleMap();
-    mapWidget = widget.tapGesturesEnabled ? mapWidget : IgnorePointer(child: mapWidget);
     return Stack(
       children: [
-        mapWidget,
+        _buildGoogleMap(),
         if (widget.showSearchInput) _buildSearchInput(),
         if (widget.myLocationButtonEnabled) _buildMyLocationButton(),
         if (widget.usePinPointingSearch) _buildPinPointingIndicator(),
@@ -474,41 +497,55 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   Widget _buildGoogleMap() {
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: widget.initialLocation ??
-            _currentLocation ??
-            PlacePicker.defaultLocation,
-        zoom: _getInitialZoom(),
-      ),
-      minMaxZoomPreference: widget.minMaxZoomPreference,
-      mapType: widget.mapType,
-      onTap: onTap,
-      markers: markers,
-      onMapCreated: onMapCreated,
-      onCameraIdle: onCameraIdle,
-      onCameraMoveStarted: onCameraMoveStarted,
-      onCameraMove: onCameraMove,
-      rotateGesturesEnabled: widget.rotateGesturesEnabled,
-      scrollGesturesEnabled: widget.scrollGesturesEnabled,
-      zoomControlsEnabled: widget.zoomControlsEnabled,
-      zoomGesturesEnabled: widget.zoomGesturesEnabled,
-      liteModeEnabled: widget.liteModeEnabled,
-      tiltGesturesEnabled: widget.tiltGesturesEnabled,
-      fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
-      myLocationEnabled: widget.myLocationEnabled,
-      myLocationButtonEnabled: widget.myLocationButtonEnabled,
-      compassEnabled: widget.compassEnabled,
-      mapToolbarEnabled: widget.mapToolbarEnabled,
-      trafficEnabled: widget.trafficEnabled,
-      cloudMapId: widget.cloudMapId,
-      onLongPress: widget.onLongPress,
-      polygons: widget.polygons,
-      circles: widget.circles,
-      cameraTargetBounds: widget.cameraTargetBounds,
-      tileOverlays: widget.tileOverlays,
-      gestureRecognizers: widget.gestureRecognizers,
-      indoorViewEnabled: widget.indoorViewEnabled,
+    return Builder(
+      builder: (context) {
+        return GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: widget.initialLocation ??
+                _currentLocation ??
+                PlacePicker.defaultLocation,
+            zoom: _getInitialZoom(),
+          ),
+          minMaxZoomPreference: widget.minMaxZoomPreference,
+          mapType: widget.mapType,
+          onTap: (coordinates) {
+            _dismissKeyboard(context);
+            onTap(coordinates);
+          },
+          markers: markers,
+          onMapCreated: onMapCreated,
+          onCameraIdle: onCameraIdle,
+          onCameraMoveStarted: onCameraMoveStarted,
+          onCameraMove: onCameraMove,
+          rotateGesturesEnabled: widget.rotateGesturesEnabled,
+          scrollGesturesEnabled: widget.scrollGesturesEnabled,
+          zoomControlsEnabled: widget.zoomControlsEnabled,
+          zoomGesturesEnabled: widget.zoomGesturesEnabled,
+          liteModeEnabled: widget.liteModeEnabled,
+          tiltGesturesEnabled: widget.tiltGesturesEnabled,
+          fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
+          myLocationEnabled: widget.myLocationEnabled,
+          myLocationButtonEnabled: widget.myLocationButtonEnabled,
+          compassEnabled: widget.compassEnabled,
+          mapToolbarEnabled: widget.mapToolbarEnabled,
+          trafficEnabled: widget.trafficEnabled,
+          cloudMapId: widget.cloudMapId,
+          onLongPress: widget.onLongPress,
+          polygons: widget.polygons,
+          circles: widget.circles,
+          cameraTargetBounds: widget.cameraTargetBounds,
+          tileOverlays: widget.tileOverlays,
+          gestureRecognizers: (widget.tapGesturesEnabled)
+              ? widget.gestureRecognizers
+              : <Factory<OneSequenceGestureRecognizer>>{
+            Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+            Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+            Factory<HorizontalDragGestureRecognizer>(() => HorizontalDragGestureRecognizer()),
+            Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
+          },
+          indoorViewEnabled: widget.indoorViewEnabled,
+        );
+      }
     );
   }
 
@@ -544,6 +581,7 @@ class PlacePickerState extends State<PlacePicker>
                   inputConfig: widget.searchInputConfig,
                   onSearchInput: searchPlace,
                   decorationConfig: widget.searchInputDecorationConfig,
+                  editController: _searchController,
                 ),
               ),
             ),
@@ -571,6 +609,7 @@ class PlacePickerState extends State<PlacePicker>
         /// update the nearby place state variable and animate to location.
         selectedNearbyPlace = nearbyPlace;
         animateToLocation(nearbyPlace.latLng!);
+        _searchController.clear();
       },
       nearbyPlaces: nearbyPlaces,
       nearbyPlaceText: widget.localizationConfig.nearBy,
@@ -652,6 +691,7 @@ class PlacePickerState extends State<PlacePicker>
     /// remove selected nearby place
     selectedNearbyPlace = null;
     animateToLocation(position);
+    _searchController.clear();
   }
 
   /// Debounce function for pin-pointing search
@@ -823,17 +863,20 @@ class PlacePickerState extends State<PlacePicker>
 
     return predictions.map((dynamic t) {
       final matchedSubstring = t['matched_substrings'][0];
+      final structuredFormatting = t['structured_formatting'];
       final aci = AutoCompleteItem()
         ..id = t['place_id']
         ..text = t['description']
         ..offset = matchedSubstring['offset']
-        ..length = matchedSubstring['length'];
+        ..length = matchedSubstring['length']
+        ..mainText = structuredFormatting['main_text']
+        ..secondaryText = structuredFormatting['secondary_text'];
 
       return RichSuggestion(
         autoCompleteItem: aci,
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
-          getDetailsAndSelectPlace(aci.id!);
+          getDetailsAndSelectPlace(aci);
         },
       );
     }).toList();
@@ -887,7 +930,7 @@ class PlacePickerState extends State<PlacePicker>
   /// Animates the camera to the provided location and
   /// updates other UI features to
   /// match the location.
-  Future<void> animateToLocation(LatLng latLng) async {
+  Future<void> animateToLocation(LatLng latLng, { AutoCompleteItem? autoCompleteResult}) async {
     _isAnimating = true;
 
     final controller = await mapController.future;
@@ -905,7 +948,7 @@ class PlacePickerState extends State<PlacePicker>
     if (!widget.usePinPointingSearch) setMarker(latLng);
 
     /// Reverse Geocode Lat Lng
-    await _reverseGeocodeLatLng(latLng);
+    await _reverseGeocodeLatLng(latLng, autoCompleteResult: autoCompleteResult);
 
     if (widget.enableNearbyPlaces) await _getNearbyPlaces(latLng);
 
@@ -943,6 +986,7 @@ class PlacePickerState extends State<PlacePicker>
       /// remove selected nearby place
       selectedNearbyPlace = null;
       animateToLocation(position);
+      _searchController.clear();
     } catch (e) {
       if (e is LocationServiceDisabledException && mounted) {
         Navigator.of(context).pop();
@@ -953,7 +997,7 @@ class PlacePickerState extends State<PlacePicker>
 
   /// This method gets the human readable name of the location. Mostly appears
   /// to be the road name and the locality.
-  Future<void> _reverseGeocodeLatLng(LatLng latLng) async {
+  Future<void> _reverseGeocodeLatLng(LatLng latLng, { AutoCompleteItem? autoCompleteResult }) async {
     try {
       final response = await googleCommonService.geocode(
         latLng: latLng,
@@ -1031,8 +1075,6 @@ class PlacePickerState extends State<PlacePicker>
                 subLocalityLevel4LongName,
                 subLocalityLevel5LongName;
 
-            bool isOnStreet = false;
-
             /// initialize geocoding result
             LocationResult? geocodingResult;
 
@@ -1054,21 +1096,18 @@ class PlacePickerState extends State<PlacePicker>
               final shortName = addressComponentRaw.shortName;
               final longName = addressComponentRaw.longName;
 
-              /// Create the human readable name
-              if (addressComponentsIdx == 0) {
-                /// [street_number]
-                name = shortName ?? "";
-                isOnStreet = types.contains('street_number');
+              /// Create the human readable name starting from the raw geocoding data
+              final formattedAddress = geocodingResultRaw.formattedAddress;
+              final formattedAddressParts = formattedAddress?.split(",");
+              name = formattedAddressParts?.first ?? name;
 
-                /// other index 0 types
-                /// [establishment, point_of_interest, subway_station, transit_station]
-                /// [premise]
-                /// [route]
-              } else if (addressComponentsIdx == 1 && isOnStreet) {
-                if (types.contains('route')) {
-                  name += ", $shortName";
-                }
-              }
+              /// If this geocoding result was routed from a nearby search
+              /// use the the nearby place's name instead
+              name = selectedNearbyPlace?.name ?? name;
+
+              /// If this geocoding result was routed from an autocomplete search
+              /// use the auto complete result's name instead
+              name = autoCompleteResult?.mainText ?? name;
 
               if (types.contains("street_number")) {
                 streetNumberLongName = longName;
@@ -1278,12 +1317,12 @@ class PlacePickerState extends State<PlacePicker>
   /// To navigate to the selected place from the autocomplete list to the map,
   /// the lat,lng is required. This method fetches the lat,lng of the place and
   /// proceeds to moving the map to that location.
-  Future<void> getDetailsAndSelectPlace(String placeId) async {
+  Future<void> getDetailsAndSelectPlace(AutoCompleteItem autoCompleteResult) async {
     _clearOverlay();
 
     try {
       final response = await googleMapsPlacesService.details(
-        placeId,
+        autoCompleteResult.id!,
         sessionToken: widget.googleAPIParameters.sessionToken ?? sessionToken,
         fields: widget.googleAPIParameters.fields,
         language: widget.googleAPIParameters.language,
@@ -1291,7 +1330,7 @@ class PlacePickerState extends State<PlacePicker>
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to fetch details of placeId: $placeId.');
+        throw Exception('Failed to fetch details of placeId: ${autoCompleteResult.id}.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -1304,7 +1343,8 @@ class PlacePickerState extends State<PlacePicker>
       if (mapController.isCompleted) {
         /// remove selected nearby place
         selectedNearbyPlace = null;
-        await animateToLocation(LatLng(location['lat'], location['lng']));
+        await animateToLocation(LatLng(location['lat'], location['lng']), autoCompleteResult: autoCompleteResult);
+        _searchController.clear();
       }
     } catch (e) {
       debugPrint(e.toString());
