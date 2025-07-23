@@ -4,8 +4,12 @@ class AutoCompleteItem {
   /// The id of the place. This helps to fetch the lat,lng of the place.
   String? id;
 
-  /// The text (name of place) displayed in the autocomplete suggestions list.
+  /// The full text displayed in the autocomplete suggestions list.
   String? text;
+  /// The bolded text (name of place) displayed in the autocomplete suggestions list.
+  String? mainText;
+  /// The secondary text (address of place) displayed in the autocomplete suggestions list.
+  String? secondaryText;
 
   /// Assistive index to begin highlight of matched part of the [text] with
   /// the original query
