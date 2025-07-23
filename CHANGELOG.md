@@ -1,3 +1,9 @@
+## [0.0.19] - 23 Jul 2025
+* Updated geolocator version from 14.0.0 to 14.0.2
+* Updated google_maps_flutter version from 2.12.2 to 2.12.3
+* Updated INVALID_REQUEST error from Places API due to incorrect location format @Domenic-MZS
+* searchbar does not respond to picking action @VOIDCRUSHER
+
 ## [0.0.18] - 23 May 2025
 * Updated `geolocator` version from 13.0.4 to 14.0.0
 
