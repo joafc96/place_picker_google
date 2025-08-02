@@ -6,8 +6,10 @@ class AutoCompleteItem {
 
   /// The full text displayed in the autocomplete suggestions list.
   String? text;
+
   /// The bolded text (name of place) displayed in the autocomplete suggestions list.
   String? mainText;
+
   /// The secondary text (address of place) displayed in the autocomplete suggestions list.
   String? secondaryText;
 

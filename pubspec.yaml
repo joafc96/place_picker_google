@@ -4,7 +4,7 @@ homepage: https://github.com/joafc96/place_picker_google
 repository: https://github.com/joafc96/place_picker_google
 issue_tracker: https://github.com/joafc96/place_picker_google/issues
 documentation: https://github.com/joafc96/place_picker_google/blob/main/README.md
-version: 0.0.18
+version: 0.0.19
 
 environment:
   sdk: ^3.6.0
@@ -15,9 +15,9 @@ dependencies:
     sdk: flutter
 
   http: ^1.4.0
-  google_maps_flutter: ^2.12.2
-  geolocator: ^14.0.2
   geocoding: ^2.1.0
+  google_maps_flutter: ^2.12.3
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:
