@@ -46,16 +46,31 @@ class GooglePlacePickerExample extends StatefulWidget {
 
 class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   GoogleMapController? mapController;
+  bool _useFreePlacemarkService = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          child: const Text("Pick Delivery location"),
-          onPressed: () {
-            showPlacePicker();
-          },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SwitchListTile(
+              title: const Text("Use Free Placemark Service"),
+              value: _useFreePlacemarkService,
+              onChanged: (value) {
+                setState(() {
+                  _useFreePlacemarkService = value;
+                });
+              },
+            ),
+            ElevatedButton(
+              child: const Text("Pick Delivery location"),
+              onPressed: () {
+                showPlacePicker();
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -70,6 +85,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
                 ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/'
                 : "https://maps.googleapis.com/maps/api/",
             usePinPointingSearch: true,
+            useFreePlacemarkService: _useFreePlacemarkService,
             apiKey: kIsWeb
                 ? "GOOGLE_MAPS_API_KEY_WEB"
                 : Platform.isAndroid

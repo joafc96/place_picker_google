@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 import 'package:place_picker_google/place_picker_google.dart';
 import 'package:place_picker_google/src/entities/google/index.dart';
@@ -144,6 +145,9 @@ class PlacePicker extends StatefulWidget {
   /// Whether to set the selection to tappable or scrollable
   final bool usePinPointingSearch;
 
+  /// Use free placemark service to get address from coordinates
+  final bool useFreePlacemarkService;
+
   /// Places api call debounce time in milli seconds
   /// works only for [usePinPointingSearch] is enabled
   final int pinPointingDebounceDuration;
@@ -271,6 +275,7 @@ class PlacePicker extends StatefulWidget {
     this.myLocationFABConfig = const MyLocationFABConfig(),
     this.autoCompleteOverlayElevation = 0,
     this.usePinPointingSearch = false,
+    this.useFreePlacemarkService = false,
     this.pinPointingDebounceDuration = 500,
     this.pinPointingPinWidgetBuilder,
     this.autocompletePlacesSearchRadius,
@@ -997,7 +1002,21 @@ class PlacePickerState extends State<PlacePicker>
 
   /// This method gets the human readable name of the location. Mostly appears
   /// to be the road name and the locality.
-  Future<void> _reverseGeocodeLatLng(LatLng latLng, { AutoCompleteItem? autoCompleteResult }) async {
+  Future<void> _reverseGeocodeLatLng(LatLng latLng,
+      {AutoCompleteItem? autoCompleteResult}) async {
+    if (widget.useFreePlacemarkService) {
+      await _reverseGeocodeLatLngWithFreeService(latLng,
+          autoCompleteResult: autoCompleteResult);
+    } else {
+      await _reverseGeocodeLatLngWithGoogle(latLng,
+          autoCompleteResult: autoCompleteResult);
+    }
+  }
+
+  /// This method gets the human readable name of the location. Mostly appears
+  /// to be the road name and the locality.
+  Future<void> _reverseGeocodeLatLngWithGoogle(LatLng latLng,
+      {AutoCompleteItem? autoCompleteResult}) async {
     try {
       final response = await googleCommonService.geocode(
         latLng: latLng,
@@ -1252,6 +1271,71 @@ class PlacePickerState extends State<PlacePicker>
             }
           }
         }
+      }
+
+      /// if the geocoding result is list is not empty
+      /// set _geocodingResult as the first element of the list
+      if (_geocodingResultList.isNotEmpty) {
+        _geocodingResult = _geocodingResultList.first;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> _reverseGeocodeLatLngWithFreeService(LatLng latLng,
+      {AutoCompleteItem? autoCompleteResult}) async {
+    try {
+      final List<geocoding.Placemark> placemarks =
+          await geocoding.placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        throw Future.error("No results found.");
+      }
+
+      /// clear the geocodingResultList
+      _geocodingResultList.clear();
+
+      for (final placemark in placemarks) {
+        _geocodingResultList.add(
+          LocationResult(
+            latLng: latLng,
+            formattedAddress:
+                '${placemark.street}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}',
+            name: placemark.name,
+            streetNumber: AddressComponent(
+              longName: placemark.subThoroughfare,
+              shortName: placemark.subThoroughfare,
+            ),
+            route: AddressComponent(
+              longName: placemark.thoroughfare,
+              shortName: placemark.thoroughfare,
+            ),
+            locality: AddressComponent(
+              longName: placemark.locality,
+              shortName: placemark.locality,
+            ),
+            administrativeAreaLevel1: AddressComponent(
+              longName: placemark.administrativeArea,
+              shortName: placemark.administrativeArea,
+            ),
+            subLocalityLevel1: AddressComponent(
+              longName: placemark.subLocality,
+              shortName: placemark.subLocality,
+            ),
+            country: AddressComponent(
+              longName: placemark.country,
+              shortName: placemark.isoCountryCode,
+            ),
+            postalCode: AddressComponent(
+              longName: placemark.postalCode,
+              shortName: placemark.postalCode,
+            ),
+          ),
+        );
       }
 
       /// if the geocoding result is list is not empty
