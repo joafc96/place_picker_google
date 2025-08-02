@@ -337,8 +337,7 @@ class PlacePickerState extends State<PlacePicker>
   late final FocusNode? _focusNode;
 
   /// Controller for the search input
-  late final TextEditingController _searchController =
-      TextEditingController(text: widget.searchInputConfig.initialValue ?? '');
+  late final TextEditingController _searchController = TextEditingController(text: widget.searchInputConfig.initialValue ?? '');
 
   /// Current location of the marker
   LatLng? _currentLocation;
@@ -481,8 +480,7 @@ class PlacePickerState extends State<PlacePicker>
         child: Column(
           children: <Widget>[
             Expanded(
-              child:
-                  _canLoadMap ? _buildMapContent() : _buildLoadingIndicator(),
+              child: _canLoadMap ? _buildMapContent() : _buildLoadingIndicator(),
             ),
             _buildSelectedPlace(),
             if (widget.enableNearbyPlaces) _buildNearbyPlaces(),
@@ -504,56 +502,56 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   Widget _buildGoogleMap() {
-    return Builder(builder: (context) {
-      return GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: widget.initialLocation ??
-              _currentLocation ??
-              PlacePicker.defaultLocation,
-          zoom: _getInitialZoom(),
-        ),
-        minMaxZoomPreference: widget.minMaxZoomPreference,
-        mapType: widget.mapType,
-        onTap: (coordinates) {
-          _dismissKeyboard(context);
-          onTap(coordinates);
-        },
-        markers: markers,
-        onMapCreated: onMapCreated,
-        onCameraIdle: onCameraIdle,
-        onCameraMoveStarted: onCameraMoveStarted,
-        onCameraMove: onCameraMove,
-        rotateGesturesEnabled: widget.rotateGesturesEnabled,
-        scrollGesturesEnabled: widget.scrollGesturesEnabled,
-        zoomControlsEnabled: widget.zoomControlsEnabled,
-        zoomGesturesEnabled: widget.zoomGesturesEnabled,
-        liteModeEnabled: widget.liteModeEnabled,
-        tiltGesturesEnabled: widget.tiltGesturesEnabled,
-        fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
-        myLocationEnabled: widget.myLocationEnabled,
-        myLocationButtonEnabled: widget.myLocationButtonEnabled,
-        compassEnabled: widget.compassEnabled,
-        mapToolbarEnabled: widget.mapToolbarEnabled,
-        trafficEnabled: widget.trafficEnabled,
-        cloudMapId: widget.cloudMapId,
-        onLongPress: widget.onLongPress,
-        polygons: widget.polygons,
-        circles: widget.circles,
-        cameraTargetBounds: widget.cameraTargetBounds,
-        tileOverlays: widget.tileOverlays,
-        gestureRecognizers: (widget.tapGesturesEnabled)
-            ? widget.gestureRecognizers
-            : <Factory<OneSequenceGestureRecognizer>>{
-                Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
-                Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
-                Factory<HorizontalDragGestureRecognizer>(
-                    () => HorizontalDragGestureRecognizer()),
-                Factory<VerticalDragGestureRecognizer>(
-                    () => VerticalDragGestureRecognizer()),
-              },
-        indoorViewEnabled: widget.indoorViewEnabled,
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: widget.initialLocation ??
+                _currentLocation ??
+                PlacePicker.defaultLocation,
+            zoom: _getInitialZoom(),
+          ),
+          minMaxZoomPreference: widget.minMaxZoomPreference,
+          mapType: widget.mapType,
+          onTap: (coordinates) {
+            _dismissKeyboard(context);
+            onTap(coordinates);
+          },
+          markers: markers,
+          onMapCreated: onMapCreated,
+          onCameraIdle: onCameraIdle,
+          onCameraMoveStarted: onCameraMoveStarted,
+          onCameraMove: onCameraMove,
+          rotateGesturesEnabled: widget.rotateGesturesEnabled,
+          scrollGesturesEnabled: widget.scrollGesturesEnabled,
+          zoomControlsEnabled: widget.zoomControlsEnabled,
+          zoomGesturesEnabled: widget.zoomGesturesEnabled,
+          liteModeEnabled: widget.liteModeEnabled,
+          tiltGesturesEnabled: widget.tiltGesturesEnabled,
+          fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
+          myLocationEnabled: widget.myLocationEnabled,
+          myLocationButtonEnabled: widget.myLocationButtonEnabled,
+          compassEnabled: widget.compassEnabled,
+          mapToolbarEnabled: widget.mapToolbarEnabled,
+          trafficEnabled: widget.trafficEnabled,
+          cloudMapId: widget.cloudMapId,
+          onLongPress: widget.onLongPress,
+          polygons: widget.polygons,
+          circles: widget.circles,
+          cameraTargetBounds: widget.cameraTargetBounds,
+          tileOverlays: widget.tileOverlays,
+          gestureRecognizers: (widget.tapGesturesEnabled)
+              ? widget.gestureRecognizers
+              : <Factory<OneSequenceGestureRecognizer>>{
+            Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+            Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+            Factory<HorizontalDragGestureRecognizer>(() => HorizontalDragGestureRecognizer()),
+            Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
+          },
+          indoorViewEnabled: widget.indoorViewEnabled,
+        );
+      }
+    );
   }
 
   double _getInitialZoom() {
@@ -937,8 +935,7 @@ class PlacePickerState extends State<PlacePicker>
   /// Animates the camera to the provided location and
   /// updates other UI features to
   /// match the location.
-  Future<void> animateToLocation(LatLng latLng,
-      {AutoCompleteItem? autoCompleteResult}) async {
+  Future<void> animateToLocation(LatLng latLng, { AutoCompleteItem? autoCompleteResult}) async {
     _isAnimating = true;
 
     final controller = await mapController.future;
@@ -1404,8 +1401,7 @@ class PlacePickerState extends State<PlacePicker>
   /// To navigate to the selected place from the autocomplete list to the map,
   /// the lat,lng is required. This method fetches the lat,lng of the place and
   /// proceeds to moving the map to that location.
-  Future<void> getDetailsAndSelectPlace(
-      AutoCompleteItem autoCompleteResult) async {
+  Future<void> getDetailsAndSelectPlace(AutoCompleteItem autoCompleteResult) async {
     _clearOverlay();
 
     try {
@@ -1418,8 +1414,7 @@ class PlacePickerState extends State<PlacePicker>
       );
 
       if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to fetch details of placeId: ${autoCompleteResult.id}.');
+        throw Exception('Failed to fetch details of placeId: ${autoCompleteResult.id}.');
       }
 
       final responseJson = jsonDecode(response.body);
@@ -1432,8 +1427,7 @@ class PlacePickerState extends State<PlacePicker>
       if (mapController.isCompleted) {
         /// remove selected nearby place
         selectedNearbyPlace = null;
-        await animateToLocation(LatLng(location['lat'], location['lng']),
-            autoCompleteResult: autoCompleteResult);
+        await animateToLocation(LatLng(location['lat'], location['lng']), autoCompleteResult: autoCompleteResult);
         _searchController.clear();
       }
     } catch (e) {

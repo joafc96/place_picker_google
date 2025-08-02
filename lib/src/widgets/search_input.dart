@@ -38,8 +38,7 @@ class SearchInputState extends State<SearchInput> {
   @override
   void initState() {
     super.initState();
-    editController = widget.editController ??
-        TextEditingController(text: widget.inputConfig.initialValue ?? '');
+    editController = widget.editController ?? TextEditingController(text: widget.inputConfig.initialValue ?? '');
     editController.addListener(onSearchInputChange);
   }
 
