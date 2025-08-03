@@ -1081,6 +1081,7 @@ class PlacePickerState extends State<PlacePicker>
 
             /// initialize geocoding result
             LocationResult? geocodingResult;
+            List<AddressComponent> political = [];
 
             /// Loop through all the address components for each results
             for (int addressComponentsIdx = 0;
@@ -1168,6 +1169,9 @@ class PlacePickerState extends State<PlacePicker>
                 plusCodeLongName = longName;
                 plusCodeShortName = shortName;
               }
+              if (types.contains('political')) {
+                political.add(AddressComponent(longName: longName, shortName: shortName));
+              }
 
               geocodingResult = LocationResult()
                 ..name = name
@@ -1252,6 +1256,7 @@ class PlacePickerState extends State<PlacePicker>
             }
 
             if (geocodingResult != null) {
+              if (political.isNotEmpty) geocodingResult.political = political;
               _geocodingResultList.add(geocodingResult);
             }
           }

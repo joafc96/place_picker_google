@@ -69,6 +69,8 @@ class LocationResult {
 
   AddressComponent? subLocalityLevel5;
 
+  List<AddressComponent>? political;
+
   LocationResult({
     this.name,
     this.latLng,
@@ -93,6 +95,7 @@ class LocationResult {
     this.subLocalityLevel3,
     this.subLocalityLevel4,
     this.subLocalityLevel5,
+    this.political,
   });
 
   /// Converts a LocationResult object to a Map (for JSON serialization).
@@ -123,6 +126,7 @@ class LocationResult {
       'subLocalityLevel3': subLocalityLevel3?.toJson(),
       'subLocalityLevel4': subLocalityLevel4?.toJson(),
       'subLocalityLevel5': subLocalityLevel5?.toJson(),
+      'political': political == null ? [] : List<dynamic>.from(political!.map((x) => x.toJson())),
     };
   }
 
@@ -192,6 +196,10 @@ class LocationResult {
       subLocalityLevel5: json['subLocalityLevel5'] != null
           ? AddressComponent.fromJson(json['subLocalityLevel5'])
           : null,
+      political: json["political"] == null
+          ? []
+          : List<AddressComponent>.from(
+              json["political"]!.map((x) => AddressComponent.fromJson(x))),
     );
   }
 }
