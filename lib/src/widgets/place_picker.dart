@@ -1029,7 +1029,7 @@ class PlacePickerState extends State<PlacePicker>
       final geocodingResponse = geocodingResponseFromJson(response.body);
 
       if (geocodingResponse.results != null &&
-          geocodingResponse.results!.isNotEmpty) {
+          (geocodingResponse.results?.isNotEmpty ?? false)) {
         /// Loop through all the results provided by google geocoding API
         for (int resultIdx = 0;
             resultIdx < geocodingResponse.results!.length;
@@ -1037,10 +1037,15 @@ class PlacePickerState extends State<PlacePicker>
           final GeocodingResultGG geocodingResultRaw =
               geocodingResponse.results![resultIdx];
 
+          /// Create the human readable name starting from the raw geocoding data
+          final formattedAddress = geocodingResultRaw.formattedAddress;
+          final formattedAddressParts = formattedAddress?.split(",");
+
           if (geocodingResultRaw.addressComponents != null &&
               geocodingResultRaw.addressComponents!.isNotEmpty) {
             /// Initialize the short and long variables
             String name = "";
+            List<AddressComponent> political = [];
             String? routeShortName,
                 streetNumberShortName,
                 localityShortName,
@@ -1079,10 +1084,6 @@ class PlacePickerState extends State<PlacePicker>
                 subLocalityLevel4LongName,
                 subLocalityLevel5LongName;
 
-            /// initialize geocoding result
-            LocationResult? geocodingResult;
-            List<AddressComponent> political = [];
-
             /// Loop through all the address components for each results
             for (int addressComponentsIdx = 0;
                 addressComponentsIdx <
@@ -1095,15 +1096,12 @@ class PlacePickerState extends State<PlacePicker>
               final types = addressComponentRaw.types;
 
               /// continue if types is either null or empty
-              if (types == null && types!.isEmpty) continue;
+              if (types == null || types.isEmpty) continue;
 
               /// `short` and `long` names from google api
               final shortName = addressComponentRaw.shortName;
               final longName = addressComponentRaw.longName;
 
-              /// Create the human readable name starting from the raw geocoding data
-              final formattedAddress = geocodingResultRaw.formattedAddress;
-              final formattedAddressParts = formattedAddress?.split(",");
               name = formattedAddressParts?.first ?? name;
 
               /// If this geocoding result was routed from a nearby search
@@ -1170,95 +1168,92 @@ class PlacePickerState extends State<PlacePicker>
                 plusCodeShortName = shortName;
               }
               if (types.contains('political')) {
-                political.add(AddressComponent(longName: longName, shortName: shortName));
+                political.add(
+                    AddressComponent(longName: longName, shortName: shortName));
               }
-
-              geocodingResult = LocationResult()
-                ..name = name
-                ..latLng = latLng
-                ..formattedAddress = geocodingResultRaw.formattedAddress
-                ..nearbyPlace = selectedNearbyPlace
-                ..placeId = geocodingResultRaw.placeId
-                ..streetNumber = AddressComponent(
-                  longName: streetNumberLongName,
-                  shortName: streetNumberShortName,
-                )
-                ..route = AddressComponent(
-                  longName: routeLongName,
-                  shortName: routeShortName,
-                )
-                ..country = AddressComponent(
-                  longName: countryLongName,
-                  shortName: countryShortName,
-                )
-                ..locality = AddressComponent(
-                  longName:
-                      localityLongName ?? administrativeAreaLevel1LongName,
-                  shortName:
-                      localityShortName ?? administrativeAreaLevel1ShortName,
-                )
-                ..administrativeAreaLevel1 = AddressComponent(
-                  longName: administrativeAreaLevel1LongName,
-                  shortName: administrativeAreaLevel1ShortName,
-                )
-                ..administrativeAreaLevel2 = AddressComponent(
-                  longName: administrativeAreaLevel2LongName,
-                  shortName: administrativeAreaLevel2ShortName,
-                )
-                ..administrativeAreaLevel3 = AddressComponent(
-                  longName: administrativeAreaLevel3LongName,
-                  shortName: administrativeAreaLevel3ShortName,
-                )
-                ..administrativeAreaLevel4 = AddressComponent(
-                  longName: administrativeAreaLevel4LongName,
-                  shortName: administrativeAreaLevel4ShortName,
-                )
-                ..administrativeAreaLevel5 = AddressComponent(
-                  longName: administrativeAreaLevel5LongName,
-                  shortName: administrativeAreaLevel5ShortName,
-                )
-                ..administrativeAreaLevel6 = AddressComponent(
-                  longName: administrativeAreaLevel6LongName,
-                  shortName: administrativeAreaLevel6ShortName,
-                )
-                ..administrativeAreaLevel7 = AddressComponent(
-                  longName: administrativeAreaLevel7LongName,
-                  shortName: administrativeAreaLevel7ShortName,
-                )
-                ..subLocalityLevel1 = AddressComponent(
-                  longName: subLocalityLevel1LongName,
-                  shortName: subLocalityLevel1ShortName,
-                )
-                ..subLocalityLevel2 = AddressComponent(
-                  longName: subLocalityLevel2LongName,
-                  shortName: subLocalityLevel2ShortName,
-                )
-                ..subLocalityLevel3 = AddressComponent(
-                  longName: subLocalityLevel3LongName,
-                  shortName: subLocalityLevel3ShortName,
-                )
-                ..subLocalityLevel4 = AddressComponent(
-                  longName: subLocalityLevel4LongName,
-                  shortName: subLocalityLevel4ShortName,
-                )
-                ..subLocalityLevel5 = AddressComponent(
-                  longName: subLocalityLevel5LongName,
-                  shortName: subLocalityLevel5ShortName,
-                )
-                ..postalCode = AddressComponent(
-                  longName: postalCodeLongName,
-                  shortName: postalCodeShortName,
-                )
-                ..plusCode = AddressComponent(
-                  longName: plusCodeLongName,
-                  shortName: plusCodeShortName,
-                );
             }
 
-            if (geocodingResult != null) {
-              if (political.isNotEmpty) geocodingResult.political = political;
-              _geocodingResultList.add(geocodingResult);
-            }
+            final geocodingResult = LocationResult()
+              ..name = name
+              ..latLng = latLng
+              ..formattedAddress = geocodingResultRaw.formattedAddress
+              ..nearbyPlace = selectedNearbyPlace
+              ..placeId = geocodingResultRaw.placeId
+              ..streetNumber = AddressComponent(
+                longName: streetNumberLongName,
+                shortName: streetNumberShortName,
+              )
+              ..route = AddressComponent(
+                longName: routeLongName,
+                shortName: routeShortName,
+              )
+              ..country = AddressComponent(
+                longName: countryLongName,
+                shortName: countryShortName,
+              )
+              ..locality = AddressComponent(
+                longName: localityLongName ?? administrativeAreaLevel1LongName,
+                shortName:
+                    localityShortName ?? administrativeAreaLevel1ShortName,
+              )
+              ..administrativeAreaLevel1 = AddressComponent(
+                longName: administrativeAreaLevel1LongName,
+                shortName: administrativeAreaLevel1ShortName,
+              )
+              ..administrativeAreaLevel2 = AddressComponent(
+                longName: administrativeAreaLevel2LongName,
+                shortName: administrativeAreaLevel2ShortName,
+              )
+              ..administrativeAreaLevel3 = AddressComponent(
+                longName: administrativeAreaLevel3LongName,
+                shortName: administrativeAreaLevel3ShortName,
+              )
+              ..administrativeAreaLevel4 = AddressComponent(
+                longName: administrativeAreaLevel4LongName,
+                shortName: administrativeAreaLevel4ShortName,
+              )
+              ..administrativeAreaLevel5 = AddressComponent(
+                longName: administrativeAreaLevel5LongName,
+                shortName: administrativeAreaLevel5ShortName,
+              )
+              ..administrativeAreaLevel6 = AddressComponent(
+                longName: administrativeAreaLevel6LongName,
+                shortName: administrativeAreaLevel6ShortName,
+              )
+              ..administrativeAreaLevel7 = AddressComponent(
+                longName: administrativeAreaLevel7LongName,
+                shortName: administrativeAreaLevel7ShortName,
+              )
+              ..subLocalityLevel1 = AddressComponent(
+                longName: subLocalityLevel1LongName,
+                shortName: subLocalityLevel1ShortName,
+              )
+              ..subLocalityLevel2 = AddressComponent(
+                longName: subLocalityLevel2LongName,
+                shortName: subLocalityLevel2ShortName,
+              )
+              ..subLocalityLevel3 = AddressComponent(
+                longName: subLocalityLevel3LongName,
+                shortName: subLocalityLevel3ShortName,
+              )
+              ..subLocalityLevel4 = AddressComponent(
+                longName: subLocalityLevel4LongName,
+                shortName: subLocalityLevel4ShortName,
+              )
+              ..subLocalityLevel5 = AddressComponent(
+                longName: subLocalityLevel5LongName,
+                shortName: subLocalityLevel5ShortName,
+              )
+              ..postalCode = AddressComponent(
+                longName: postalCodeLongName,
+                shortName: postalCodeShortName,
+              )
+              ..plusCode = AddressComponent(
+                longName: plusCodeLongName,
+                shortName: plusCodeShortName,
+              );
+            if (political.isNotEmpty) geocodingResult.political = political;
+            _geocodingResultList.add(geocodingResult);
           }
         }
       }

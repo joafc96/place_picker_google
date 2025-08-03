@@ -126,7 +126,7 @@ class LocationResult {
       'subLocalityLevel3': subLocalityLevel3?.toJson(),
       'subLocalityLevel4': subLocalityLevel4?.toJson(),
       'subLocalityLevel5': subLocalityLevel5?.toJson(),
-      'political': political == null ? [] : List<dynamic>.from(political!.map((x) => x.toJson())),
+      'political': political?.map((x) => x.toJson()).toList() ?? [],
     };
   }
 
@@ -196,10 +196,13 @@ class LocationResult {
       subLocalityLevel5: json['subLocalityLevel5'] != null
           ? AddressComponent.fromJson(json['subLocalityLevel5'])
           : null,
-      political: json["political"] == null
-          ? []
-          : List<AddressComponent>.from(
-              json["political"]!.map((x) => AddressComponent.fromJson(x))),
+      political: json['political'] != null
+          ? List<AddressComponent>.from(
+              json['political']!.map(
+                (x) => x.toJson(),
+              ),
+            )
+          : [],
     );
   }
 }

@@ -1,3 +1,7 @@
+## [0.0.20] - 03 Aug 2025
+* Added political attribute. @samfzb
+* Updated _reverseGeocodeLatLng method.
+
 ## [0.0.19] - 23 Jul 2025
 * Updated geolocator version from 14.0.0 to 14.0.2
 * Updated google_maps_flutter version from 2.12.2 to 2.12.3
