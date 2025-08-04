@@ -3,6 +3,7 @@
 * Updated _reverseGeocodeLatLng method.
 * Added geocoding package to use the free Geocoding services provided by the iOS and Android platforms. @giorgio79
 * A new boolean flag `useFreeGeocoding` in the PlacePicker widget, so user could use free geocoding if required. @giorgio79
+* Updated Readme
 
 ## [0.0.19] - 23 Jul 2025
 * Updated geolocator version from 14.0.0 to 14.0.2
