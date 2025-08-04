@@ -46,17 +46,30 @@ class GooglePlacePickerExample extends StatefulWidget {
 
 class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
   GoogleMapController? mapController;
+  bool _useFreeGeocoding = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          child: const Text("Pick Delivery location"),
-          onPressed: () {
-            showPlacePicker();
-          },
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SwitchListTile(
+            title: const Text("Use Free Geocoding"),
+            value: _useFreeGeocoding,
+            onChanged: (value) {
+              setState(() {
+                _useFreeGeocoding = value;
+              });
+            },
+          ),
+          ElevatedButton(
+            child: const Text("Pick Delivery location"),
+            onPressed: () {
+              showPlacePicker();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -66,6 +79,7 @@ class _GooglePlacePickerExampleState extends State<GooglePlacePickerExample> {
       MaterialPageRoute(
         builder: (context) {
           return PlacePicker(
+            useFreeGeocoding: _useFreeGeocoding,
             mapsBaseUrl: kIsWeb
                 ? 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/'
                 : "https://maps.googleapis.com/maps/api/",

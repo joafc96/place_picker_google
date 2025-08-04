@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 import 'package:place_picker_google/place_picker_google.dart';
 import 'package:place_picker_google/src/entities/google/index.dart';
@@ -243,7 +244,13 @@ class PlacePicker extends StatefulWidget {
   /// Geographical bounding box for the camera target.
   final CameraTargetBounds cameraTargetBounds;
 
+  /// Configuration for Google Maps Places and Geocoding API requests,
+  /// including language, region, bounds, and whether to use free local geocoding.
   final GoogleAPIParameters googleAPIParameters;
+
+  /// Use free place-marks service from geocoding package to get address from coordinates,
+  /// instead of the priced one provided by Google.
+  final bool useFreeGeocoding;
 
   const PlacePicker({
     super.key,
@@ -300,6 +307,7 @@ class PlacePicker extends StatefulWidget {
     this.cameraTargetBounds = CameraTargetBounds.unbounded,
     this.googleAPIParameters = const GoogleAPIParameters(),
     this.backWidgetBuilder,
+    this.useFreeGeocoding = false,
   });
 
   @override
@@ -1002,6 +1010,17 @@ class PlacePickerState extends State<PlacePicker>
   /// to be the road name and the locality.
   Future<void> _reverseGeocodeLatLng(LatLng latLng,
       {AutoCompleteItem? autoCompleteResult}) async {
+    if (widget.useFreeGeocoding) {
+      await _reverseGeocodeLatLngWithFreeService(latLng,
+          autoCompleteResult: autoCompleteResult);
+    } else {
+      await _reverseGeocodeLatLngWithGoogle(latLng,
+          autoCompleteResult: autoCompleteResult);
+    }
+  }
+
+  Future<void> _reverseGeocodeLatLngWithGoogle(LatLng latLng,
+      {AutoCompleteItem? autoCompleteResult}) async {
     try {
       final response = await googleCommonService.geocode(
         latLng: latLng,
@@ -1016,11 +1035,11 @@ class PlacePickerState extends State<PlacePicker>
       final responseJson = jsonDecode(response.body);
 
       if (responseJson['results'] == null) {
-        throw Future.error("No results found.");
+        throw Exception("No results found.");
       }
 
       if (responseJson["status"] != PlacesDetailsStatus.ok.status) {
-        Future.error(responseJson.toString());
+        throw Exception(responseJson.toString());
       }
 
       /// clear the geocodingResultList
@@ -1256,6 +1275,79 @@ class PlacePickerState extends State<PlacePicker>
             _geocodingResultList.add(geocodingResult);
           }
         }
+      }
+
+      /// if the geocoding result is list is not empty
+      /// set _geocodingResult as the first element of the list
+      if (_geocodingResultList.isNotEmpty) {
+        _geocodingResult = _geocodingResultList.first;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> _reverseGeocodeLatLngWithFreeService(LatLng latLng,
+      {AutoCompleteItem? autoCompleteResult}) async {
+    try {
+      final List<geocoding.Placemark> placemarks =
+          await geocoding.placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        throw Exception("No results found.");
+      }
+
+      /// clear the geocodingResultList
+      _geocodingResultList.clear();
+
+      for (final placemark in placemarks) {
+        final geocodingResult = LocationResult(
+          latLng: latLng,
+          formattedAddress: [
+            placemark.street,
+            placemark.locality,
+            placemark.postalCode,
+            placemark.country,
+          ].where((s) => (s ?? '').trim().isNotEmpty).join(', '),
+          name: placemark.name,
+          streetNumber: AddressComponent(
+            longName: placemark.subThoroughfare,
+            shortName: placemark.subThoroughfare,
+          ),
+          route: AddressComponent(
+            longName: placemark.thoroughfare,
+            shortName: placemark.thoroughfare,
+          ),
+          locality: AddressComponent(
+            longName: placemark.locality,
+            shortName: placemark.locality,
+          ),
+          administrativeAreaLevel1: AddressComponent(
+            longName: placemark.administrativeArea,
+            shortName: placemark.administrativeArea,
+          ),
+          administrativeAreaLevel2: AddressComponent(
+            longName: placemark.subAdministrativeArea,
+            shortName: placemark.subAdministrativeArea,
+          ),
+          subLocalityLevel1: AddressComponent(
+            longName: placemark.subLocality,
+            shortName: placemark.subLocality,
+          ),
+          country: AddressComponent(
+            longName: placemark.country,
+            shortName: placemark.isoCountryCode,
+          ),
+          postalCode: AddressComponent(
+            longName: placemark.postalCode,
+            shortName: placemark.postalCode,
+          ),
+        );
+
+        _geocodingResultList.add(geocodingResult);
       }
 
       /// if the geocoding result is list is not empty

@@ -274,6 +274,7 @@ PACKAGE | INFO
 [http](https://pub.dev/packages/http) | To consume HTTP resources
 [geolocator](https://pub.dev/packages/geolocator) | Access to location services
 [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) | Access to Google Maps widget
+[geocoding](https://pub.dev/packages/geocoding) | Access to free Geocoding services
 
 ## Feature Requests and Issues
 
