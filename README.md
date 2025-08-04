@@ -265,6 +265,28 @@ However, if you don't like this UI/UX, simply override the builder using `select
 
 **Note that using this customization WILL NOT INVOKE `onPlacePicked` callback**
 
+### Free Geocoding (Reduce Google API Billing)
+
+This package supports free geocoding using the [geocoding](https://pub.dev/packages/geocoding) package, which leverages the device’s native geocoding capabilities on iOS and Android.
+
+Benefits
+Avoids Google Geocoding API calls → **Reduce billing costs**
+
+On-device geocoding for common address lookups
+
+Works offline for some platforms (cached or approximated results)
+
+```dart
+await _reverseGeocodeLatLngWithFreeService(
+LatLng(37.7749, -122.4194),
+);
+```
+## Note:
+
+- Native geocoding may provide less detailed results than Google Geocoding API.
+
+- For precise or international addresses, use Google’s API as a fallback.
+
 ## Packages Used
 
 Below are the information about the packages used.
