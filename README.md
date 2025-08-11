@@ -218,7 +218,7 @@ Now in your `Dart` code, you can use:
 import 'package:place_picker_google/place_picker_google.dart';
 ```
 
-### Basic usage
+## Basic usage
 
 You can use PlacePicker by pushing to a new page using Navigator, OR put as a child of any widget.  
 When the user picks a place on the map, it will return result to `onPlacePicked` with `LocationResult` type.
@@ -250,13 +250,13 @@ PlacePicker(
     ),
 ```
 
-### Enabling nearby searches
+## Enabling nearby searches
 
 If you do want to fetch places from a custom location or refresh them when the user moves the map, you must enable /nearbysearch queries in `Place Picker`.
 
 To do that, enable `enableNearbyPlaces` flag in the package.
 
-### Customizing selected place UI
+## Customizing selected place UI
 
 By default, when a user selects a place by using auto complete search or dragging/tapping the map, 
 we display the information at the bottom of the map.
@@ -265,27 +265,22 @@ However, if you don't like this UI/UX, simply override the builder using `select
 
 **Note that using this customization WILL NOT INVOKE `onPlacePicked` callback**
 
-### Free Geocoding (Reduce Google API Billing)
+## Free Geocoding (Reduce Google API Billing)
 
 This package supports free geocoding using the [geocoding](https://pub.dev/packages/geocoding) package, which leverages the device’s native geocoding capabilities on iOS and Android.
 
-Benefits
-Avoids Google Geocoding API calls → **Reduce billing costs**
+Set `useFreeGeocoding` in `PlacePicker` as true to access geocoding API's.
 
-On-device geocoding for common address lookups
+### Benefits
+- Avoids Google Geocoding API calls → **Reduce billing costs**
+- On-device geocoding for common address lookups
+- Works offline for some platforms (cached or approximated results)
 
-Works offline for some platforms (cached or approximated results)
-
-```dart
-await _reverseGeocodeLatLngWithFreeService(
-LatLng(37.7749, -122.4194),
-);
-```
-## Note:
+### Note:
 
 - Native geocoding may provide less detailed results than Google Geocoding API.
-
 - For precise or international addresses, use Google’s API as a fallback.
+- Not available on the web.
 
 ## Packages Used
 
@@ -304,6 +299,10 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/joafc96/place_picker_google/issues/new
 
-## Contributing
+## Support
+
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/JomonJoshyGeorge)
+
+## Contribute
 
 Issues and PRs welcome. Unless otherwise specified, all contributions to this lib will be under MIT license.

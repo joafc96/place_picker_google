@@ -2,6 +2,7 @@
 * Updated http version from 1.4.0 to 1.5.0.
 * Updated google entities to have const constructors.
 * Organised config models to separate config directory.
+* Updated README.md
 
 ## [0.0.20] - 04 Aug 2025
 * Added political attribute. @samfzb
