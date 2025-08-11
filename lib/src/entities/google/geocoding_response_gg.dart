@@ -8,7 +8,7 @@ class GeocodingResponse {
   final List<GeocodingResultGG>? results;
   final String? status;
 
-  GeocodingResponse({
+  const GeocodingResponse({
     this.results,
     this.status,
   });

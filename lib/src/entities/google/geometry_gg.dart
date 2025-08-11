@@ -5,7 +5,7 @@ class GeometryGG {
   final String? locationType;
   final ViewportGG? viewport;
 
-  GeometryGG({
+  const GeometryGG({
     this.location,
     this.locationType,
     this.viewport,

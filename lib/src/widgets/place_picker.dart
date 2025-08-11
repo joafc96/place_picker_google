@@ -1476,11 +1476,14 @@ class PlacePickerState extends State<PlacePicker>
       nearbyPlaces.clear();
 
       for (Map<String, dynamic> item in responseJson['results']) {
-        final nearbyPlace = NearbyPlace()
-          ..name = item['name']
-          ..icon = item['icon']
-          ..latLng = LatLng(item['geometry']['location']['lat'],
-              item['geometry']['location']['lng']);
+        final nearbyPlace = NearbyPlace(
+          name: item['name'],
+          icon: item['icon'],
+          latLng: LatLng(
+            item['geometry']['location']['lat'],
+            item['geometry']['location']['lng'],
+          ),
+        );
 
         nearbyPlaces.add(nearbyPlace);
       }

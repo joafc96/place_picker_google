@@ -2,7 +2,7 @@ class LocationGG {
   final double? lat;
   final double? lng;
 
-  LocationGG({
+  const LocationGG({
     this.lat,
     this.lng,
   });

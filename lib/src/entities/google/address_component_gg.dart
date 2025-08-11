@@ -3,7 +3,7 @@ class AddressComponentGG {
   final String? shortName;
   final List<String>? types;
 
-  AddressComponentGG({
+  const AddressComponentGG({
     this.longName,
     this.shortName,
     this.types,

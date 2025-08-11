@@ -2,7 +2,7 @@ class PlusCodeGG {
   final String? compoundCode;
   final String? globalCode;
 
-  PlusCodeGG({
+  const PlusCodeGG({
     this.compoundCode,
     this.globalCode,
   });

@@ -8,7 +8,7 @@ class GeocodingResultGG {
   final PlusCodeGG? plusCode;
   final List<String>? types;
 
-  GeocodingResultGG({
+  const GeocodingResultGG({
     this.addressComponents,
     this.formattedAddress,
     this.geometry,

@@ -4,7 +4,7 @@ class ViewportGG {
   final LocationGG? northeast;
   final LocationGG? southwest;
 
-  ViewportGG({
+  const ViewportGG({
     this.northeast,
     this.southwest,
   });
