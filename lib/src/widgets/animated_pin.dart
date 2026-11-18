@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:place_picker_google/place_picker_google.dart';
 
 class AnimatedPin extends StatelessWidget {

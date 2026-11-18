@@ -1,3 +1,6 @@
+## [0.3.0] - 18 Nov 2026
+* **Breaking:** migrated from the SDK design libraries (`package:flutter/material.dart`, `package:flutter/cupertino.dart`) to the `material_ui` (^1.11.1) and `cupertino_ui` (^1.1.7) packages. The host app must also be on `material_ui` (its `MaterialApp`/`Theme`, and the `ButtonStyle` / `InputDecoration` values passed in the configs); apps still on the SDK libraries should stay on 0.2.0.
+
 ## [0.2.0] - 18 Nov 2026
 * **Breaking:** minimum Flutter is now 3.47.0 (Dart 3.13).
 * Updated `geocoding` version from 4.0.0 to 5.0.1 (`geocoding_darwin` replaces `geocoding_ios`); free geocoding now goes through the `Geocoding()` instance API.

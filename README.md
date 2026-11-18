@@ -10,7 +10,8 @@ Places autocomplete, My Location, and Nearby places from google maps given you h
 `Places API (New)`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
 
 > **Fork notes**
-> * Requires Flutter 3.47.0 or later.
+> * Requires Flutter 3.47.0 or later and an app built on `material_ui` / `cupertino_ui`
+>   (apps still importing `package:flutter/material.dart` should pin 0.2.0).
 > * Uses **Places API (New)**, not the legacy Places API. It must be enabled as its own service in the
 >   Google Cloud project and listed in the key's API restrictions, otherwise autocomplete returns `REQUEST_DENIED`.
 > * The `example/android` project still targets an older Gradle / Android Gradle Plugin / Kotlin toolchain
