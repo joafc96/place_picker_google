@@ -1,3 +1,17 @@
+## [0.2.0] - 18 Nov 2026
+* **Breaking:** minimum Flutter is now 3.47.0 (Dart 3.13).
+* Updated `geocoding` version from 4.0.0 to 5.0.1 (`geocoding_darwin` replaces `geocoding_ios`); free geocoding now goes through the `Geocoding()` instance API.
+* Updated `google_maps_flutter` version from 2.12.3 to 2.19.0. `PlacePicker.cloudMapId` keeps its name and is forwarded to `GoogleMap.mapId` (`GoogleMap.cloudMapId` is deprecated).
+* Fixed `use_build_context_synchronously` in the location-services dialog (now guarded by the dialog's own `context.mounted`).
+* Fixed sources for the Dart 3.13 language version (`final` parameter modifier, initializing formals).
+* Example now declares its `google_maps_flutter` dependency.
+
+## [0.1.0] - 11 May 2026
+* **Breaking:** migrated from the legacy Places API to **Places API (New)**: autocomplete (`POST places:autocomplete`), nearby search (`POST places:searchNearby`) and place details (`GET places/{id}`). "Places API (New)" must be enabled for the API key. The Geocoding API call is unchanged.
+* The API key is now sent in the `X-Goog-Api-Key` header and fields are selected with `X-Goog-FieldMask`.
+* Fixed nearby place icons rendering as black silhouettes.
+* Added unit tests for the Places service layer.
+
 ## [0.0.21] - 04 Aug 2025
 * Updated http version from 1.4.0 to 1.5.0.
 * Updated google entities to have const constructors.

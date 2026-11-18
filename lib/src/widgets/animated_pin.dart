@@ -12,7 +12,7 @@ class AnimatedPin extends StatelessWidget {
   final PinState state;
 
   @override
-  Widget build(final BuildContext context) {
+  Widget build(BuildContext context) {
     return state == PinState.preparing
         ? const SizedBox.shrink()
         : AnimatedContainer(

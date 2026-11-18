@@ -538,7 +538,7 @@ class PlacePickerState extends State<PlacePicker>
         compassEnabled: widget.compassEnabled,
         mapToolbarEnabled: widget.mapToolbarEnabled,
         trafficEnabled: widget.trafficEnabled,
-        cloudMapId: widget.cloudMapId,
+        mapId: widget.cloudMapId,
         onLongPress: widget.onLongPress,
         polygons: widget.polygons,
         circles: widget.circles,
@@ -1308,7 +1308,7 @@ class PlacePickerState extends State<PlacePicker>
       {AutoCompleteItem? autoCompleteResult}) async {
     try {
       final List<geocoding.Placemark> placemarks =
-          await geocoding.placemarkFromCoordinates(
+          await geocoding.Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
@@ -1603,7 +1603,7 @@ class PlacePickerState extends State<PlacePicker>
                 child: const Text("OK"),
                 onPressed: () {
                   Geolocator.openLocationSettings().then((value) {
-                    if (mounted) Navigator.of(context).pop(true);
+                    if (context.mounted) Navigator.of(context).pop(true);
                   });
                 },
               ),

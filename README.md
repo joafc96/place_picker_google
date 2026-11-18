@@ -7,7 +7,14 @@ A comprehensive, cross-platform google maps place picker library for Flutter.
 
 The package provides common operations for Place picking, 
 Places autocomplete, My Location, and Nearby places from google maps given you have enabled 
-`Places API`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
+`Places API (New)`, `Maps SDK for Android`, `Maps SDK for iOS` and `Geocoding API` for your API key.
+
+> **Fork notes**
+> * Requires Flutter 3.47.0 or later.
+> * Uses **Places API (New)**, not the legacy Places API. It must be enabled as its own service in the
+>   Google Cloud project and listed in the key's API restrictions, otherwise autocomplete returns `REQUEST_DENIED`.
+> * The `example/android` project still targets an older Gradle / Android Gradle Plugin / Kotlin toolchain
+>   and does not build with Flutter 3.47 until it is regenerated.
 
 ## Screenshots
 
