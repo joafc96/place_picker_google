@@ -37,7 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   place_picker_google:
     path: ../
+  google_maps_flutter: ^2.19.0
   flutter_config: ^2.0.2
+  material_ui: ^1.11.1
 
 dev_dependencies:
   flutter_test:

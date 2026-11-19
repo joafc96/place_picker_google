@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:place_picker_google/place_picker_google.dart';
 
 /// Custom Search input field, showing the search and clear icons.

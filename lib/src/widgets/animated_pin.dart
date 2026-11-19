@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:place_picker_google/place_picker_google.dart';
 
 class AnimatedPin extends StatelessWidget {
@@ -12,7 +12,7 @@ class AnimatedPin extends StatelessWidget {
   final PinState state;
 
   @override
-  Widget build(final BuildContext context) {
+  Widget build(BuildContext context) {
     return state == PinState.preparing
         ? const SizedBox.shrink()
         : AnimatedContainer(

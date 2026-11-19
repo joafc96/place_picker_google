@@ -28,13 +28,11 @@ abstract class GoogleMapsHTTPService {
 
   GoogleMapsHTTPService({
     required String apiPath,
-    String? apiKey,
+    this._apiKey,
     String? baseUrl,
     http.Client? httpClient,
-    Map<String, String>? apiHeaders,
-  })  : _httpClient = httpClient ?? http.Client(),
-        _apiKey = apiKey,
-        _apiHeaders = apiHeaders {
+    this._apiHeaders,
+  })  : _httpClient = httpClient ?? http.Client() {
     var uri = kGMapsBaseUrl;
 
     if (baseUrl != null) {
