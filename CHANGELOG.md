@@ -1,3 +1,6 @@
+## [0.3.1] - 20 Nov 2026
+* A place picked from the autocomplete list keeps its own name (the suggestion's main text) and address (the Place Details `formattedAddress`, else the suggestion's full text). Reverse geocoding used to replace both with the nearest street ("300 Webster St" for "Blue Bottle Coffee"), with either geocoding mode. The geocoded address components are kept, and a pick still yields a result when reverse geocoding finds nothing. Tapping the map, dragging the pin or "my location" still name the place by reverse geocoding.
+
 ## [0.3.0] - 18 Nov 2026
 * **Breaking:** migrated from the SDK design libraries (`package:flutter/material.dart`, `package:flutter/cupertino.dart`) to the `material_ui` (^1.11.1) and `cupertino_ui` (^1.1.7) packages. The host app must also be on `material_ui` (its `MaterialApp`/`Theme`, and the `ButtonStyle` / `InputDecoration` values passed in the configs); apps still on the SDK libraries should stay on 0.2.0.
 
