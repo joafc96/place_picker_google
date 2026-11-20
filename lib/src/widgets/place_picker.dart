@@ -948,7 +948,8 @@ class PlacePickerState extends State<PlacePicker>
   /// updates other UI features to
   /// match the location.
   Future<void> animateToLocation(LatLng latLng,
-      {AutoCompleteItem? autoCompleteResult}) async {
+      {AutoCompleteItem? autoCompleteResult,
+      String? pickedFormattedAddress}) async {
     _isAnimating = true;
 
     if (!mounted) {
@@ -977,6 +978,17 @@ class PlacePickerState extends State<PlacePicker>
 
     /// Reverse Geocode Lat Lng
     await _reverseGeocodeLatLng(latLng, autoCompleteResult: autoCompleteResult);
+
+    /// A place picked from the autocomplete list keeps its own name and
+    /// address; reverse geocoding names the nearest street instead.
+    if (autoCompleteResult?.id != null) {
+      _geocodingResult = pickedPlaceResult(
+        latLng: latLng,
+        picked: autoCompleteResult!,
+        geocoded: _geocodingResult,
+        formattedAddress: pickedFormattedAddress,
+      );
+    }
 
     if (widget.enableNearbyPlaces) await _getNearbyPlaces(latLng);
 
@@ -1447,7 +1459,8 @@ class PlacePickerState extends State<PlacePicker>
         selectedNearbyPlace = null;
         await animateToLocation(
             LatLng(location['latitude'], location['longitude']),
-            autoCompleteResult: autoCompleteResult);
+            autoCompleteResult: autoCompleteResult,
+            pickedFormattedAddress: responseJson['formattedAddress'] as String?);
         _searchController.clear();
       }
     } catch (e) {

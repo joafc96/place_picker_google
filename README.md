@@ -13,6 +13,7 @@ Places autocomplete, My Location, and Nearby places from google maps given you h
 > * Requires Flutter 3.47.0 or later and an app built on `material_ui` / `cupertino_ui`
 >   (apps still importing `package:flutter/material.dart` should pin the `hearthmates-0.2.0` tag,
 >   commit `e0f1d1f`, as a git dependency).
+> * A place picked from the search results keeps its own name and address (0.3.1); reverse geocoding names only map taps, pin drags and my location.
 > * Uses **Places API (New)**, not the legacy Places API. It must be enabled as its own service in the
 >   Google Cloud project and listed in the key's API restrictions, otherwise autocomplete returns `REQUEST_DENIED`.
 > * The `example/android` project still targets an older Gradle / Android Gradle Plugin / Kotlin toolchain
