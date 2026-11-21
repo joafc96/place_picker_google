@@ -38,6 +38,10 @@ typedef BackWidgetBuilder = Widget Function(
 /// API key provided should have `Maps SDK for Android`,
 /// `Maps SDK for iOS` and `Places API`  enabled for it
 class PlacePicker extends StatefulWidget {
+  /// Where the map opens, zoomed out with no place selected, when there is
+  /// no [initialLocation] and the device location is unavailable (permission
+  /// denied, location off or no fix). The user then searches, taps the map
+  /// or moves the pin to select a place.
   static const LatLng defaultLocation = LatLng(37.4219983, -122.084);
 
   /// API key generated from Google Cloud Console. You can get an API key
@@ -1005,9 +1009,11 @@ class PlacePickerState extends State<PlacePicker>
       animateToLocation(widget.initialLocation!);
     } else if (_currentLocation != null) {
       animateToLocation(_currentLocation!);
-    } else {
-      animateToLocation(PlacePicker.defaultLocation);
     }
+
+    /// Otherwise the device location is unavailable: the map stays zoomed
+    /// out on [PlacePicker.defaultLocation] with no place selected, rather
+    /// than selecting the default as if the user were there.
   }
 
   /// Callback if user has enabled [myLocationButtonEnabled].
@@ -1032,6 +1038,11 @@ class PlacePickerState extends State<PlacePicker>
         Navigator.of(context).pop();
       }
       debugPrint(e.toString());
+
+      /// The device location is unavailable: keep the current selection.
+      setState(() {
+        _searchingState = SearchingState.idle;
+      });
     }
   }
 
@@ -1335,13 +1346,8 @@ class PlacePickerState extends State<PlacePicker>
       for (final placemark in placemarks) {
         final geocodingResult = LocationResult(
           latLng: latLng,
-          formattedAddress: [
-            placemark.street,
-            placemark.locality,
-            placemark.postalCode,
-            placemark.country,
-          ].where((s) => (s ?? '').trim().isNotEmpty).join(', '),
-          name: placemark.name,
+          formattedAddress: placemarkAddress(placemark),
+          name: placemarkName(placemark),
           streetNumber: AddressComponent(
             longName: placemark.subThoroughfare,
             shortName: placemark.subThoroughfare,
@@ -1510,7 +1516,6 @@ class PlacePickerState extends State<PlacePicker>
 
   /// Get current location API
   Future<LatLng> _getCurrentLocation() async {
-    const fallbackLocation = PlacePicker.defaultLocation;
     const timeoutDuration = Duration(seconds: 10);
 
     /// 1. Ensure location services are enabled
@@ -1561,12 +1566,13 @@ class PlacePickerState extends State<PlacePicker>
       final locationData = await Geolocator.getLastKnownPosition();
       if (locationData != null) {
         return LatLng(locationData.latitude, locationData.longitude);
-      } else {
-        return fallbackLocation;
       }
+
+      /// No fix: the location is unknown, not the default location.
+      return Future.error('Current location is unavailable.');
     } catch (e) {
       debugPrint('Location fetch error: $e');
-      return fallbackLocation;
+      return Future.error('Current location is unavailable.');
     }
   }
 
@@ -1645,11 +1651,11 @@ class PlacePickerState extends State<PlacePicker>
   }
 
   /// Utility function to get clean readable formatted address of a location.
-  String getFormattedLocationName() {
-    if (_geocodingResult == null) {
-      return widget.localizationConfig.unnamedLocation;
-    }
-
-    return "${_geocodingResult?.formattedAddress}";
+  /// Null with no place selected ([getLocationName] already shows
+  /// [LocalizationConfig.unnamedLocation]) or no address (open water), so
+  /// the card shows no address line.
+  String? getFormattedLocationName() {
+    final address = _geocodingResult?.formattedAddress?.trim();
+    return (address == null || address.isEmpty) ? null : address;
   }
 }
